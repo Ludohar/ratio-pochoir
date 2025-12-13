@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ratio pochoir CMS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color-scheme: light;
+    }
+    body {
+      margin: 0;
+      padding: 1rem;
+      background: #f5f5f5;
+    }
+    .app {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 1.25rem 1.5rem 1.5rem;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+    .subtitle {
+      font-size: 0.8rem;
+      color: #555;
+    }
+    .lang-toggle {
+      font-size: 0.8rem;
+      border-radius: 999px;
+      border: 1px solid #ddd;
+      padding: 0.1rem;
+      display: inline-flex;
+      background: #f5f5f5;
+    }
+    .lang-toggle button {
+      border: none;
+      background: transparent;
+      padding: 0.2rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .lang-toggle button.active {
+      background: #007aff;
+      color: #fff;
+    }
+
+    .illustrations {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.75rem;
+      margin: 0.5rem 0 1rem;
+    }
+    .card {
+      background: #fafafa;
+      border-radius: 12px;
+      padding: 0.6rem;
+      border: 1px solid #e3e3e3;
+    }
+    .card img {
+      width: 100%;
+      display: block;
+      border-radius: 8px;
+      object-fit: contain;
+    }
+    .card .caption {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.3rem;
+    }
+
+    .inputs-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+    label {
+      font-size: 0.9rem;
+      display: block;
+    }
+    .label-main {
+      font-weight: 600;
+    }
+    .label-sub {
+      font-size: 0.75rem;
+      color: #555;
+    }
+    input {
+      width: 100%;
+      margin-top: 0.25rem;
+      padding: 0.4rem 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    button.primary {
+      margin-top: 0.5rem;
+      width: 100%;
+      padding: 0.55rem;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: none;
+      background: #007aff;
+      color: white;
+      cursor: pointer;
+    }
+
+    .outputs {
+      margin-top: 0.8rem;
+      border-top: 1px solid #e3e3e3;
+      padding-top: 0.8rem;
+      font-size: 0.9rem;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin: 0.2rem 0;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+    .value {
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+    .badge {
+      padding: 0.1rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+    .ok {
+      background: #d4edda;
+      color: #155724;
+    }
+    .bad {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .note {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.5rem;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Ratio pochoir CMS</h1>
+      <div class="subtitle" id="subtitle">
+        Calcul de l'aspect ratio et de l'area ratio pour ouvertures rectangulaires à coins arrondis.
+      </div>
+    </div>
+    <div class="lang-toggle">
+      <button id="btn-fr" class="active" onclick="setLang('fr')">FR</button>
+      <button id="btn-en" onclick="setLang('en')">EN</button>
+    </div>
+  </header>
+
+  <section class="illustrations">
+    <div class="card">
+      <img src="img_top.png" alt="Vue du dessus, dimensions a et t">
+      <div class="caption" id="capTop">
+        Vue du dessus / Top view — a : petite largeur, t : épaisseur du pochoir.
+      </div>
+    </div>
+    <div class="card">
+      <img src="img_side.png" alt="Vue 3D, dimensions a, b, r, t">
+      <div class="caption" id="capSide">
+        Vue 3D / 3D view — a, b : dimensions de l'ouverture, r : rayon, t : épaisseur.
+      </div>
+    </div>
+  </section>
+
+  <div class="inputs-header">
+    <div id="inputsTitle"><strong>Entrée des dimensions / Enter dimensions</strong></div>
+  </div>
+
+  <div class="grid">
+    <label for="a">
+      <span class="label-main">a</span>
+      <span class="label-sub" id="labelA">
+        petite largeur / short side
+      </span>
+      <input id="a" type="number" step="0.01" inputmode="decimal" oninput="calculate()">
+    </label>
+    <label for="b">
+      <span class="label-main">b</span>
+      <span class="label-sub" id="labelB">
+        grande longueur / long side
+      </span>
+      <input id="b" type="number" step="0.01" inputmode="decimal" oninput="calculate()">
+    </label>
+    <label for="t">
+      <span class="label-main">t</span>
+      <span class="label-sub" id="labelT">
+        épaisseur du pochoir / stencil thickness
+      </span>
+      <input id="t" type="number" step="0.01" inputmode="decimal" oninput="calculate()">
+    </label>
+    <label for="r">
+      <span class="label-main">r</span>
+      <span class="label-sub" id="labelR">
+        rayon des coins / corner radius
+      </span>
+      <input id="r" type="number" step="0.01" inputmode="decimal" oninput="calculate()">
+    </label>
+  </div>
+
+  <button class="primary" type="button" onclick="calculate()" id="btnCalc">
+    Calculer / Calculate
+  </button>
+
+  <div class="outputs">
+    <div class="row">
+      <span id="openRatioLabel">Rapport d'ouverture a / t</span>
+      <span class="value" id="openingRatio">–</span>
+    </div>
+    <div class="row">
+      <span id="openRuleLabel">Règle 1 : a / t ≥ 1,50</span>
+      <span id="openingStatus" class="badge">–</span>
+    </div>
+
+    <div class="row" style="margin-top:0.4rem;">
+      <span id="areaRatioLabel">Rapport de surface (area ratio)</span>
+      <span class="value" id="areaRatio">–</span>
+    </div>
+    <div class="row">
+      <span id="areaRuleLabel">Règle 2 : area ratio ≥ 0,66</span>
+      <span id="areaStatus" class="badge">–</span>
+    </div>
+
+    <p class="note" id="noteText">
+      Utiliser la même unité pour a, b, t et r (µm ou mil).<br>
+      Formules utilisées :<br>
+      &nbsp;&nbsp;• Aspect ratio = a / t<br>
+      &nbsp;&nbsp;• Area ratio = (a·b − r²(4−π)) / (2·t·[a + b + r(π−4)]).
+    </p>
+  </div>
+</div>
+
+<script>
+let currentLang = 'fr';
+
+function formatNumber(x) {
+  return Number.isFinite(x) ? x.toFixed(4) : '–';
+}
+
+function calculate() {
+  const a = parseFloat(document.getElementById('a').value);
+  const b = parseFloat(document.getElementById('b').value);
+  const t = parseFloat(document.getElementById('t').value);
+  const r = parseFloat(document.getElementById('r').value);
+
+  const openingRatioEl = document.getElementById('openingRatio');
+  const areaRatioEl = document.getElementById('areaRatio');
+  const openingStatusEl = document.getElementById('openingStatus');
+  const areaStatusEl = document.getElementById('areaStatus');
+
+  if (!isFinite(a) || !isFinite(b) || !isFinite(t) || !isFinite(r) || t === 0) {
+    openingRatioEl.textContent = '–';
+    areaRatioEl.textContent = '–';
+    openingStatusEl.textContent = '–';
+    openingStatusEl.className = 'badge';
+    areaStatusEl.textContent = '–';
+    areaStatusEl.className = 'badge';
+    return;
+  }
+
+  const openingRatio = a / t;
+
+  const numerator = a * b - r * r * (4 - Math.PI);
+  const denominator = 2 * t * (a + b + r * (Math.PI - 4));
+  const areaRatio = numerator / denominator;
+
+  openingRatioEl.textContent = formatNumber(openingRatio);
+  areaRatioEl.textContent = formatNumber(areaRatio);
+
+  const txtOk = currentLang === 'fr' ? 'OK' : 'OK';
+  const txtSmall = currentLang === 'fr' ? 'Trop petit' : 'Too small';
+
+  if (openingRatio >= 1.5) {
+    openingStatusEl.textContent = txtOk;
+    openingStatusEl.className = 'badge ok';
+  } else {
+    openingStatusEl.textContent = txtSmall;
+    openingStatusEl.className = 'badge bad';
+  }
+
+  if (areaRatio >= 0.66) {
+    areaStatusEl.textContent = txtOk;
+    areaStatusEl.className = 'badge ok';
+  } else {
+    areaStatusEl.textContent = txtSmall;
+    areaStatusEl.className = 'badge bad';
+  }
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  const fr = (lang === 'fr');
+
+  // Boutons FR / EN
+  document.getElementById('btn-fr').classList.toggle('active', fr);
+  document.getElementById('btn-en').classList.toggle('active', !fr);
+
+  // Textes selon la langue
+  document.getElementById('subtitle').textContent = fr
+    ? "Calcul de l'aspect ratio et de l'area ratio pour ouvertures rectangulaires à coins arrondis."
+    : "Aspect ratio and area ratio for rounded-rectangle stencil apertures.";
+
+  document.getElementById('capTop').textContent = fr
+    ? "Vue du dessus — a : petite largeur, t : épaisseur du pochoir."
+    : "Top view — a: short side, t: stencil thickness.";
+
+  document.getElementById('capSide').textContent = fr
+    ? "Vue 3D — a, b : dimensions de l'ouverture, r : rayon, t : épaisseur."
+    : "3D view — a, b: aperture dimensions, r: corner radius, t: thickness.";
+
+  document.getElementById('inputsTitle').innerHTML = fr
+    ? "<strong>Entrée des dimensions</strong>"
+    : "<strong>Enter dimensions</strong>";
+
+  document.getElementById('labelA').textContent = fr
+    ? "petite largeur"
+    : "short side";
+
+  document.getElementById('labelB').textContent = fr
+    ? "grande longueur"
+    : "long side";
+
+  document.getElementById('labelT').textContent = fr
+    ? "épaisseur du pochoir"
+    : "stencil thickness";
+
+  document.getElementById('labelR').textContent = fr
+    ? "rayon des coins"
+    : "corner radius";
+
+  document.getElementById('btnCalc').textContent = fr
+    ? "Calculer"
+    : "Calculate";
+
+  document.getElementById('openRatioLabel').textContent = fr
+    ? "Rapport d'ouverture a / t"
+    : "Opening ratio a / t";
+
+  document.getElementById('openRuleLabel').textContent = fr
+    ? "Règle 1 : a / t ≥ 1,50"
+    : "Rule 1: a / t ≥ 1.50";
+
+  document.getElementById('areaRatioLabel').textContent = fr
+    ? "Rapport de surface (area ratio)"
+    : "Area ratio";
+
+  document.getElementById('areaRuleLabel').textContent = fr
+    ? "Règle 2 : area ratio ≥ 0,66"
+    : "Rule 2: area ratio ≥ 0.66";
+
+  document.getElementById('noteText').innerHTML = fr
+    ? "Utiliser la même unité pour a, b, t et r (µm ou mil).<br>" +
+      "Formules utilisées :<br>" +
+      "&nbsp;&nbsp;• Aspect ratio = a / t<br>" +
+      "&nbsp;&nbsp;• Area ratio = (a·b − r²(4−π)) / (2·t·[a + b + r(π−4)])."
+    : "Use the same unit for a, b, t and r (µm or mil).<br>" +
+      "Formulas used:<br>" +
+      "&nbsp;&nbsp;• Aspect ratio = a / t<br>" +
+      "&nbsp;&nbsp;• Area ratio = (a·b − r²(4−π)) / (2·t·[a + b + r(π−4)]).";
+
+  // On recalcule pour mettre à jour les textes "Trop petit / Too small"
+  calculate();
+}
+
+// Au chargement de la page, on force le français
+window.addEventListener('load', () => {
+  setLang('fr');
+});
+</script>
+</body>
+</html>
