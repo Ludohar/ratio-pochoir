@@ -2,8 +2,15 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Ratio pochoir CMS</title>
+  <title>Ratio de démoulage pochoir</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Déclaration de l'appli web -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Ratio pochoir">
+  <link rel="apple-touch-icon" href="icon-192.png">
 
   <style>
     :root {
@@ -175,7 +182,7 @@
     <div>
       <h1>Ratio pochoir CMS</h1>
       <div class="subtitle" id="subtitle">
-        Calcul de l'aspect ratio et de l'area ratio pour ouvertures rectangulaires à coins arrondis.
+        Calcul du ratio de pénétration et de démoulage.
       </div>
     </div>
     <div class="lang-toggle">
@@ -186,49 +193,49 @@
 
   <section class="illustrations">
     <div class="card">
-      <img src="img_top.png" alt="Vue du dessus, dimensions a et t">
+      <img src="img_top.png" alt="Ratio de pénétration, dimensions a et t">
       <div class="caption" id="capTop">
-        Vue du dessus / Top view — a : petite largeur, t : épaisseur du pochoir.
+        a : largeur, t : épaisseur du pochoir.
       </div>
     </div>
     <div class="card">
       <img src="img_side.png" alt="Vue 3D, dimensions a, b, r, t">
       <div class="caption" id="capSide">
-        Vue 3D / 3D view — a, b : dimensions de l'ouverture, r : rayon, t : épaisseur.
+        a, b : dimensions de l'ouverture, r : rayon, t : épaisseur du pochoir.
       </div>
     </div>
   </section>
 
   <div class="inputs-header">
-    <div id="inputsTitle"><strong>Entrée des dimensions / Enter dimensions</strong></div>
+    <div id="inputsTitle"><strong>Dimensions de l'ouverture / Aperture dimensions</strong></div>
   </div>
 
   <div class="grid">
     <label for="a">
       <span class="label-main">a</span>
       <span class="label-sub" id="labelA">
-        petite largeur / short side
+        Largeur / Width
       </span>
       <input id="a" type="number" step="0.01" inputmode="decimal" oninput="calculate()">
     </label>
     <label for="b">
       <span class="label-main">b</span>
       <span class="label-sub" id="labelB">
-        grande longueur / long side
+        Longueur / Length
       </span>
       <input id="b" type="number" step="0.01" inputmode="decimal" oninput="calculate()">
     </label>
     <label for="t">
       <span class="label-main">t</span>
       <span class="label-sub" id="labelT">
-        épaisseur du pochoir / stencil thickness
+       Épaisseur du pochoir / Stencil thickness
       </span>
       <input id="t" type="number" step="0.01" inputmode="decimal" oninput="calculate()">
     </label>
     <label for="r">
       <span class="label-main">r</span>
       <span class="label-sub" id="labelR">
-        rayon des coins / corner radius
+        Rayon / Radius
       </span>
       <input id="r" type="number" step="0.01" inputmode="decimal" oninput="calculate()">
     </label>
@@ -240,7 +247,7 @@
 
   <div class="outputs">
     <div class="row">
-      <span id="openRatioLabel">Rapport d'ouverture a / t</span>
+      <span id="openRatioLabel">Ratio de pénétration a / t</span>
       <span class="value" id="openingRatio">–</span>
     </div>
     <div class="row">
@@ -249,7 +256,7 @@
     </div>
 
     <div class="row" style="margin-top:0.4rem;">
-      <span id="areaRatioLabel">Rapport de surface (area ratio)</span>
+      <span id="areaRatioLabel">Ratio de démoulage</span>
       <span class="value" id="areaRatio">–</span>
     </div>
     <div class="row">
@@ -333,36 +340,36 @@ function setLang(lang) {
 
   // Textes selon la langue
   document.getElementById('subtitle').textContent = fr
-    ? "Calcul de l'aspect ratio et de l'area ratio pour ouvertures rectangulaires à coins arrondis."
-    : "Aspect ratio and area ratio for rounded-rectangle stencil apertures.";
+    ? "Calcul du ratio de pénétration et de démoulage."
+    : "Aspect ratio and area ratio.";
 
   document.getElementById('capTop').textContent = fr
-    ? "Vue du dessus — a : petite largeur, t : épaisseur du pochoir."
-    : "Top view — a: short side, t: stencil thickness.";
+    ? "a : largeur, t : épaisseur du pochoir."
+    : "a: width, t: stencil thickness.";
 
   document.getElementById('capSide').textContent = fr
-    ? "Vue 3D — a, b : dimensions de l'ouverture, r : rayon, t : épaisseur."
-    : "3D view — a, b: aperture dimensions, r: corner radius, t: thickness.";
+    ? "a, b : dimensions de l'ouverture, r : rayon, t : épaisseur du pochoir."
+    : "a, b: aperture dimensions, r: radius, t: stencil thickness.";
 
   document.getElementById('inputsTitle').innerHTML = fr
     ? "<strong>Entrée des dimensions</strong>"
     : "<strong>Enter dimensions</strong>";
 
   document.getElementById('labelA').textContent = fr
-    ? "petite largeur"
-    : "short side";
+    ? "Largeur"
+    : "Width";
 
   document.getElementById('labelB').textContent = fr
-    ? "grande longueur"
-    : "long side";
+    ? "Longueur"
+    : "Length";
 
   document.getElementById('labelT').textContent = fr
-    ? "épaisseur du pochoir"
-    : "stencil thickness";
+    ? "Épaisseur du pochoir"
+    : "Stencil thickness";
 
   document.getElementById('labelR').textContent = fr
-    ? "rayon des coins"
-    : "corner radius";
+    ? "Rayon"
+    : "Radius";
 
   document.getElementById('btnCalc').textContent = fr
     ? "Calculer"
@@ -402,6 +409,15 @@ function setLang(lang) {
 window.addEventListener('load', () => {
   setLang('fr');
 });
+
+// Enregistrement du service worker pour le mode hors-ligne
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(err => {
+      console.log('SW registration failed', err);
+    });
+  });
+}
 </script>
 </body>
 </html>
