@@ -2,9 +2,10 @@ const CACHE_NAME = 'stencil-ratio-v1';
 const URLS_TO_CACHE = [
   './',
   './index.html',
+  './pip.html',
   './manifest.json',
-  './icon-180.png',
-  './icon-512.png',
+  './icon_180.png',
+  './icon_512.png',
   './img_top.png',
   './img_side.png'
 ];
