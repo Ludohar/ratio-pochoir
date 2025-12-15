@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Ratio pochoir">
-  <link rel="apple-touch-icon" sizes="180x180" href="icon_180.png">
+  <link rel="apple-touch-icon" href="icon_192.png">
 
   <style>
     :root {
@@ -207,42 +207,42 @@
   </section>
 
   <div class="inputs-header">
-    <div id="inputsTitle"><strong>Dimensions de l'ouverture / Aperture dimensions</strong></div>
+    <div id="inputsTitle"><strong>Dimensions de l'ouverture</strong></div>
   </div>
 
   <div class="grid">
     <label for="a">
       <span class="label-main">a</span>
       <span class="label-sub" id="labelA">
-        Largeur / Width
+        Largeur
       </span>
       <input id="a" type="number" step="0.01" inputmode="decimal" oninput="calculate()">
     </label>
     <label for="b">
       <span class="label-main">b</span>
       <span class="label-sub" id="labelB">
-        Longueur / Length
+        Longueur
       </span>
       <input id="b" type="number" step="0.01" inputmode="decimal" oninput="calculate()">
     </label>
     <label for="t">
       <span class="label-main">t</span>
       <span class="label-sub" id="labelT">
-       Épaisseur du pochoir / Stencil thickness
+       Épaisseur du pochoir
       </span>
       <input id="t" type="number" step="0.01" inputmode="decimal" oninput="calculate()">
     </label>
     <label for="r">
       <span class="label-main">r</span>
       <span class="label-sub" id="labelR">
-        Rayon / Radius
+        Rayon
       </span>
       <input id="r" type="number" step="0.01" inputmode="decimal" oninput="calculate()">
     </label>
   </div>
 
   <button class="primary" type="button" onclick="calculate()" id="btnCalc">
-    Calculer / Calculate
+    Calculer
   </button>
 
   <div class="outputs">
@@ -265,11 +265,10 @@
     </div>
 
     <p class="note" id="noteText">
-      Utiliser la même unité pour a, b, t et r (µm ou mil).<br>
-      Formules utilisées :<br>
-      &nbsp;&nbsp;• Aspect ratio = a / t<br>
-      &nbsp;&nbsp;• Area ratio = (a·b − r²(4−π)) / (2·t·[a + b + r(π−4)]).
+      <!-- Texte explicatif géré par JavaScript (setLang) -->
+      Utiliser la même unité pour a, b, t et r (µm ou mil).
     </p>
+
     <p class="note">
       Autre outil : <a href="pip.html">calcul Pin-in-Paste (volume de pâte)</a>.
     </p>
@@ -355,8 +354,8 @@ function setLang(lang) {
     : "a, b: aperture dimensions, r: radius, t: stencil thickness.";
 
   document.getElementById('inputsTitle').innerHTML = fr
-    ? "<strong>Saisir les dimensions</strong>"
-    : "<strong>Enter dimensions</strong>";
+    ? "<strong>Dimensions de l'ouverture</strong>"
+    : "<strong>Aperture dimensions</strong>";
 
   document.getElementById('labelA').textContent = fr
     ? "Largeur"
@@ -379,30 +378,46 @@ function setLang(lang) {
     : "Calculate";
 
   document.getElementById('openRatioLabel').textContent = fr
-    ? "Rapport d'ouverture a / t"
-    : "Opening ratio a / t";
+    ? "Ratio de pénétration a / t"
+    : "Penetration ratio a / t";
 
   document.getElementById('openRuleLabel').textContent = fr
     ? "Règle 1 : a / t ≥ 1,50"
     : "Rule 1: a / t ≥ 1.50";
 
   document.getElementById('areaRatioLabel').textContent = fr
-    ? "Rapport de surface (area ratio)"
-    : "Area ratio";
+    ? "Ratio de démoulage (area ratio)"
+    : "Release ratio (area ratio)";
 
   document.getElementById('areaRuleLabel').textContent = fr
     ? "Règle 2 : area ratio ≥ 0,66"
     : "Rule 2: area ratio ≥ 0.66";
 
+  // Texte d'explication détaillé
   document.getElementById('noteText').innerHTML = fr
     ? "Utiliser la même unité pour a, b, t et r (µm ou mil).<br>" +
-      "Formules utilisées :<br>" +
-      "&nbsp;&nbsp;• Aspect ratio = a / t<br>" +
-      "&nbsp;&nbsp;• Area ratio = (a·b − r²(4−π)) / (2·t·[a + b + r(π−4)])."
+      "<strong>Pourquoi la règle 1 (a / t ≥ 1,50) ?</strong><br>" +
+      "Le ratio de pénétration a / t compare la largeur de l'ouverture à l'épaisseur du pochoir. " +
+      "Si a / t est trop faible, l'ouverture est trop étroite pour l'épaisseur : la raclette remplit mal l'ouverture " +
+      "et la pâte reste plus volontiers collée aux parois qu'au pad. Les recommandations issues de la norme IPC-7525 " +
+      "et de la pratique industrielle visent en général a / t ≥ 1,50 pour obtenir un remplissage stable.<br><br>" +
+      "<strong>Pourquoi la règle 2 (area ratio ≥ 0,66) ?</strong><br>" +
+      "Le ratio de démoulage (area ratio) compare la surface d'ouverture à la surface de contact pâte / parois. " +
+      "En dessous d'environ 0,66, la surface de contact avec les parois devient dominante : la pâte a tendance à rester " +
+      "dans le pochoir lors du démoulage et le volume déposé diminue. C'est pour cela que les recommandations IPC utilisent " +
+      "typiquement un seuil de 0,66 pour garantir un transfert de pâte fiable.<br><br>" +
+      "Formules utilisées : Aspect ratio = a / t ; Area ratio = (a·b − r²(4−π)) / (2·t·[a + b + r(π−4)])."
     : "Use the same unit for a, b, t and r (µm or mil).<br>" +
-      "Formulas used:<br>" +
-      "&nbsp;&nbsp;• Aspect ratio = a / t<br>" +
-      "&nbsp;&nbsp;• Area ratio = (a·b − r²(4−π)) / (2·t·[a + b + r(π−4)]).";
+      "<strong>Why Rule 1 (a / t ≥ 1.50)?</strong><br>" +
+      "The penetration ratio a / t compares aperture width to stencil thickness. When a / t is too low, the aperture is too narrow " +
+      "for the chosen thickness: the squeegee does not completely fill the aperture and the paste tends to adhere to the walls " +
+      "rather than transfer to the pad. IPC-7525 guidelines and common industrial practice typically target a / t ≥ 1.50 " +
+      "for stable filling.<br><br>" +
+      "<strong>Why Rule 2 (area ratio ≥ 0.66)?</strong><br>" +
+      "The release (area) ratio compares the opening area to the wall area in contact with the paste. Below about 0.66, wall contact " +
+      "dominates and the paste tends to stay inside the stencil during separation, which reduces the deposited volume. " +
+      "For this reason IPC-based recommendations often use a threshold of 0.66 to ensure reliable paste transfer.<br><br>" +
+      "Formulas used: Aspect ratio = a / t ; Area ratio = (a·b − r²(4−π)) / (2·t·[a + b + r(π−4)]).";
 
   // On recalcule pour mettre à jour les textes "Trop petit / Too small"
   calculate();
