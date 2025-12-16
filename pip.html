@@ -76,6 +76,17 @@
       font-size: 0.95rem;
       box-sizing: border-box;
     }
+    .radio-group {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 0.25rem;
+      font-size: 0.85rem;
+    }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
     .outputs {
       margin-top: 0.8rem;
       border-top: 1px solid #e3e3e3;
@@ -127,20 +138,49 @@
       <div class="subtitle">
         Estimation du volume de pâte à déposer par pin (approximation).
       </div>
-    </div>
+      <img src="pip_schema.png" alt="Principe Pin-in-Paste : dépôt de pâte, insertion de la broche, refusion">
+     </div>
     <a href="index.html" class="back">← Ratio pochoir</a>
-  </header>
+</header>
 
-  <div class="section-title">1. Trou et composant (en mm)</div>
+  <div class="section-title">1. Trou et broche (en mm)</div>
   <div class="grid">
     <label>
       Diamètre du trou D<sub>trou</sub> [mm]
       <input id="pip_d_hole" type="number" step="0.01" inputmode="decimal" oninput="pip_calculate()">
     </label>
+    <div>
+      Type de broche
+      <div class="radio-group">
+        <label>
+          <input type="radio" name="pip_pin_shape" value="round" checked onchange="pip_updatePinShape()"> Ronde
+        </label>
+        <label>
+          <input type="radio" name="pip_pin_shape" value="rect" onchange="pip_updatePinShape()"> Rectangulaire
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div id="pip_pin_round" class="grid">
     <label>
-      Diamètre de la patte D<sub>pin</sub> [mm]
+      Diamètre de la broche D<sub>pin</sub> [mm]
       <input id="pip_d_pin" type="number" step="0.01" inputmode="decimal" oninput="pip_calculate()">
     </label>
+  </div>
+
+  <div id="pip_pin_rect" class="grid" style="display:none">
+    <label>
+      Largeur broche W<sub>pin</sub> [mm]
+      <input id="pip_w_pin" type="number" step="0.01" inputmode="decimal" oninput="pip_calculate()">
+    </label>
+    <label>
+      Épaisseur broche T<sub>pin</sub> [mm]
+      <input id="pip_t_pin" type="number" step="0.01" inputmode="decimal" oninput="pip_calculate()">
+    </label>
+  </div>
+
+  <div class="grid">
     <label>
       Épaisseur de la carte t<sub>carte</sub> [mm]
       <input id="pip_t_board" type="number" step="0.01" inputmode="decimal" oninput="pip_calculate()">
@@ -173,7 +213,15 @@
 
   <div class="outputs">
     <div class="row">
-      <span>Volume annulaire V<sub>annulaire</sub> (trou − pin) [mm³]</span>
+      <span>Surface trou A<sub>trou</sub> [mm²]</span>
+      <span class="value" id="pip_a_hole">–</span>
+    </div>
+    <div class="row">
+      <span>Surface broche A<sub>pin</sub> [mm²]</span>
+      <span class="value" id="pip_a_pin">–</span>
+    </div>
+    <div class="row">
+      <span>Volume annulaire V<sub>annulaire</sub> (trou − broche) [mm³]</span>
       <span class="value" id="pip_v_annular">–</span>
     </div>
     <div class="row">
@@ -199,8 +247,10 @@
     <p class="note">
       Hypothèses :<br>
       • Toutes les longueurs sont saisies en mm, les volumes affichés sont en mm³.<br>
-      • V<sub>annulaire</sub> ≈ (π/4)·(D<sub>trou</sub>² − D<sub>pin</sub>²)·t<sub>carte</sub> (barillet rempli de soudure).<br>
-      • V<sub>soudure</sub> = k·V<sub>annulaire</sub> pour tenir compte des fillets haut/bas et pertes (k typiquement 1,1 à 1,3).<br>
+      • A<sub>trou</sub> = π·D<sub>trou</sub>²/4.<br>
+      • A<sub>pin</sub> = π·D<sub>pin</sub>²/4 pour une broche ronde, ou W<sub>pin</sub>·T<sub>pin</sub> pour une broche rectangulaire.<br>
+      • V<sub>annulaire</sub> = (A<sub>trou</sub> − A<sub>pin</sub>)·t<sub>carte</sub> (barillet rempli de soudure).<br>
+      • V<sub>soudure</sub> = k·V<sub>annulaire</sub> (k typiquement 1,1 à 1,3).<br>
       • On suppose ~50 % de métal en volume dans la pâte → V<sub>pâte, requis</sub> ≈ 2·V<sub>soudure</sub>.<br>
       • V<sub>pâte, fourni</sub> = N<sub>ouvertures</sub>·(a·b)·t<sub>pochoir</sub>.<br>
       • Ratio entre ~0,9 et 1,3 généralement acceptable ; &lt; 1 → risque de sous-remplissage, &gt; 1,5 → risque d'excès.
@@ -210,6 +260,13 @@
 
 <script>
 const PIP_METAL_FRACTION = 0.5; // 50 % de métal en volume
+
+function pip_updatePinShape() {
+  const shape = document.querySelector('input[name="pip_pin_shape"]:checked').value;
+  document.getElementById('pip_pin_round').style.display = (shape === 'round') ? 'grid' : 'none';
+  document.getElementById('pip_pin_rect').style.display = (shape === 'rect') ? 'grid' : 'none';
+  pip_calculate();
+}
 
 function pip_parse(id) {
   const v = parseFloat(document.getElementById(id).value);
@@ -222,7 +279,6 @@ function pip_fmt(x) {
 
 function pip_calculate() {
   const d_hole = pip_parse('pip_d_hole');
-  const d_pin = pip_parse('pip_d_pin');
   const t_board = pip_parse('pip_t_board');
   const k = pip_parse('pip_k');
   const t_stencil = pip_parse('pip_t_stencil');
@@ -230,6 +286,8 @@ function pip_calculate() {
   const a = pip_parse('pip_a');
   const b = pip_parse('pip_b');
 
+  const a_hole_el = document.getElementById('pip_a_hole');
+  const a_pin_el = document.getElementById('pip_a_pin');
   const v_annular_el = document.getElementById('pip_v_annular');
   const v_solder_el = document.getElementById('pip_v_solder');
   const v_paste_req_el = document.getElementById('pip_v_paste_req');
@@ -237,8 +295,10 @@ function pip_calculate() {
   const ratio_el = document.getElementById('pip_ratio');
   const status_el = document.getElementById('pip_status');
 
-  // Réinitialisation si données insuffisantes
-  if (!d_hole || !d_pin || !t_board || !k || d_hole <= d_pin) {
+  // Reset par défaut
+  function resetAll() {
+    a_hole_el.textContent = '–';
+    a_pin_el.textContent = '–';
     v_annular_el.textContent = '–';
     v_solder_el.textContent = '–';
     v_paste_req_el.textContent = '–';
@@ -246,11 +306,49 @@ function pip_calculate() {
     ratio_el.textContent = '–';
     status_el.textContent = '–';
     status_el.className = 'badge';
+  }
+
+  if (!d_hole || !t_board || !k) {
+    resetAll();
     return;
   }
 
-  // Volume annulaire (mm³)
-  const v_annular = Math.PI * (Math.pow(d_hole, 2) - Math.pow(d_pin, 2)) * t_board / 4;
+  // Surface trou
+  const area_hole = Math.PI * Math.pow(d_hole, 2) / 4;
+
+  // Surface broche selon forme
+  const shape = document.querySelector('input[name="pip_pin_shape"]:checked').value;
+  let area_pin = null;
+
+  if (shape === 'round') {
+    const d_pin = pip_parse('pip_d_pin');
+    if (!d_pin) {
+      resetAll();
+      return;
+    }
+    area_pin = Math.PI * Math.pow(d_pin, 2) / 4;
+    if (d_pin >= d_hole) {
+      resetAll();
+      return;
+    }
+  } else {
+    const w_pin = pip_parse('pip_w_pin');
+    const t_pin = pip_parse('pip_t_pin');
+    if (!w_pin || !t_pin) {
+      resetAll();
+      return;
+    }
+    area_pin = w_pin * t_pin;
+    if (area_pin >= area_hole) {
+      resetAll();
+      return;
+    }
+  }
+
+  a_hole_el.textContent = pip_fmt(area_hole);
+  a_pin_el.textContent = pip_fmt(area_pin);
+
+  const v_annular = (area_hole - area_pin) * t_board;
   const v_solder = k * v_annular;
   const v_paste_req = v_solder / PIP_METAL_FRACTION;
 
@@ -268,10 +366,10 @@ function pip_calculate() {
   }
 
   v_paste_av_el.textContent = pip_fmt(v_paste_avail);
-  ratio_el.textContent = ratio ? ratio.toFixed(2) : '–';
+  ratio_el.textContent = Number.isFinite(ratio) ? ratio.toFixed(2) : '–';
 
   status_el.className = 'badge';
-  if (!ratio) {
+  if (!Number.isFinite(ratio)) {
     status_el.textContent = '–';
     return;
   }
