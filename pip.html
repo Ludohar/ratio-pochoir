@@ -33,7 +33,7 @@
     header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start; /* IMPORTANT: pour que le lien soit en haut */
       gap: 0.75rem;
       margin-bottom: 0.75rem;
     }
@@ -49,6 +49,17 @@
       font-size: 0.8rem;
       text-decoration: none;
       color: #007aff;
+      margin-top: 0.2rem;
+      white-space: nowrap;
+    }
+
+    .pip-figure {
+      margin: 0 0 0.8rem;
+    }
+    .pip-figure img {
+      width: 100%;
+      display: block;
+      border-radius: 8px;
     }
 
     .section-title {
@@ -78,6 +89,7 @@
     }
     .radio-group {
       display: flex;
+      flex-wrap: wrap;          /* pour que ça s’adapte bien en largeur */
       gap: 0.75rem;
       margin-top: 0.25rem;
       font-size: 0.85rem;
@@ -85,7 +97,8 @@
     .radio-group label {
       display: flex;
       align-items: center;
-      gap: 0.25rem;
+      gap: 0.35rem;             /* un peu plus d’espace entre rond et texte */
+      white-space: nowrap;      /* évite que “Ronde” ou “Rectangulaire” se casse en 2 */
     }
     .outputs {
       margin-top: 0.8rem;
@@ -138,10 +151,14 @@
       <div class="subtitle">
         Estimation du volume de pâte à déposer par pin (approximation).
       </div>
-      <img src="pip_schema.png" alt="Principe Pin-in-Paste : dépôt de pâte, insertion de la broche, refusion">
-     </div>
+    </div>
     <a href="index.html" class="back">← Ratio pochoir</a>
-</header>
+  </header>
+
+  <!-- L’illustration est maintenant EN DEHORS du header -->
+  <figure class="pip-figure">
+    <img src="pip_schema.png" alt="Principe du Pin-in-Paste : dépôt de pâte dans le trou, insertion de la broche, refusion.">
+  </figure>
 
   <div class="section-title">1. Trou et broche (en mm)</div>
   <div class="grid">
@@ -295,7 +312,6 @@ function pip_calculate() {
   const ratio_el = document.getElementById('pip_ratio');
   const status_el = document.getElementById('pip_status');
 
-  // Reset par défaut
   function resetAll() {
     a_hole_el.textContent = '–';
     a_pin_el.textContent = '–';
@@ -313,36 +329,22 @@ function pip_calculate() {
     return;
   }
 
-  // Surface trou
   const area_hole = Math.PI * Math.pow(d_hole, 2) / 4;
 
-  // Surface broche selon forme
   const shape = document.querySelector('input[name="pip_pin_shape"]:checked').value;
   let area_pin = null;
 
   if (shape === 'round') {
     const d_pin = pip_parse('pip_d_pin');
-    if (!d_pin) {
-      resetAll();
-      return;
-    }
+    if (!d_pin) { resetAll(); return; }
     area_pin = Math.PI * Math.pow(d_pin, 2) / 4;
-    if (d_pin >= d_hole) {
-      resetAll();
-      return;
-    }
+    if (d_pin >= d_hole) { resetAll(); return; }
   } else {
     const w_pin = pip_parse('pip_w_pin');
     const t_pin = pip_parse('pip_t_pin');
-    if (!w_pin || !t_pin) {
-      resetAll();
-      return;
-    }
+    if (!w_pin || !t_pin) { resetAll(); return; }
     area_pin = w_pin * t_pin;
-    if (area_pin >= area_hole) {
-      resetAll();
-      return;
-    }
+    if (area_pin >= area_hole) { resetAll(); return; }
   }
 
   a_hole_el.textContent = pip_fmt(area_hole);
