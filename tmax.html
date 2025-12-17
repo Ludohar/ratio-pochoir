@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Épaisseur max pochoir</title>
+  <title>Épaisseur max du pochoir</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <link rel="manifest" href="manifest.json">
@@ -166,6 +166,14 @@
         <span class="badge" id="tmax_limiting">–</span>
       </span>
     </div>
+    <div class="row">
+      <span>Aspect ratio a / t<sub>max</sub></span>
+      <span class="value" id="tmax_ar_val">–</span>
+    </div>
+    <div class="row">
+      <span>Area ratio à t<sub>max</sub></span>
+      <span class="value" id="tmax_area_val">–</span>
+    </div>
 
     <p class="note">
       Hypothèses :<br>
@@ -175,6 +183,7 @@
       • t<sub>max, Règle 1</sub> = a / (seuil aspect ratio).<br>
       • t<sub>max, Règle 2</sub> = (a·b − r²(4−π)) / (2·(a + b + r(π−4))·seuil area ratio).<br>
       • t<sub>max</sub> = min(t<sub>max, Règle 1</sub>, t<sub>max, Règle 2</sub>).<br>
+      • Aspect ratio et area ratio affichés sont calculés à t = t<sub>max</sub> recommandé.<br>
       • Si les résultats restent vides (–), vérifier les valeurs saisies (rayon trop grand, a ou b nuls, etc.).
     </p>
   </div>
@@ -201,12 +210,16 @@ function tmax_calculate() {
   const rule2El = document.getElementById('tmax_rule2');
   const globalEl = document.getElementById('tmax_global');
   const limitingEl = document.getElementById('tmax_limiting');
+  const arValEl = document.getElementById('tmax_ar_val');
+  const areaValEl = document.getElementById('tmax_area_val');
 
   // reset
   rule1El.textContent = '–';
   rule2El.textContent = '–';
   globalEl.textContent = '–';
   limitingEl.textContent = '–';
+  arValEl.textContent = '–';
+  areaValEl.textContent = '–';
 
   if (!a || !b || !r || !ar_min || !area_min) {
     return;
@@ -215,13 +228,11 @@ function tmax_calculate() {
   // Règle 1 : a/t >= ar_min  → t <= a / ar_min
   const tmax_rule1 = a / ar_min;
 
-  // Règle 2 : area_ratio = (A) / (2 t P) >= area_min
-  // A = a*b - r^2(4-π), P = a + b + r(π-4)
+  // Règle 2 : area_ratio = A / (2 t P) >= area_min
   const A = a * b - r * r * (4 - Math.PI);
   const P = a + b + r * (Math.PI - 4);
 
   let tmax_rule2 = NaN;
-
   if (A > 0 && P > 0) {
     tmax_rule2 = A / (2 * P * area_min);
   }
@@ -237,13 +248,21 @@ function tmax_calculate() {
   const tmax = Math.min.apply(null, candidates);
   globalEl.textContent = tmax_fmt(tmax);
 
-  // Règle limitante
+  // règle limitante
   if (Math.abs(tmax - tmax_rule1) < Math.abs(tmax - tmax_rule2)) {
     limitingEl.textContent = 'Règle limitante : Règle 1 (a / t)';
   } else if (Number.isFinite(tmax_rule2)) {
     limitingEl.textContent = 'Règle limitante : Règle 2 (area ratio)';
   } else {
     limitingEl.textContent = 'Règle limitante : Règle 1 (a / t)';
+  }
+
+  // Aspect ratio et area ratio à tmax
+  if (Number.isFinite(tmax) && A > 0 && P > 0) {
+    const ar_at_t = a / tmax;
+    const area_at_t = A / (2 * tmax * P);
+    arValEl.textContent = ar_at_t.toFixed(2);
+    areaValEl.textContent = area_at_t.toFixed(3);
   }
 }
 </script>
