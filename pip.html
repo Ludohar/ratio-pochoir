@@ -89,17 +89,25 @@
     }
     .radio-group {
       display: flex;
-      flex-wrap: wrap;          /* pour que ça s’adapte bien en largeur */
-      gap: 0.75rem;
+      flex-wrap: wrap;
+      gap: 1.2rem;
       margin-top: 0.25rem;
       font-size: 0.85rem;
     }
-    .radio-group label {
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;             /* un peu plus d’espace entre rond et texte */
-      white-space: nowrap;      /* évite que “Ronde” ou “Rectangulaire” se casse en 2 */
+
+   .radio-option {
+     display: inline-flex;
+     align-items: center;
+     gap: 0.4rem;
+     white-space: nowrap;
     }
+
+   .radio-option input[type="radio"] {
+     margin: 0;
+     width: 16px;
+     height: 16px;
+    }
+
     .outputs {
       margin-top: 0.8rem;
       border-top: 1px solid #e3e3e3;
@@ -169,12 +177,14 @@
     <div>
       Type de broche
       <div class="radio-group">
-        <label>
-          <input type="radio" name="pip_pin_shape" value="round" checked onchange="pip_updatePinShape()"> Ronde
-        </label>
-        <label>
-          <input type="radio" name="pip_pin_shape" value="rect" onchange="pip_updatePinShape()"> Rectangulaire
-        </label>
+       <label class="radio-option">
+        <input type="radio" name="pip_pin_shape" value="round" checked onchange="pip_updatePinShape()">
+        <span>Ronde</span>
+       </label>
+       <label class="radio-option">
+        <input type="radio" name="pip_pin_shape" value="rect" onchange="pip_updatePinShape()">
+        <span>Rectangulaire</span>
+       </label>
       </div>
     </div>
   </div>
