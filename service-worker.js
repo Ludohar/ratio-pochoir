@@ -1,13 +1,15 @@
-const CACHE_NAME = 'stencil-ratio-v6';
+const CACHE_NAME = 'stencil-ratio-v7';
 const URLS_TO_CACHE = [
   './',
   './index.html',
   './pip.html',
+  './tmax.html',
   './manifest.json',
   './icon_180.png',
   './icon_512.png',
   './img_top.png',
-  './img_side.png'
+  './img_side.png',
+  './pip_schema.png'
 ];
 
 self.addEventListener('install', event => {
