@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Convertisseur d’unités – Sérigraphie</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Outils CMS">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color-scheme: light;
+    }
+    body {
+      margin: 0;
+      padding: 1rem;
+      background: #f5f5f5;
+    }
+    .app {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 1.25rem 1.5rem 1.5rem;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+    .subtitle {
+      font-size: 0.8rem;
+      color: #555;
+    }
+    a.back {
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: #007aff;
+      margin-top: 0.2rem;
+      white-space: nowrap;
+    }
+
+    .section-title {
+      font-weight: 600;
+      margin-top: 0.6rem;
+      margin-bottom: 0.3rem;
+      font-size: 0.95rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+    label {
+      font-size: 0.85rem;
+      display: block;
+    }
+    input, select {
+      width: 100%;
+      margin-top: 0.25rem;
+      padding: 0.4rem 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+    }
+    .outputs {
+      margin-top: 0.4rem;
+      font-size: 0.9rem;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin: 0.1rem 0;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+    .value {
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+    .note {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.5rem;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Convertisseur d’unités – Sérigraphie</h1>
+      <div class="subtitle">
+        Longueurs (µm, mm, mil, pouce) et volumes (mm³, nL).
+      </div>
+    </div>
+    <a href="index.html" class="back">← Ratio pochoir</a>
+  </header>
+
+  <!-- LONGUEURS -->
+  <div class="section-title">1. Longueurs (épaisseur, dimensions d’ouverture)</div>
+  <div class="grid">
+    <label>
+      Valeur à convertir
+      <input id="len_input" type="number" step="0.0001" inputmode="decimal" oninput="convertLength()">
+    </label>
+    <label>
+      Unité de la valeur
+      <select id="len_unit" onchange="convertLength()">
+        <option value="um">µm (micromètre)</option>
+        <option value="mm">mm</option>
+        <option value="mil">mil (1/1000″)</option>
+        <option value="inch">pouce (inch)</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="outputs">
+    <div class="row">
+      <span>µm</span>
+      <span class="value" id="len_um">–</span>
+    </div>
+    <div class="row">
+      <span>mm</span>
+      <span class="value" id="len_mm">–</span>
+    </div>
+    <div class="row">
+      <span>mil</span>
+      <span class="value" id="len_mil">–</span>
+    </div>
+    <div class="row">
+      <span>Pouce (inch)</span>
+      <span class="value" id="len_inch">–</span>
+    </div>
+  </div>
+
+  <p class="note">
+    Rappels : 1 mm = 1000 µm. 1 pouce = 25,4 mm. 1 mil = 0,001 pouce = 25,4 µm.
+  </p>
+
+  <!-- VOLUMES -->
+  <div class="section-title">2. Volumes (dépôt de pâte, SPI/AOI)</div>
+  <div class="grid">
+    <label>
+      Valeur à convertir
+      <input id="vol_input" type="number" step="0.0001" inputmode="decimal" oninput="convertVolume()">
+    </label>
+    <label>
+      Unité de la valeur
+      <select id="vol_unit" onchange="convertVolume()">
+        <option value="mm3">mm³</option>
+        <option value="nl">nL (nanolitre)</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="outputs">
+    <div class="row">
+      <span>mm³</span>
+      <span class="value" id="vol_mm3">–</span>
+    </div>
+    <div class="row">
+      <span>nL</span>
+      <span class="value" id="vol_nl">–</span>
+    </div>
+  </div>
+
+  <p class="note">
+    Rappels : 1 mm³ = 1 µL = 1000 nL.<br>
+    Exemple : un dépôt de 0,30 mm³ correspond à 300 nL.
+  </p>
+</div>
+
+<script>
+function fmt(x, digits = 4) {
+  return Number.isFinite(x) ? x.toFixed(digits) : '–';
+}
+
+function convertLength() {
+  const val = parseFloat(document.getElementById('len_input').value);
+  const unit = document.getElementById('len_unit').value;
+
+  const umEl = document.getElementById('len_um');
+  const mmEl = document.getElementById('len_mm');
+  const milEl = document.getElementById('len_mil');
+  const inchEl = document.getElementById('len_inch');
+
+  if (!isFinite(val)) {
+    umEl.textContent = '–';
+    mmEl.textContent = '–';
+    milEl.textContent = '–';
+    inchEl.textContent = '–';
+    return;
+  }
+
+  // Conversion de départ vers mm
+  let mm;
+  switch (unit) {
+    case 'um':
+      mm = val / 1000;         // 1000 µm = 1 mm
+      break;
+    case 'mm':
+      mm = val;
+      break;
+    case 'mil':
+      mm = val * 0.0254;       // 1 mil = 0,0254 mm
+      break;
+    case 'inch':
+      mm = val * 25.4;         // 1" = 25,4 mm
+      break;
+    default:
+      mm = NaN;
+  }
+
+  const um   = mm * 1000;
+  const mil  = mm / 0.0254;
+  const inch = mm / 25.4;
+
+  umEl.textContent   = fmt(um, 2);
+  mmEl.textContent   = fmt(mm, 4);
+  milEl.textContent  = fmt(mil, 2);
+  inchEl.textContent = fmt(inch, 4);
+}
+
+function convertVolume() {
+  const val = parseFloat(document.getElementById('vol_input').value);
+  const unit = document.getElementById('vol_unit').value;
+
+  const mm3El = document.getElementById('vol_mm3');
+  const nlEl  = document.getElementById('vol_nl');
+
+  if (!isFinite(val)) {
+    mm3El.textContent = '–';
+    nlEl.textContent = '–';
+    return;
+  }
+
+  let mm3;
+  switch (unit) {
+    case 'mm3':
+      mm3 = val;
+      break;
+    case 'nl':
+      mm3 = val / 1000;      // 1 mm³ = 1000 nL
+      break;
+    default:
+      mm3 = NaN;
+  }
+
+  const nl = mm3 * 1000;
+
+  mm3El.textContent = fmt(mm3, 4);
+  nlEl.textContent  = fmt(nl,   1);
+}
+</script>
+</body>
+</html>
