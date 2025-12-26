@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Infos PCB & pochoir</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Outils CMS">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color-scheme: light;
+    }
+    body {
+      margin: 0;
+      padding: 1rem;
+      background: #f5f5f5;
+    }
+    .app {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 1.25rem 1.5rem 1.5rem;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+    .subtitle {
+      font-size: 0.8rem;
+      color: #555;
+    }
+    a.back {
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: #007aff;
+      margin-top: 0.2rem;
+      white-space: nowrap;
+    }
+    section {
+      margin-top: 1rem;
+    }
+    h2 {
+      font-size: 1.0rem;
+      margin: 0 0 0.3rem;
+    }
+    .img-wrapper {
+      margin: 0.4rem 0;
+      overflow-x: auto;
+    }
+    .img-wrapper img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+    p {
+      font-size: 0.85rem;
+      color: #444;
+      line-height: 1.4;
+      margin: 0.3rem 0 0.6rem;
+    }
+    .note {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Infos PCB & pochoir</h1>
+      <div class="subtitle">
+        Rappel visuel de la structure du PCB et du procédé de sérigraphie.
+      </div>
+    </div>
+    <a href="index.html" class="back">← Ratio pochoir</a>
+  </header>
+
+  <section>
+    <h2>1. Coupe du PCB</h2>
+    <div class="img-wrapper">
+      <img src="pcb_profile.png"
+           alt="Coupe d'un PCB montrant le solder mask, les pads et le composant">
+    </div>
+    <p>
+      Ce schéma montre une vue de profil simplifiée de la carte&nbsp;:
+      le substrat <strong>PCB</strong> (FR4) en vert, les <strong>pads cuivre</strong> en jaune
+      et le <strong>solder mask</strong> (vernis épargne) en vert clair.
+      On voit également un composant CMS posé sur la carte.
+    </p>
+    <p>
+      Le solder mask dégage les pads mais recouvre le reste du cuivre, ce qui :
+      limite les ponts de soudure, protège les pistes et définit la zone exacte
+      où la pâte à braser doit être déposée via le pochoir.
+    </p>
+  </section>
+
+  <section>
+    <h2>2. Impression de pâte à braser avec le pochoir</h2>
+    <div class="img-wrapper">
+      <img src="pcb_printing.png"
+           alt="Schéma de sérigraphie : pochoir, racle, solder paste et carte PCB">
+    </div>
+    <p>
+      Ici, on visualise le process de sérigraphie&nbsp;:
+      la <strong>carte PCB</strong> est plaquée contre le <strong>pochoir</strong> (stencil),
+      la <strong>pâte à braser</strong> est déposée devant la <strong>racle</strong>
+      (squeegee), puis la racle se déplace dans la direction indiquée.
+    </p>
+    <p>
+      Sous la pression de la racle, la pâte remplit les ouvertures du pochoir
+      au-dessus des pads dégagés dans le solder mask. Le volume et la forme de ces
+      ouvertures, ainsi que l'épaisseur du pochoir, déterminent le volume de pâte
+      réellement déposé sur les pads.
+    </p>
+  </section>
+
+  <p class="note">
+    Ces schémas sont à but pédagogique pour rappeler visuellement ce que l’on
+    calcule avec les outils de ratio pochoir, Pin-in-Paste, épaisseur max et
+    volume de pâte. Ils ne sont pas à l’échelle.
+  </p>
+</div>
+
+<script>
+// Enregistrement du service worker pour le mode hors-ligne (facultatif mais cohérent)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(err => {
+      console.log('SW registration failed', err);
+    });
+  });
+}
+</script>
+</body>
+</html>
