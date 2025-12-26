@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Volume de pâte – CMS standard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Outils CMS">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color-scheme: light;
+    }
+    body {
+      margin: 0;
+      padding: 1rem;
+      background: #f5f5f5;
+    }
+    .app {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 1.25rem 1.5rem 1.5rem;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+    .subtitle {
+      font-size: 0.8rem;
+      color: #555;
+    }
+    a.back {
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: #007aff;
+      margin-top: 0.2rem;
+      white-space: nowrap;
+    }
+
+    .section-title {
+      font-weight: 600;
+      margin-top: 0.6rem;
+      margin-bottom: 0.3rem;
+      font-size: 0.95rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+    label {
+      font-size: 0.85rem;
+      display: block;
+    }
+    input, select {
+      width: 100%;
+      margin-top: 0.25rem;
+      padding: 0.4rem 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+    }
+    .outputs {
+      margin-top: 0.8rem;
+      border-top: 1px solid #e3e3e3;
+      padding-top: 0.8rem;
+      font-size: 0.9rem;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin: 0.2rem 0;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+    .value {
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+    .badge {
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+    .ok {
+      background: #d4edda;
+      color: #155724;
+    }
+    .warn {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .bad {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .note {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.6rem;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Volume de pâte – CMS standard</h1>
+      <div class="subtitle">
+        Estimation du volume de pâte déposé par composant (ouvertures rectangulaires).
+      </div>
+    </div>
+    <a href="index.html" class="back">← Ratio pochoir</a>
+  </header>
+
+  <div class="section-title">1. Composant et pads (en mm)</div>
+  <div class="grid">
+    <label>
+      Longueur du pad sur PCB L<sub>pad</sub> [mm]
+      <input id="cms_L_pad" type="number" step="0.01" inputmode="decimal" oninput="cms_calculate()">
+    </label>
+    <label>
+      Largeur du pad sur PCB W<sub>pad</sub> [mm]
+      <input id="cms_W_pad" type="number" step="0.01" inputmode="decimal" oninput="cms_calculate()">
+    </label>
+    <label>
+      Nombre de pads du composant N<sub>pads</sub>
+      <input id="cms_N_pads" type="number" step="1" inputmode="numeric" value="2" oninput="cms_calculate()">
+    </label>
+  </div>
+
+  <div class="section-title">2. Pochoir et ouvertures (en mm)</div>
+  <div class="grid">
+    <label>
+      Épaisseur pochoir t<sub>pochoir</sub> [mm]
+      <input id="cms_t_stencil" type="number" step="0.01" inputmode="decimal" oninput="cms_calculate()">
+    </label>
+    <label>
+      Nombre d'ouvertures par pad N<sub>ouv/pad</sub>
+      <input id="cms_N_open" type="number" step="1" inputmode="numeric" value="1" oninput="cms_calculate()">
+    </label>
+    <label>
+      Largeur ouverture a [mm]
+      <input id="cms_a" type="number" step="0.01" inputmode="decimal" oninput="cms_calculate()">
+    </label>
+    <label>
+      Longueur ouverture b [mm]
+      <input id="cms_b" type="number" step="0.01" inputmode="decimal" oninput="cms_calculate()">
+    </label>
+  </div>
+
+  <div class="section-title">3. Volume cible (optionnel)</div>
+  <div class="grid">
+    <label>
+      Volume cible par pad
+      <input id="cms_V_target" type="number" step="0.0001" inputmode="decimal" oninput="cms_calculate()">
+    </label>
+    <label>
+      Unité
+      <select id="cms_V_unit" onchange="cms_calculate()">
+        <option value="mm3">mm³</option>
+        <option value="nl">nL</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="outputs">
+    <div class="row">
+      <span>Volume d'une ouverture V<sub>ouv</sub> [mm³]</span>
+      <span class="value" id="cms_V_ouv_mm3">–</span>
+    </div>
+    <div class="row">
+      <span>Volume d'une ouverture V<sub>ouv</sub> [nL]</span>
+      <span class="value" id="cms_V_ouv_nl">–</span>
+    </div>
+
+    <div class="row" style="margin-top:0.3rem;">
+      <span>Volume par pad V<sub>pad</sub> [mm³]</span>
+      <span class="value" id="cms_V_pad_mm3">–</span>
+    </div>
+    <div class="row">
+      <span>Volume par pad V<sub>pad</sub> [nL]</span>
+      <span class="value" id="cms_V_pad_nl">–</span>
+    </div>
+
+    <div class="row" style="margin-top:0.3rem;">
+      <span>Volume total composant V<sub>total</sub> [mm³]</span>
+      <span class="value" id="cms_V_tot_mm3">–</span>
+    </div>
+    <div class="row">
+      <span>Volume total composant V<sub>total</sub> [nL]</span>
+      <span class="value" id="cms_V_tot_nl">–</span>
+    </div>
+
+    <div class="row" style="margin-top:0.4rem;">
+      <span>Volume cible par pad (converti) [mm³]</span>
+      <span class="value" id="cms_V_target_mm3">–</span>
+    </div>
+    <div class="row">
+      <span>Volume cible par pad (converti) [nL]</span>
+      <span class="value" id="cms_V_target_nl">–</span>
+    </div>
+
+    <div class="row">
+      <span>Ratio V<sub>pad</sub> / V<sub>cible</sub></span>
+      <span>
+        <span class="value" id="cms_ratio">–</span>
+        <span class="badge" id="cms_status">–</span>
+      </span>
+    </div>
+
+    <p class="note">
+      Hypothèses :<br>
+      • Toutes les longueurs sont saisies en mm, les volumes affichés sont en mm³ et nL (1 mm³ = 1000 nL).<br>
+      • Volume d'une ouverture rectangulaire : V<sub>ouv</sub> = a · b · t<sub>pochoir</sub>.<br>
+      • Volume par pad : V<sub>pad</sub> = N<sub>ouv/pad</sub> · V<sub>ouv</sub>.<br>
+      • Volume total composant : V<sub>total</sub> = N<sub>pads</sub> · V<sub>pad</sub>.<br>
+      • Le volume cible par pad (optionnel) permet de comparer le dépôt réel au besoin théorique ou à une mesure SPI/AOI.<br>
+      • Interprétation du ratio V<sub>pad</sub> / V<sub>cible</sub> : &lt; 0,9 = trop faible ; 0,9–1,1 = OK ; 1,1–1,3 = élevé ; &gt; 1,3 = très élevé.
+    </p>
+  </div>
+</div>
+
+<script>
+function cms_parse(id) {
+  const v = parseFloat(document.getElementById(id).value);
+  return isFinite(v) && v > 0 ? v : null;
+}
+
+function cms_fmt(x, digits = 4) {
+  return Number.isFinite(x) ? x.toFixed(digits) : '–';
+}
+
+function cms_calculate() {
+  const L_pad   = cms_parse('cms_L_pad');
+  const W_pad   = cms_parse('cms_W_pad');   // utile pour information mais non utilisé dans V_ouv (ouverture indépendante)
+  const N_pads  = cms_parse('cms_N_pads');
+  const t_sten  = cms_parse('cms_t_stencil');
+  const N_open  = cms_parse('cms_N_open');
+  const a       = cms_parse('cms_a');
+  const b       = cms_parse('cms_b');
+
+  const V_ouv_mm3_el = document.getElementById('cms_V_ouv_mm3');
+  const V_ouv_nl_el  = document.getElementById('cms_V_ouv_nl');
+  const V_pad_mm3_el = document.getElementById('cms_V_pad_mm3');
+  const V_pad_nl_el  = document.getElementById('cms_V_pad_nl');
+  const V_tot_mm3_el = document.getElementById('cms_V_tot_mm3');
+  const V_tot_nl_el  = document.getElementById('cms_V_tot_nl');
+  const V_tar_mm3_el = document.getElementById('cms_V_target_mm3');
+  const V_tar_nl_el  = document.getElementById('cms_V_target_nl');
+  const ratio_el     = document.getElementById('cms_ratio');
+  const status_el    = document.getElementById('cms_status');
+
+  // reset
+  V_ouv_mm3_el.textContent = '–';
+  V_ouv_nl_el.textContent  = '–';
+  V_pad_mm3_el.textContent = '–';
+  V_pad_nl_el.textContent  = '–';
+  V_tot_mm3_el.textContent = '–';
+  V_tot_nl_el.textContent  = '–';
+  V_tar_mm3_el.textContent = '–';
+  V_tar_nl_el.textContent  = '–';
+  ratio_el.textContent     = '–';
+  status_el.textContent    = '–';
+  status_el.className      = 'badge';
+
+  // il faut au minimum a, b, t_sten et N_pads, N_open
+  if (!a || !b || !t_sten || !N_pads || !N_open) {
+    return;
+  }
+
+  // Volume d'une ouverture
+  const V_ouv_mm3 = a * b * t_sten;
+  const V_ouv_nl  = V_ouv_mm3 * 1000;
+
+  // Volume par pad
+  const V_pad_mm3 = V_ouv_mm3 * N_open;
+  const V_pad_nl  = V_pad_mm3 * 1000;
+
+  // Volume total composant
+  const V_tot_mm3 = V_pad_mm3 * N_pads;
+  const V_tot_nl  = V_tot_mm3 * 1000;
+
+  V_ouv_mm3_el.textContent = cms_fmt(V_ouv_mm3, 4);
+  V_ouv_nl_el.textContent  = cms_fmt(V_ouv_nl, 1);
+  V_pad_mm3_el.textContent = cms_fmt(V_pad_mm3, 4);
+  V_pad_nl_el.textContent  = cms_fmt(V_pad_nl, 1);
+  V_tot_mm3_el.textContent = cms_fmt(V_tot_mm3, 4);
+  V_tot_nl_el.textContent  = cms_fmt(V_tot_nl, 1);
+
+  // Volume cible (optionnel)
+  const V_tar_in = parseFloat(document.getElementById('cms_V_target').value);
+  const unit     = document.getElementById('cms_V_unit').value;
+
+  if (!isFinite(V_tar_in) || V_tar_in <= 0) {
+    return;
+  }
+
+  let V_tar_mm3;
+  if (unit === 'mm3') {
+    V_tar_mm3 = V_tar_in;
+  } else { // nL
+    V_tar_mm3 = V_tar_in / 1000;
+  }
+  const V_tar_nl = V_tar_mm3 * 1000;
+
+  V_tar_mm3_el.textContent = cms_fmt(V_tar_mm3, 4);
+  V_tar_nl_el.textContent  = cms_fmt(V_tar_nl, 1);
+
+  // Ratio V_pad / V_cible
+  const ratio = V_pad_mm3 / V_tar_mm3;
+  ratio_el.textContent = cms_fmt(ratio, 2);
+
+  if (!Number.isFinite(ratio)) {
+    return;
+  }
+
+  if (ratio < 0.9) {
+    status_el.textContent = 'Trop faible';
+    status_el.className = 'badge bad';
+  } else if (ratio <= 1.1) {
+    status_el.textContent = 'OK';
+    status_el.className = 'badge ok';
+  } else if (ratio <= 1.3) {
+    status_el.textContent = 'Élevé';
+    status_el.className = 'badge warn';
+  } else {
+    status_el.textContent = 'Très élevé';
+    status_el.className = 'badge bad';
+  }
+}
+
+// Service worker pour mode hors-ligne (cohérent avec le reste)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(err => {
+      console.log('SW registration failed', err);
+    });
+  });
+}
+</script>
+</body>
+</html>
