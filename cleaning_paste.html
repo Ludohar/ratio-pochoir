@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Nettoyage pochoir & vie de la pâte</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Outils CMS">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color-scheme: light;
+    }
+    body {
+      margin: 0;
+      padding: 1rem;
+      background: #f5f5f5;
+    }
+    .app {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 1.25rem 1.5rem 1.5rem;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+    .subtitle {
+      font-size: 0.8rem;
+      color: #555;
+    }
+    a.back {
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: #007aff;
+      margin-top: 0.2rem;
+      white-space: nowrap;
+    }
+
+    .section-title {
+      font-weight: 600;
+      margin-top: 0.8rem;
+      margin-bottom: 0.3rem;
+      font-size: 0.95rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+    label {
+      font-size: 0.85rem;
+      display: block;
+    }
+    input, select {
+      width: 100%;
+      margin-top: 0.25rem;
+      padding: 0.4rem 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+    }
+    .help {
+      font-size: 0.75rem;
+      color: #666;
+    }
+    .outputs {
+      margin-top: 0.4rem;
+      font-size: 0.9rem;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin: 0.2rem 0;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+    .value {
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+    .badge {
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      background: #e9ecef;
+      color: #495057;
+    }
+    .ok {
+      background: #d4edda;
+      color: #155724;
+    }
+    .warn {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .bad {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .note {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.6rem;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Nettoyage pochoir & vie de la pâte</h1>
+      <div class="subtitle">
+        Aide pour la fréquence de nettoyage et le suivi de l’utilisation de la pâte sur la machine.
+      </div>
+    </div>
+    <a href="index.html" class="back">← Ratio pochoir</a>
+  </header>
+
+  <!-- 1. Nettoyage pochoir -->
+  <div class="section-title">1. Fréquence de nettoyage pochoir</div>
+  <div class="grid">
+    <label>
+      Nombre de panneaux entre deux nettoyages
+      <span class="help">(impressions consécutives avant nettoyage)</span>
+      <input id="cp_panels_between_clean" type="number" step="1" inputmode="numeric" oninput="cp_calculate()">
+    </label>
+    <label>
+      Cartes par panneau
+      <span class="help">(nombre de PCB individuelles par panneau)</span>
+      <input id="cp_boards_per_panel" type="number" step="1" inputmode="numeric" oninput="cp_calculate()">
+    </label>
+    <label>
+      Cycle impression imprimante [s/panneau]
+      <span class="help">(temps entre deux impressions consécutives d’un panneau)</span>
+      <input id="cp_cycle_time" type="number" step="0.1" inputmode="decimal" oninput="cp_calculate()">
+    </label>
+    <label>
+      Plus petite ouverture / pas le plus fin [mm]
+      <span class="help">(optionnel, pour l’évaluation de la fréquence)</span>
+      <input id="cp_min_aperture" type="number" step="0.01" inputmode="decimal" oninput="cp_calculate()">
+    </label>
+  </div>
+
+  <div class="outputs">
+    <div class="row">
+      <span>Nombre total de cartes imprimées entre deux nettoyages</span>
+      <span class="value" id="cp_boards_between_clean">–</span>
+    </div>
+    <div class="row">
+      <span>Temps entre deux nettoyages [min]</span>
+      <span class="value" id="cp_time_between_clean_min">–</span>
+    </div>
+    <div class="row">
+      <span>Temps entre deux nettoyages [h]</span>
+      <span class="value" id="cp_time_between_clean_h">–</span>
+    </div>
+    <div class="row">
+      <span>Évaluation de la fréquence de nettoyage</span>
+      <span class="badge" id="cp_clean_status">–</span>
+    </div>
+    <div class="row">
+      <span>Commentaire</span>
+      <span class="value" id="cp_clean_comment">–</span>
+    </div>
+
+    <p class="note">
+      Repères généraux (à adapter à ton process) :<br>
+      • Pour des ouvertures/pas très fins (≤ 0,30&nbsp;mm), on a tendance à nettoyer plus souvent (par exemple tous les 5–10 panneaux, ou ~10–20&nbsp;minutes).<br>
+      • Pour du pas plus grossier, on peut souvent espacer les nettoyages, sous réserve que la SPI et l’aspect restent corrects.<br>
+      • L’outil donne un avis indicatif “OK / à surveiller / trop espacé” en fonction du pas le plus fin et du temps entre nettoyages.
+    </p>
+  </div>
+
+  <!-- 2. Vie de la pâte sur pochoir -->
+  <div class="section-title">2. Vie de la pâte sur le pochoir</div>
+  <div class="grid">
+    <label>
+      Durée max recommandée sur pochoir [h]
+      <span class="help">(valeur datasheet fournisseur de pâte)</span>
+      <input id="cp_paste_max_h" type="number" step="0.1" inputmode="decimal" oninput="cp_calculate()">
+    </label>
+    <label>
+      Durée d’utilisation prévue / actuelle [h]
+      <span class="help">(temps total déjà passé sur le pochoir à température de ligne)</span>
+      <input id="cp_paste_used_h" type="number" step="0.1" inputmode="decimal" oninput="cp_calculate()">
+    </label>
+  </div>
+
+  <div class="outputs">
+    <div class="row">
+      <span>Taux d’utilisation de la limite</span>
+      <span class="value" id="cp_paste_usage_pct">–</span>
+    </div>
+    <div class="row">
+      <span>Durée restante estimée [h]</span>
+      <span class="value" id="cp_paste_remaining_h">–</span>
+    </div>
+    <div class="row">
+      <span>Évaluation</span>
+      <span class="badge" id="cp_paste_status">–</span>
+    </div>
+
+    <p class="note">
+      Repères indiqués :<br>
+      • &lt; 70&nbsp;% de la durée max&nbsp;: <strong>OK</strong> (sous réserve de la SPI et de l’aspect de la pâte).<br>
+      • 70–100&nbsp;%&nbsp;: <strong>à surveiller</strong> (finir le pot / la cartouche, éviter de prolonger encore beaucoup).<br>
+      • &gt; 100&nbsp;%&nbsp;: <strong>au-delà de la limite</strong> datasheet (risque sur l’imprimabilité et la qualité des joints).<br>
+      Toujours se référer aux recommandations du fournisseur de pâte à braser.
+    </p>
+  </div>
+
+  <p class="note">
+    Cet outil fournit des <strong>repères</strong> pour animer les bonnes pratiques sur la ligne (quand nettoyer le pochoir, quand renouveler la pâte).
+    Les décisions finales doivent rester basées sur la SPI, l’AOI, l’expérience terrain et les datasheets des matériaux.
+  </p>
+</div>
+
+<script>
+function cp_parse(id) {
+  const v = parseFloat(document.getElementById(id).value);
+  return isFinite(v) && v > 0 ? v : null;
+}
+
+function cp_fmt(x, digits = 2) {
+  return Number.isFinite(x) ? x.toFixed(digits) : '–';
+}
+
+function cp_setBadge(elId, text, cls) {
+  const el = document.getElementById(elId);
+  el.textContent = text;
+  el.className = 'badge' + (cls ? ' ' + cls : '');
+}
+
+function cp_calculate() {
+  // Nettoyage pochoir
+  const panels   = cp_parse('cp_panels_between_clean');
+  const boardsPP = cp_parse('cp_boards_per_panel');
+  const cycle_s  = cp_parse('cp_cycle_time');
+  const a_min    = cp_parse('cp_min_aperture');
+
+  const boardsBetweenEl = document.getElementById('cp_boards_between_clean');
+  const timeMinEl       = document.getElementById('cp_time_between_clean_min');
+  const timeHEl         = document.getElementById('cp_time_between_clean_h');
+  const cleanStatusEl   = 'cp_clean_status';
+  const cleanCommentEl  = document.getElementById('cp_clean_comment');
+
+  boardsBetweenEl.textContent = '–';
+  timeMinEl.textContent = '–';
+  timeHEl.textContent = '–';
+  cp_setBadge(cleanStatusEl, '–', '');
+  cleanCommentEl.textContent = 'Saisir au moins le nombre de panneaux, le cycle et, si possible, le pas le plus fin.';
+
+  if (panels && boardsPP && cycle_s) {
+    const totalBoards = panels * boardsPP;
+    const totalTime_s = panels * cycle_s;
+    const totalTime_min = totalTime_s / 60;
+    const totalTime_h   = totalTime_min / 60;
+
+    boardsBetweenEl.textContent = cp_fmt(totalBoards, 0);
+    timeMinEl.textContent       = cp_fmt(totalTime_min, 1);
+    timeHEl.textContent         = cp_fmt(totalTime_h, 2);
+
+    // Évaluation de la fréquence en fonction de a_min et du temps
+    let status = 'ok';
+    let msg = '';
+
+    if (a_min) {
+      // Cas pas très fin
+      if (a_min <= 0.30) {
+        if (totalTime_min > 30 || panels > 20) {
+          status = 'bad';
+          msg = "Pour du pas ≤ 0,30 mm, un nettoyage toutes les 5–10 impressions (~10–20 min) est souvent préférable.";
+        } else if (totalTime_min > 20 || panels > 10) {
+          status = 'warn';
+          msg = "Pour du pas fin, la fréquence semble un peu espacée. À valider avec la SPI.";
+        } else {
+          status = 'ok';
+          msg = "Fréquence de nettoyage cohérente pour du pas fin (sous réserve de la SPI).";
+        }
+      } else {
+        // Pas plus grossier
+        if (totalTime_min > 60 || panels > 40) {
+          status = 'warn';
+          msg = "Fréquence assez espacée : vérifier régulièrement la SPI et l'état du pochoir.";
+        } else {
+          status = 'ok';
+          msg = "Fréquence raisonnable pour du pas plus grossier, sous réserve de la SPI.";
+        }
+      }
+    } else {
+      // Sans info de pas, on reste prudent
+      if (totalTime_min > 45) {
+        status = 'warn';
+        msg = "Sans info sur le pas, un intervalle > 45 min peut être limite. À adapter selon le produit.";
+      } else {
+        status = 'ok';
+        msg = "Intervalle de nettoyage raisonnable, à ajuster selon le retour SPI et produit.";
+      }
+    }
+
+    if (status === 'ok') {
+      cp_setBadge(cleanStatusEl, 'OK', 'ok');
+    } else if (status === 'warn') {
+      cp_setBadge(cleanStatusEl, 'À surveiller', 'warn');
+    } else {
+      cp_setBadge(cleanStatusEl, 'Trop espacé', 'bad');
+    }
+    cleanCommentEl.textContent = msg;
+  }
+
+  // Vie de la pâte
+  const pasteMax_h  = cp_parse('cp_paste_max_h');
+  const pasteUsed_h = cp_parse('cp_paste_used_h');
+
+  const usagePctEl = document.getElementById('cp_paste_usage_pct');
+  const remainingEl = document.getElementById('cp_paste_remaining_h');
+  const pasteStatusId = 'cp_paste_status';
+
+  usagePctEl.textContent = '–';
+  remainingEl.textContent = '–';
+  cp_setBadge(pasteStatusId, '–', '');
+
+  if (pasteMax_h && pasteUsed_h !== null) {
+    const usage = (pasteUsed_h / pasteMax_h) * 100;
+    const remaining = pasteMax_h - pasteUsed_h;
+
+    usagePctEl.textContent = cp_fmt(usage, 1) + ' %';
+    remainingEl.textContent = remaining > 0 ? cp_fmt(remaining, 2) : '0';
+
+    if (usage < 70) {
+      cp_setBadge(pasteStatusId, 'OK', 'ok');
+    } else if (usage <= 100) {
+      cp_setBadge(pasteStatusId, 'À surveiller', 'warn');
+    } else {
+      cp_setBadge(pasteStatusId, 'Au-delà de la limite', 'bad');
+    }
+  }
+}
+
+// Service worker pour mode hors-ligne
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(err => {
+      console.log('SW registration failed', err);
+    });
+  });
+}
+</script>
+</body>
+</html>

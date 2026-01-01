@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Défauts & outils à utiliser</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Outils CMS">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color-scheme: light;
+    }
+    body {
+      margin: 0;
+      padding: 1rem;
+      background: #f5f5f5;
+    }
+    .app {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 1.25rem 1.5rem 1.5rem;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+    .subtitle {
+      font-size: 0.8rem;
+      color: #555;
+    }
+    a.back {
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: #007aff;
+      margin-top: 0.2rem;
+      white-space: nowrap;
+    }
+    .note {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.4rem;
+      line-height: 1.4;
+    }
+
+    .section-title {
+      font-weight: 600;
+      margin-top: 0.8rem;
+      margin-bottom: 0.3rem;
+      font-size: 0.95rem;
+    }
+
+    .defect-card {
+      border-radius: 14px;
+      border: 1px solid #e3e3e3;
+      padding: 0.8rem 0.9rem;
+      margin-top: 0.6rem;
+      background: #fafafa;
+    }
+    .defect-header {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0.2rem;
+    }
+    .defect-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .defect-tag {
+      font-size: 0.7rem;
+      padding: 0.1rem 0.55rem;
+      border-radius: 999px;
+      background: #e9ecef;
+      color: #495057;
+      white-space: nowrap;
+    }
+    .defect-desc {
+      font-size: 0.8rem;
+      color: #555;
+      margin-bottom: 0.3rem;
+    }
+    .sub-heading {
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-top: 0.4rem;
+      margin-bottom: 0.15rem;
+    }
+    ul {
+      margin: 0;
+      padding-left: 1.1rem;
+      margin-bottom: 0.2rem;
+    }
+    ul li {
+      font-size: 0.8rem;
+      margin-bottom: 0.1rem;
+    }
+    .tool-name {
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Défauts & outils à utiliser</h1>
+      <div class="subtitle">
+        Pour chaque défaut observé, où regarder sur la ligne et quels modules de l’appli utiliser.
+      </div>
+    </div>
+    <a href="index.html" class="back">← Ratio pochoir</a>
+  </header>
+
+  <p class="note">
+    Cette page sert de <strong>mémo rapide</strong> pour orienter la recherche de causes&nbsp;:
+    quand un défaut apparaît, on repère le type de défaut ci-dessous, puis on regarde
+    quels réglages et quels outils de l’application peuvent aider à analyser la situation.
+  </p>
+
+  <div class="section-title">1. Défauts liés à l’impression de pâte</div>
+
+  <!-- 1. Manque de pâte -->
+  <div class="defect-card">
+    <div class="defect-header">
+      <div class="defect-title">1. Manque de pâte / ouverture partiellement remplie</div>
+      <div class="defect-tag">Étape : impression</div>
+    </div>
+    <div class="defect-desc">
+      Pâte insuffisante sur certains pads, souvent plus marqué sur les petites ouvertures ou aux bords du PCB.
+    </div>
+    <div class="sub-heading">À vérifier sur la ligne</div>
+    <ul>
+      <li>Aspect ratio et area ratio des ouvertures (pads les plus critiques).</li>
+      <li>Épaisseur de pochoir adaptée au pas le plus fin.</li>
+      <li>Pression de racle : suffisante mais sans excès.</li>
+      <li>Vitesse de racle et séparation (décollement pochoir/PCB).</li>
+      <li>Tension du pochoir et planéité de l’appui.</li>
+      <li>État de la pâte (temps sur pochoir, viscosité, mélange).</li>
+      <li>Fréquence de nettoyage du pochoir (dessous et éventuellement dessus).</li>
+    </ul>
+    <div class="sub-heading">Outils de l’application utiles</div>
+    <ul>
+      <li><span class="tool-name">Ratio pochoir</span> : vérifier l’aspect ratio et l’area ratio des ouvertures critiques.</li>
+      <li><span class="tool-name">tmax (épaisseur max pochoir)</span> : confirmer que l’épaisseur choisie reste compatible avec les ouvertures.</li>
+      <li><span class="tool-name">Réglage impression</span> : ajuster pression, vitesse, tension pochoir, TE SPI.</li>
+      <li><span class="tool-name">Nettoyage & pâte</span> : vérifier l’intervalle de nettoyage et la durée d’utilisation de la pâte.</li>
+      <li><span class="tool-name">Volume pâte CMS / PiP</span> : comparer volumes théoriques et volumes SPI mesurés.</li>
+    </ul>
+  </div>
+
+  <!-- 2. Excès de pâte / ponts de brasure -->
+  <div class="defect-card">
+    <div class="defect-header">
+      <div class="defect-title">2. Excès de pâte / ponts de brasure (bridging)</div>
+      <div class="defect-tag">Étape : impression + refusion</div>
+    </div>
+    <div class="defect-desc">
+      Pâte en trop, joint de brasure qui relie deux pads adjacents (surtout entre pattes fines).
+    </div>
+    <div class="sub-heading">À vérifier sur la ligne</div>
+    <ul>
+      <li>Surface d’ouverture pochoir trop généreuse sur les pads fins (pas réduction suffisante).</li>
+      <li>Épaisseur de pochoir trop élevée pour le pas utilisé.</li>
+      <li>Pression de racle trop forte, bavures, smearing.</li>
+      <li>Vitesse de racle trop élevée, pâte poussée sous le pochoir.</li>
+      <li>Profil refusion : TAL ou pic trop élevés → brasure très fluide qui “court”.</li>
+      <li>Quantité de flux / type de pâte (mouillage très actif).</li>
+    </ul>
+    <div class="sub-heading">Outils de l’application utiles</div>
+    <ul>
+      <li><span class="tool-name">Ratio pochoir</span> : vérifier l’area ratio et ajuster les ouvertures si nécessaire.</li>
+      <li><span class="tool-name">tmax</span> : revoir l’épaisseur de pochoir pour les pas fins.</li>
+      <li><span class="tool-name">Réglage impression</span> : diminuer la pression de racle, ajuster la vitesse et la séparation.</li>
+      <li><span class="tool-name">Profil refusion</span> : contrôler TAL et pic par rapport aux plages recommandées.</li>
+    </ul>
+  </div>
+
+  <!-- 3. Solder balls / boules de brasure -->
+  <div class="defect-card">
+    <div class="defect-header">
+      <div class="defect-title">3. Solder balls / boules de brasure</div>
+      <div class="defect-tag">Étape : impression + refusion</div>
+    </div>
+    <div class="defect-desc">
+      Petites billes de brasure autour des pads ou entre pistes après refusion.
+    </div>
+    <div class="sub-heading">À vérifier sur la ligne</div>
+    <ul>
+      <li>Pâte trop vieille ou trop longtemps restée sur le pochoir (séparation flux / poudre).</li>
+      <li>Volume de pâte trop important par pad / débordements.</li>
+      <li>Profil refusion : rampe trop agressive ou soak insuffisant pour évacuer les solvants.</li>
+      <li>Nettoyage pochoir insuffisant, résidus qui se transfèrent.</li>
+    </ul>
+    <div class="sub-heading">Outils de l’application utiles</div>
+    <ul>
+      <li><span class="tool-name">Nettoyage & pâte</span> : vérifier la durée d’utilisation de la pâte vs. limite datasheet.</li>
+      <li><span class="tool-name">Volume pâte CMS / PiP</span> : contrôler les volumes imprimés.</li>
+      <li><span class="tool-name">Profil refusion</span> : vérifier la pente, le soak et le TAL par rapport aux plages.</li>
+      <li><span class="tool-name">Réglage impression</span> : ajuster pression/vitesse si la pâte “bave” en impression.</li>
+    </ul>
+  </div>
+
+  <!-- 4. Décalage d’impression -->
+  <div class="defect-card">
+    <div class="defect-header">
+      <div class="defect-title">4. Décalage d’impression (offset)</div>
+      <div class="defect-tag">Étape : impression</div>
+    </div>
+    <div class="defect-desc">
+      Pâte déposée décalée par rapport aux pads cuivre, parfois dans une direction dominante.
+    </div>
+    <div class="sub-heading">À vérifier sur la ligne</div>
+    <ul>
+      <li>Réglage d’alignement de l’imprimante (fiducials, offset X/Y).</li>
+      <li>Fixation du pochoir, jeu mécanique, tension insuffisante.</li>
+      <li>Planéité du support PCB / outillage (support central, pins).</li>
+      <li>Pression racle trop élevée ou trop faible entraînant un glissement du pochoir.</li>
+      <li>Nettoyage dessous pochoir (pâte résiduelle qui décale le contact).</li>
+    </ul>
+    <div class="sub-heading">Outils de l’application utiles</div>
+    <ul>
+      <li><span class="tool-name">Réglage impression</span> : tension pochoir, pression, TE SPI, vitesse de séparation.</li>
+      <li><span class="tool-name">Nettoyage & pâte</span> : ajuster la fréquence de nettoyage pour limiter les résidus.</li>
+      <li><span class="tool-name">Infos PCB & pochoir</span> : rappeler la configuration couche cuivre / vernis pour l’appui.</li>
+    </ul>
+  </div>
+
+  <!-- 5. Tombstoning / composants qui se relèvent -->
+  <div class="defect-card">
+    <div class="defect-header">
+      <div class="defect-title">5. Tombstoning / composants verticaux</div>
+      <div class="defect-tag">Étape : refusion (lié impression + design)</div>
+    </div>
+    <div class="defect-desc">
+      Petits passifs (0201, 0402, 0603…) qui se relèvent et restent soudés sur un seul pad.
+    </div>
+    <div class="sub-heading">À vérifier sur la ligne</div>
+    <ul>
+      <li>Symétrie des volumes de pâte entre les deux pads (surface d’ouverture pochoir).</li>
+      <li>Réduction d’ouverture identique sur les deux côtés du composant.</li>
+      <li>Profil refusion : rampe et TAL (fusion progressive, mouillage symétrique).</li>
+      <li>Placement des composants (décentrage éventuel sur un pad).</li>
+    </ul>
+    <div class="sub-heading">Outils de l’application utiles</div>
+    <ul>
+      <li><span class="tool-name">Ratio pochoir</span> : vérifier area ratio et équilibrage des ouvertures pour les passifs sensibles.</li>
+      <li><span class="tool-name">Volume pâte CMS</span> : comparer volumes théoriques sur les deux pads d’un même composant.</li>
+      <li><span class="tool-name">Profil refusion</span> : vérifier que la pente et le TAL restent dans la plage recommandée.</li>
+    </ul>
+  </div>
+
+  <!-- 6. Voids sur pads de puissance / thermal pads -->
+  <div class="defect-card">
+    <div class="defect-header">
+      <div class="defect-title">6. Voids importants sur pads de puissance / thermal pads</div>
+      <div class="defect-tag">Étape : impression + refusion</div>
+    </div>
+    <div class="defect-desc">
+      Cavités de gaz dans la brasure sous un boîtier de puissance (QFN, DPAK, etc.).
+    </div>
+    <div class="sub-heading">À vérifier sur la ligne</div>
+    <ul>
+      <li>Pattern d’ouverture pochoir (découpe en “fenêtres”, pour laisser sortir les gaz).</li>
+      <li>Volume total de pâte sur le pad thermique.</li>
+      <li>Profil refusion : soak suffisamment long pour évacuer les solvants avant la fusion complète.</li>
+      <li>Vie de la pâte (pâte vieille → volatils plus difficiles à évacuer).</li>
+    </ul>
+    <div class="sub-heading">Outils de l’application utiles</div>
+    <ul>
+      <li><span class="tool-name">Volume pâte CMS</span> : vérifier le volume théorique sur les thermal pads.</li>
+      <li><span class="tool-name">Profil refusion</span> : ajuster soak et TAL pour limiter les voids.</li>
+      <li><span class="tool-name">Nettoyage & pâte</span> : vérifier la durée d’utilisation de la pâte sur pochoir.</li>
+    </ul>
+  </div>
+
+  <!-- 7. Broches / trous PiP pas assez remplis -->
+  <div class="defect-card">
+    <div class="defect-header">
+      <div class="defect-title">7. Broches / trous PiP insuffisamment remplis</div>
+      <div class="defect-tag">Étape : impression + refusion</div>
+    </div>
+    <div class="defect-desc">
+      Pâte insuffisante pour remplir correctement les trous métallisés des composants Pin-in-Paste.
+    </div>
+    <div class="sub-heading">À vérifier sur la ligne</div>
+    <ul>
+      <li>Volume théorique de pâte vs volume du trou à remplir.</li>
+      <li>Forme et dimensions des ouvertures pochoir (rectangles, croix, multiples).</li>
+      <li>Épaisseur de pochoir (souvent besoin de plus épais ou de zones step-up).</li>
+      <li>Profil refusion : mouillage suffisant, TAL adapté.</li>
+    </ul>
+    <div class="sub-heading">Outils de l’application utiles</div>
+    <ul>
+      <li><span class="tool-name">PiP (Pin-in-Paste)</span> : calcul du volume de pâte nécessaire vs volume du trou.</li>
+      <li><span class="tool-name">tmax</span> : cohérence de l’épaisseur pochoir par rapport aux besoins PiP.</li>
+      <li><span class="tool-name">Profil refusion</span> : vérifier TAL et pic pour assurer un bon remplissage.</li>
+    </ul>
+  </div>
+
+  <!-- 8. Joints ternes / mauvais mouillage -->
+  <div class="defect-card">
+    <div class="defect-header">
+      <div class="defect-title">8. Joints ternes / mauvais mouillage</div>
+      <div class="defect-tag">Étape : refusion (lié pâte + profil)</div>
+    </div>
+    <div class="defect-desc">
+      Joints de brasure ternes, mouillage incomplet sur la pad ou la broche, parfois associés à des défauts électriques.
+    </div>
+    <div class="sub-heading">À vérifier sur la ligne</div>
+    <ul>
+      <li>Profil refusion : TAL suffisant et pic correctement positionné par rapport au liquidus.</li>
+      <li>Pâte (date de fabrication, stockage, durée sur pochoir).</li>
+      <li>Oxydation éventuelle des pads ou des broches (stockage cartes/composants).</li>
+      <li>Épaisseur et volume de pâte (trop faible → mouillage visuellement pauvre).</li>
+    </ul>
+    <div class="sub-heading">Outils de l’application utiles</div>
+    <ul>
+      <li><span class="tool-name">Profil refusion</span> : contrôler rampe, soak, TAL, pic vs plage recommandée.</li>
+      <li><span class="tool-name">Nettoyage & pâte</span> : vérifier la durée d’utilisation de la pâte vs limite fournisseur.</li>
+      <li><span class="tool-name">Volume pâte CMS</span> : confirmer que le volume imprimé n’est pas trop faible.</li>
+    </ul>
+  </div>
+
+  <p class="note">
+    Cette checklist ne remplace pas les analyses plus détaillées (8D, Ishikawa, etc.), mais fournit un
+    <strong>point d’entrée rapide</strong> pour utiliser les bons modules de l’application en fonction du défaut observé.
+  </p>
+</div>
+
+<script>
+// Service worker pour mode hors-ligne
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(err => {
+      console.log('SW registration failed', err);
+    });
+  });
+}
+</script>
+</body>
+</html>

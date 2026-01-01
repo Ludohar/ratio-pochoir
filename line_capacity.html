@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Capacité ligne CMS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Outils CMS">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color-scheme: light;
+    }
+    body {
+      margin: 0;
+      padding: 1rem;
+      background: #f5f5f5;
+    }
+    .app {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 1.25rem 1.5rem 1.5rem;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+    .subtitle {
+      font-size: 0.8rem;
+      color: #555;
+    }
+    a.back {
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: #007aff;
+      margin-top: 0.2rem;
+      white-space: nowrap;
+    }
+
+    .section-title {
+      font-weight: 600;
+      margin-top: 0.8rem;
+      margin-bottom: 0.3rem;
+      font-size: 0.95rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+    label {
+      font-size: 0.85rem;
+      display: block;
+    }
+    input {
+      width: 100%;
+      margin-top: 0.25rem;
+      padding: 0.4rem 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+    }
+    .help {
+      font-size: 0.75rem;
+      color: #666;
+    }
+    .outputs {
+      margin-top: 0.4rem;
+      font-size: 0.9rem;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin: 0.2rem 0;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+    .value {
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+    .badge {
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      background: #e9ecef;
+      color: #495057;
+    }
+    .ok {
+      background: #d4edda;
+      color: #155724;
+    }
+    .warn {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .bad {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .note {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.6rem;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Capacité ligne CMS</h1>
+      <div class="subtitle">
+        Estimation de la capacité en cartes/heure et identification du goulot d’étranglement.
+      </div>
+    </div>
+    <a href="index.html" class="back">← Ratio pochoir</a>
+  </header>
+
+  <div class="section-title">1. Paramètres généraux</div>
+  <div class="grid">
+    <label>
+      Cartes par panneau
+      <span class="help">Nombre de PCB individuelles par panneau.</span>
+      <input id="lc_boards_per_panel" type="number" step="1" inputmode="numeric" oninput="lc_calculate()">
+    </label>
+    <label>
+      Objectif de production [cartes/h]
+      <span class="help">Optionnel, pour comparer à la capacité calculée.</span>
+      <input id="lc_target_cph" type="number" step="1" inputmode="numeric" oninput="lc_calculate()">
+    </label>
+  </div>
+
+  <div class="section-title">2. Temps cycle par station (ligne simple en série)</div>
+  <div class="grid">
+    <label>
+      Imprimante pâte [s/panneau]
+      <span class="help">Temps entre deux impressions consécutives du même panneau.</span>
+      <input id="lc_ct_printer" type="number" step="0.1" inputmode="decimal" oninput="lc_calculate()">
+    </label>
+    <label>
+      Placeur 1 [s/panneau]
+      <span class="help">Temps cycle programme pour le panneau.</span>
+      <input id="lc_ct_placer1" type="number" step="0.1" inputmode="decimal" oninput="lc_calculate()">
+    </label>
+    <label>
+      Placeur 2 [s/panneau] (optionnel)
+      <span class="help">Laisser vide si non utilisé ou inconnu.</span>
+      <input id="lc_ct_placer2" type="number" step="0.1" inputmode="decimal" oninput="lc_calculate()">
+    </label>
+    <label>
+      Placeur 3 [s/panneau] (optionnel)
+      <span class="help">Laisser vide si non utilisé ou inconnu.</span>
+      <input id="lc_ct_placer3" type="number" step="0.1" inputmode="decimal" oninput="lc_calculate()">
+    </label>
+    <label>
+      Four refusion [s/panneau]
+      <span class="help">Temps de passage pour un panneau (ou équivalent).</span>
+      <input id="lc_ct_oven" type="number" step="0.1" inputmode="decimal" oninput="lc_calculate()">
+    </label>
+  </div>
+
+  <div class="section-title">3. Capacités théoriques par station</div>
+  <div class="outputs">
+    <div class="row">
+      <span>Imprimante pâte [cartes/h]</span>
+      <span class="value" id="lc_cap_printer">–</span>
+    </div>
+    <div class="row">
+      <span>Placeur 1 [cartes/h]</span>
+      <span class="value" id="lc_cap_placer1">–</span>
+    </div>
+    <div class="row">
+      <span>Placeur 2 [cartes/h]</span>
+      <span class="value" id="lc_cap_placer2">–</span>
+    </div>
+    <div class="row">
+      <span>Placeur 3 [cartes/h]</span>
+      <span class="value" id="lc_cap_placer3">–</span>
+    </div>
+    <div class="row">
+      <span>Four refusion [cartes/h]</span>
+      <span class="value" id="lc_cap_oven">–</span>
+    </div>
+  </div>
+
+  <div class="section-title">4. Synthèse ligne</div>
+  <div class="outputs">
+    <div class="row">
+      <span>Goulot d’étranglement (station la plus lente)</span>
+      <span class="value" id="lc_bottleneck_name">–</span>
+    </div>
+    <div class="row">
+      <span>Capacité du goulot [cartes/h]</span>
+      <span class="value" id="lc_bottleneck_cap">–</span>
+    </div>
+    <div class="row">
+      <span>Capacité globale théorique ligne [cartes/h]</span>
+      <span class="value" id="lc_line_cap">–</span>
+    </div>
+    <div class="row">
+      <span>Comparaison à l’objectif</span>
+      <span class="badge" id="lc_target_status">–</span>
+    </div>
+    <div class="row">
+      <span>Commentaire</span>
+      <span class="value" id="lc_target_comment">–</span>
+    </div>
+
+    <p class="note">
+      Hypothèses :<br>
+      • On considère une ligne en série : la capacité globale est limitée par la station la plus lente (goulot).<br>
+      • Les temps indiqués sont des temps cycle <strong>moyens</strong> en régime stabilisé (sans longs arrêts).<br>
+      • Les valeurs obtenues sont des capacités <strong>théoriques</strong> : la capacité réelle sera plus faible
+        (changements de série, micro-arrêts, contrôles, etc.).
+    </p>
+  </div>
+
+  <p class="note">
+    Conseils d’utilisation :<br>
+    • Saisir le nombre de cartes par panneau, puis les temps cycle par station.<br>
+    • L’outil calcule les cartes/h par station, identifie le goulot et indique si l’objectif de cartes/h est atteignable.<br>
+    • Pour équilibrer la ligne, on cherche à rapprocher les capacités des différentes stations, en particulier celles en amont du goulot.
+  </p>
+</div>
+
+<script>
+function lc_parse(id) {
+  const v = parseFloat(document.getElementById(id).value);
+  return isFinite(v) && v > 0 ? v : null;
+}
+
+function lc_fmt(x, digits = 0) {
+  return Number.isFinite(x) ? x.toFixed(digits) : '–';
+}
+
+function lc_setBadge(id, text, cls) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'badge' + (cls ? ' ' + cls : '');
+}
+
+function lc_calculate() {
+  const boardsPerPanel = lc_parse('lc_boards_per_panel');
+  const targetCph      = lc_parse('lc_target_cph');
+
+  const ct_printer = lc_parse('lc_ct_printer');
+  const ct_placer1 = lc_parse('lc_ct_placer1');
+  const ct_placer2 = lc_parse('lc_ct_placer2');
+  const ct_placer3 = lc_parse('lc_ct_placer3');
+  const ct_oven    = lc_parse('lc_ct_oven');
+
+  const capPrinterEl = document.getElementById('lc_cap_printer');
+  const capPl1El     = document.getElementById('lc_cap_placer1');
+  const capPl2El     = document.getElementById('lc_cap_placer2');
+  const capPl3El     = document.getElementById('lc_cap_placer3');
+  const capOvenEl    = document.getElementById('lc_cap_oven');
+
+  const bottNameEl   = document.getElementById('lc_bottleneck_name');
+  const bottCapEl    = document.getElementById('lc_bottleneck_cap');
+  const lineCapEl    = document.getElementById('lc_line_cap');
+  const tgtCommentEl = document.getElementById('lc_target_comment');
+
+  // Reset
+  capPrinterEl.textContent = capPl1El.textContent = capPl2El.textContent =
+    capPl3El.textContent = capOvenEl.textContent = '–';
+  bottNameEl.textContent = '–';
+  bottCapEl.textContent  = '–';
+  lineCapEl.textContent  = '–';
+  lc_setBadge('lc_target_status', '–', '');
+  tgtCommentEl.textContent = 'Saisir au minimum les cartes/panneau, les temps cycle et éventuellement un objectif.';
+
+  if (!boardsPerPanel) {
+    // Sans cartes/panneau, on ne peut pas calculer de capacité en cartes/h
+    return;
+  }
+
+  // Capacité en cartes/h = (3600 / temps_s_par_panneau) * cartes_par_panneau
+  function capacity(ct_s) {
+    if (!ct_s || ct_s <= 0) return null;
+    return 3600 / ct_s * boardsPerPanel;
+  }
+
+  const capPrinter = capacity(ct_printer);
+  const capPl1     = capacity(ct_placer1);
+  const capPl2     = capacity(ct_placer2);
+  const capPl3     = capacity(ct_placer3);
+  const capOven    = capacity(ct_oven);
+
+  capPrinterEl.textContent = lc_fmt(capPrinter);
+  capPl1El.textContent     = lc_fmt(capPl1);
+  capPl2El.textContent     = lc_fmt(capPl2);
+  capPl3El.textContent     = lc_fmt(capPl3);
+  capOvenEl.textContent    = lc_fmt(capOven);
+
+  const stations = [];
+  if (capPrinter) stations.push({ name: 'Imprimante', cap: capPrinter });
+  if (capPl1)     stations.push({ name: 'Placeur 1',   cap: capPl1 });
+  if (capPl2)     stations.push({ name: 'Placeur 2',   cap: capPl2 });
+  if (capPl3)     stations.push({ name: 'Placeur 3',   cap: capPl3 });
+  if (capOven)    stations.push({ name: 'Four',        cap: capOven });
+
+  if (stations.length === 0) {
+    tgtCommentEl.textContent = 'Saisir au moins un temps cycle pour afficher une capacité.';
+    return;
+  }
+
+  // Goulot = station avec la plus faible capacité
+  let bottleneck = stations[0];
+  for (let i = 1; i < stations.length; i++) {
+    if (stations[i].cap < bottleneck.cap) {
+      bottleneck = stations[i];
+    }
+  }
+
+  bottNameEl.textContent = bottleneck.name;
+  bottCapEl.textContent  = lc_fmt(bottleneck.cap);
+  lineCapEl.textContent  = lc_fmt(bottleneck.cap);
+
+  // Comparaison à l’objectif
+  if (!targetCph) {
+    lc_setBadge('lc_target_status', '–', '');
+    tgtCommentEl.textContent = "Capacité calculée affichée. Saisir un objectif cartes/h pour une évaluation plus complète.";
+    return;
+  }
+
+  const cap = bottleneck.cap;
+  if (!cap || cap <= 0) {
+    lc_setBadge('lc_target_status', '–', '');
+    tgtCommentEl.textContent = "Impossible d’évaluer l’objectif : capacité non calculable.";
+    return;
+  }
+
+  if (targetCph <= 0.9 * cap) {
+    lc_setBadge('lc_target_status', 'OK', 'ok');
+    tgtCommentEl.textContent =
+      "Objectif atteignable avec une marge raisonnable, sous réserve de limiter les arrêts.";
+  } else if (targetCph <= cap) {
+    lc_setBadge('lc_target_status', 'Limite', 'warn');
+    tgtCommentEl.textContent =
+      "Objectif atteignable mais très proche de la capacité du goulot : faible marge pour les arrêts.";
+  } else {
+    lc_setBadge('lc_target_status', 'Non atteignable', 'bad');
+    tgtCommentEl.textContent =
+      "Avec les temps cycle saisis, l’objectif dépasse la capacité du goulot. " +
+      "Réduire les temps cycle, modifier le paneling ou revoir l’objectif.";
+  }
+}
+
+// Service worker pour mode hors-ligne
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(err => {
+      console.log('SW registration failed', err);
+    });
+  });
+}
+</script>
+</body>
+</html>

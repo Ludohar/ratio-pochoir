@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Assistant tombstoning passifs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Outils CMS">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color-scheme: light;
+    }
+    body {
+      margin: 0;
+      padding: 1rem;
+      background: #f5f5f5;
+    }
+    .app {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 1.25rem 1.5rem 1.5rem;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+    .subtitle {
+      font-size: 0.8rem;
+      color: #555;
+    }
+    a.back {
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: #007aff;
+      margin-top: 0.2rem;
+      white-space: nowrap;
+    }
+
+    .section-title {
+      font-weight: 600;
+      margin-top: 0.8rem;
+      margin-bottom: 0.3rem;
+      font-size: 0.95rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+    label {
+      font-size: 0.85rem;
+      display: block;
+    }
+    input, select {
+      width: 100%;
+      margin-top: 0.25rem;
+      padding: 0.4rem 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+    }
+    .help {
+      font-size: 0.75rem;
+      color: #666;
+    }
+    .pad-block {
+      border-radius: 14px;
+      border: 1px solid #e3e3e3;
+      padding: 0.6rem 0.7rem;
+      background: #fafafa;
+    }
+    .pad-title {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.3rem;
+    }
+    .same-pads {
+      font-size: 0.8rem;
+      margin-bottom: 0.3rem;
+    }
+    .same-pads input {
+      margin-right: 0.3rem;
+    }
+
+    .outputs {
+      margin-top: 0.4rem;
+      font-size: 0.9rem;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin: 0.2rem 0;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+    .value {
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+    .badge {
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      background: #e9ecef;
+      color: #495057;
+    }
+    .ok {
+      background: #d4edda;
+      color: #155724;
+    }
+    .warn {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .bad {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .note {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.6rem;
+      line-height: 1.4;
+    }
+    .shape-param {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Assistant tombstoning passifs</h1>
+      <div class="subtitle">
+        Comparaison des deux pads (cuivre, ouvertures, volumes de pâte) pour évaluer le déséquilibre.
+      </div>
+    </div>
+    <a href="index.html" class="back">← Ratio pochoir</a>
+  </header>
+
+  <div class="section-title">1. Données composant</div>
+  <div class="grid">
+    <label>
+      Type de composant (indicatif)
+      <select id="tb_type" onchange="tb_calculate()">
+        <option value="">—</option>
+        <option value="0201">0201</option>
+        <option value="0402">0402</option>
+        <option value="0603">0603</option>
+        <option value="0805">0805</option>
+        <option value="autre">Autre</option>
+      </select>
+    </label>
+    <label>
+      Épaisseur pochoir t [mm]
+      <span class="help">Utiliser t en mm (ex. 0,10 mm = 100 µm). Si vide, le calcul de volume reste relatif.</span>
+      <input id="tb_t" type="number" step="0.001" inputmode="decimal" oninput="tb_onPad1Change()">
+    </label>
+    <label>
+      Entraxe centre-à-centre P [mm]
+      <span class="help">Distance entre centres des deux pads cuivre (pitch).</span>
+      <input id="tb_pitch" type="number" step="0.001" inputmode="decimal" oninput="tb_calculate()">
+    </label>
+  </div>
+
+  <div class="section-title">2. Pads et ouvertures de pochoir</div>
+  <div class="same-pads">
+    <label>
+      <input type="checkbox" id="tb_same_pads" onchange="tb_syncPadsFromCheckbox()">
+      Pads 1 et 2 identiques (le pad 2 est recopié automatiquement à partir du pad 1).
+    </label>
+  </div>
+
+  <div class="grid">
+    <div class="pad-block">
+      <div class="pad-title">Pad 1</div>
+      <label>
+        Longueur pad cuivre L1 [mm]
+        <input id="tb_L1" type="number" step="0.001" inputmode="decimal" oninput="tb_onPad1Change()">
+      </label>
+      <label>
+        Largeur pad cuivre W1 [mm]
+        <input id="tb_W1" type="number" step="0.001" inputmode="decimal" oninput="tb_onPad1Change()">
+      </label>
+      <label>
+        Longueur ouverture pochoir a1 [mm]
+        <input id="tb_a1" type="number" step="0.001" inputmode="decimal" oninput="tb_onPad1Change()">
+      </label>
+      <label>
+        Largeur ouverture pochoir b1 [mm]
+        <input id="tb_b1" type="number" step="0.001" inputmode="decimal" oninput="tb_onPad1Change()">
+      </label>
+    </div>
+
+    <div class="pad-block">
+      <div class="pad-title">Pad 2</div>
+      <label>
+        Longueur pad cuivre L2 [mm]
+        <input id="tb_L2" type="number" step="0.001" inputmode="decimal" oninput="tb_calculate()">
+      </label>
+      <label>
+        Largeur pad cuivre W2 [mm]
+        <input id="tb_W2" type="number" step="0.001" inputmode="decimal" oninput="tb_calculate()">
+      </label>
+      <label>
+        Longueur ouverture pochoir a2 [mm]
+        <input id="tb_a2" type="number" step="0.001" inputmode="decimal" oninput="tb_calculate()">
+      </label>
+      <label>
+        Largeur ouverture pochoir b2 [mm]
+        <input id="tb_b2" type="number" step="0.001" inputmode="decimal" oninput="tb_calculate()">
+      </label>
+    </div>
+  </div>
+
+  <div class="section-title">3. Modèle d’ouverture pochoir (facultatif)</div>
+  <div class="grid">
+    <label>
+      Type d’ouverture (appliqué à partir des pads cuivre)
+      <select id="tb_shape" onchange="tb_apply_shape()">
+        <option value="none">— aucun (saisie manuelle des ouvertures)</option>
+        <option value="full">Rectangulaire plein (ouverture ≈ pad cuivre)</option>
+        <option value="rect_reduc">Réduction rectangulaire sous le composant (% de L)</option>
+        <option value="k_reduc">Réduction dents de scie (triangle retiré, % de L)</option>
+      </select>
+    </label>
+
+    <div id="tb_rect_wrapper" class="shape-param">
+      <label>
+        Réduction rectangulaire sous composant [% de L]
+        <span class="help">Exemple : 20 % → ouverture plus courte de 20 % côté composant (a ≈ 0,8 · L).</span>
+        <input id="tb_rect_reduc" type="number" step="1" inputmode="numeric" oninput="tb_apply_shape()">
+      </label>
+    </div>
+
+    <div id="tb_k_wrapper" class="shape-param">
+      <label>
+        Réduction dents de scie (triangle) [% de L]
+        <span class="help">
+          Largeur de la base du triangle retiré, en % de la longueur L (ex. 25 % → triangle de base 0,25·L,
+          surface équivalente ≈ rectangle de longueur 0,875·L).
+        </span>
+        <input id="tb_k_reduc" type="number" step="1" inputmode="numeric" oninput="tb_apply_shape()">
+      </label>
+    </div>
+  </div>
+
+  <p class="note">
+    Le modèle d’ouverture ne fait qu’<strong>aider à remplir a1, b1, a2, b2</strong> à partir des longueurs/largeurs cuivre.
+    Tu peux aussi saisir directement les dimensions d’ouverture si tu préfères.
+  </p>
+
+  <div class="section-title">4. Analyse du déséquilibre</div>
+  <div class="outputs">
+    <div class="row">
+      <span>Entraxe P [mm]</span>
+      <span class="value" id="tb_pitch_val">–</span>
+    </div>
+    <div class="row">
+      <span>Évaluation entraxe (par type)</span>
+      <span class="badge" id="tb_pitch_status">–</span>
+    </div>
+    <div class="row">
+      <span>Commentaire sur l'entraxe</span>
+      <span class="value" id="tb_pitch_comment">–</span>
+    </div>
+
+    <div class="row" style="margin-top:0.4rem;">
+      <span>Surface cuivre pad 1 [mm²]</span>
+      <span class="value" id="tb_cu1">–</span>
+    </div>
+    <div class="row">
+      <span>Surface cuivre pad 2 [mm²]</span>
+      <span class="value" id="tb_cu2">–</span>
+    </div>
+    <div class="row">
+      <span>Rapport surfaces cuivre (plus petit / plus grand)</span>
+      <span class="value" id="tb_cu_ratio">–</span>
+    </div>
+
+    <div class="row" style="margin-top:0.4rem;">
+      <span>Surface ouverture pochoir pad 1 [mm²]</span>
+      <span class="value" id="tb_st1">–</span>
+    </div>
+    <div class="row">
+      <span>Surface ouverture pochoir pad 2 [mm²]</span>
+      <span class="value" id="tb_st2">–</span>
+    </div>
+    <div class="row">
+      <span>Rapport surfaces ouvertures (plus petite / plus grande)</span>
+      <span class="value" id="tb_st_ratio">–</span>
+    </div>
+
+    <div class="row" style="margin-top:0.4rem;">
+      <span>Volume pâte pad 1 [mm³]</span>
+      <span class="value" id="tb_v1">–</span>
+    </div>
+    <div class="row">
+      <span>Volume pâte pad 2 [mm³]</span>
+      <span class="value" id="tb_v2">–</span>
+    </div>
+    <div class="row">
+      <span>Rapport volumes (plus petit / plus grand)</span>
+      <span class="value" id="tb_v_ratio">–</span>
+    </div>
+
+    <div class="row">
+      <span>Volume moyen par pad [mm³]</span>
+      <span class="value" id="tb_v_mean">–</span>
+    </div>
+    <div class="row">
+      <span>Évaluation volume global (par type)</span>
+      <span class="badge" id="tb_v_global_status">–</span>
+    </div>
+    <div class="row">
+      <span>Commentaire volume global</span>
+      <span class="value" id="tb_v_global_comment">–</span>
+    </div>
+
+    <div class="row" style="margin-top:0.4rem;">
+      <span>Évaluation risque tombstoning (symétrie)</span>
+      <span class="badge" id="tb_risk_status">–</span>
+    </div>
+    <div class="row">
+      <span>Commentaire (symétrie)</span>
+      <span class="value" id="tb_risk_comment">–</span>
+    </div>
+
+    <p class="note">
+      Interprétation :<br>
+      • <strong>Symétrie</strong> : rapport proche de 1 (ex. ≥ 0,9) → pads très symétriques. En-dessous de 0,8 → déséquilibre important.<br>
+      • <strong>Volume global</strong> : l’indicateur compare le volume moyen par pad à des plages typiques 0201/0402/0603/0805
+        (ordre de grandeur, à ajuster avec ton expérience, SPI et AOI).<br>
+      • <strong>Entraxe</strong> : l’évaluation compare P à une plage “confort” par type (dérivée des footprints IPC + retour terrain).<br><br>
+      Utiliser la <strong>même unité</strong> (mm, par exemple) pour toutes les longueurs. Les volumes sont alors en mm³.
+    </p>
+  </div>
+
+  <p class="note">
+    Cet outil fournit trois informations complémentaires :<br>
+    • la <strong>symétrie</strong> des pads et des volumes de pâte (liée directement au tombstoning),<br>
+    • un indicateur de <strong>volume global</strong> par rapport à des plages typiques pour le type de composant choisi,<br>
+    • une évaluation de l’<strong>entraxe</strong> par rapport à une plage “raisonnable” pour ce type.<br>
+    Il ne remplace pas les recommandations IPC, les datasheets matériaux ni les retours SPI/AOI.
+  </p>
+</div>
+
+<script>
+function tb_parse(id) {
+  const v = parseFloat(document.getElementById(id).value);
+  return isFinite(v) && v > 0 ? v : null;
+}
+
+function tb_fmt(x, digits = 3) {
+  return Number.isFinite(x) ? x.toFixed(digits) : '–';
+}
+
+function tb_setText(id, text) {
+  document.getElementById(id).textContent = text;
+}
+
+function tb_setBadge(id, text, cls) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'badge' + (cls ? ' ' + cls : '');
+}
+
+function tb_ratio_and_delta(v1, v2) {
+  if (!Number.isFinite(v1) || !Number.isFinite(v2) || v1 <= 0 || v2 <= 0) {
+    return null;
+  }
+  const vmin = Math.min(v1, v2);
+  const vmax = Math.max(v1, v2);
+  const ratio = vmin / vmax;
+  const deltaPct = (1 - ratio) * 100;
+  return { ratio, deltaPct };
+}
+
+function tb_copyPad1ToPad2(fields) {
+  const f = fields || ['L', 'W', 'a', 'b'];
+  f.forEach(name => {
+    const v = document.getElementById('tb_' + name + '1').value;
+    document.getElementById('tb_' + name + '2').value = v;
+  });
+}
+
+function tb_syncPadsFromCheckbox() {
+  const same = document.getElementById('tb_same_pads').checked;
+  const pad2Fields = ['tb_L2', 'tb_W2', 'tb_a2', 'tb_b2'];
+
+  pad2Fields.forEach(id => {
+    const el = document.getElementById(id);
+    el.readOnly = same;
+    el.style.backgroundColor = same ? '#f0f0f0' : '';
+  });
+
+  if (same) {
+    tb_copyPad1ToPad2();
+  }
+  tb_calculate();
+}
+
+function tb_onPad1Change() {
+  if (document.getElementById('tb_same_pads').checked) {
+    tb_copyPad1ToPad2();
+  }
+  tb_calculate();
+}
+
+function tb_updateShapeVisibility() {
+  const shape = document.getElementById('tb_shape').value;
+  document.getElementById('tb_rect_wrapper').style.display =
+    (shape === 'rect_reduc') ? 'block' : 'none';
+  document.getElementById('tb_k_wrapper').style.display =
+    (shape === 'k_reduc') ? 'block' : 'none';
+}
+
+function tb_apply_shape() {
+  const shape = document.getElementById('tb_shape').value;
+  tb_updateShapeVisibility();
+
+  if (shape === 'none') {
+    tb_calculate();
+    return;
+  }
+
+  const same = document.getElementById('tb_same_pads').checked;
+
+  const L1 = tb_parse('tb_L1');
+  const W1 = tb_parse('tb_W1');
+  const L2 = tb_parse('tb_L2');
+  const W2 = tb_parse('tb_W2');
+
+  const rectPct = parseFloat(document.getElementById('tb_rect_reduc').value);
+  const rectFrac = isFinite(rectPct) && rectPct > 0 ? rectPct / 100 : 0;
+
+  const kPct = parseFloat(document.getElementById('tb_k_reduc').value);
+  const kFrac = isFinite(kPct) && kPct > 0 ? kPct / 100 : 0;
+
+  function openingFromPad(L, W) {
+    if (!L || !W) return { a: null, b: null };
+    let a = L;
+    let b = W;
+
+    if (shape === 'full') {
+      a = L;
+      b = W;
+    } else if (shape === 'rect_reduc') {
+      a = L * (1 - rectFrac);
+      b = W;
+    } else if (shape === 'k_reduc') {
+      const Leff = L * (1 - kFrac / 2);
+      a = Leff;
+      b = W;
+    }
+    return { a, b };
+  }
+
+  if (L1 && W1) {
+    const o1 = openingFromPad(L1, W1);
+    if (o1.a && o1.b) {
+      document.getElementById('tb_a1').value = o1.a.toFixed(3);
+      document.getElementById('tb_b1').value = o1.b.toFixed(3);
+    }
+  }
+
+  if (same) {
+    tb_copyPad1ToPad2(['a', 'b']);
+  } else if (L2 && W2) {
+    const o2 = openingFromPad(L2, W2);
+    if (o2.a && o2.b) {
+      document.getElementById('tb_a2').value = o2.a.toFixed(3);
+      document.getElementById('tb_b2').value = o2.b.toFixed(3);
+    }
+  }
+
+  tb_onPad1Change();
+}
+
+function tb_evaluateVolumeGlobal(type, t, vMean) {
+  const statusId = 'tb_v_global_status';
+  const commentId = 'tb_v_global_comment';
+
+  if (!type || type === 'autre' || !t || !vMean) {
+    tb_setBadge(statusId, '–', '');
+    tb_setText(
+      commentId,
+      'Pour une estimation du volume global, saisir le type (0201/0402/0603/0805), l\'épaisseur de pochoir et au moins un volume de pad.'
+    );
+    return;
+  }
+
+  // Plages très approximatives pour t = 0,10 mm (ordre de grandeur, à adapter avec l’expérience)
+  const ref = {
+    '0201': {min: 0.010, max: 0.030},
+    '0402': {min: 0.020, max: 0.050},
+    '0603': {min: 0.040, max: 0.090},
+    '0805': {min: 0.060, max: 0.130}
+  }[type];
+
+  if (!ref) {
+    tb_setBadge(statusId, '–', '');
+    tb_setText(
+      commentId,
+      'Type de composant non pris en compte pour l\'instant dans l\'estimation de volume global.'
+    );
+    return;
+  }
+
+  const tRef = 0.10; // mm
+  const factor = t / tRef;
+  const vMin = ref.min * factor;
+  const vMax = ref.max * factor;
+
+  let status = '';
+  let text = '';
+
+  if (vMean < 0.8 * vMin) {
+    status = 'warn';
+    text = 'Volume plutôt faible pour ' + type +
+      ' (≈ ' + tb_fmt(vMean, 4) + ' mm³, plage indicative ~ ' +
+      tb_fmt(vMin, 4) + ' à ' + tb_fmt(vMax, 4) + ' mm³). À surveiller si les joints semblent maigres.';
+    tb_setBadge(statusId, 'Volume faible', status);
+  } else if (vMean <= vMax) {
+    status = 'ok';
+    text = 'Volume moyen dans une plage typique pour ' + type +
+      ' (≈ ' + tb_fmt(vMean, 4) + ' mm³, plage indicative ~ ' +
+      tb_fmt(vMin, 4) + ' à ' + tb_fmt(vMax, 4) + ' mm³).';
+    tb_setBadge(statusId, 'Volume dans la plage', status);
+  } else if (vMean <= 1.5 * vMax) {
+    status = 'warn';
+    text = 'Volume assez élevé pour ' + type +
+      ' (≈ ' + tb_fmt(vMean, 4) + ' mm³, plage indicative ~ ' +
+      tb_fmt(vMin, 4) + ' à ' + tb_fmt(vMax, 4) + ' mm³). Risque accru de ponts / tombstoning selon le profil.';
+    tb_setBadge(statusId, 'Volume élevé', status);
+  } else {
+    status = 'bad';
+    text = 'Volume très élevé pour ' + type +
+      ' (≈ ' + tb_fmt(vMean, 4) + ' mm³, plage indicative ~ ' +
+      tb_fmt(vMin, 4) + ' à ' + tb_fmt(vMax, 4) + ' mm³). À reconsidérer sérieusement (réduction ouverture, épaisseur, etc.).';
+    tb_setBadge(statusId, 'Volume très élevé', status);
+  }
+
+  tb_setText(commentId, text);
+}
+
+function tb_evaluatePitch(type, pitch) {
+  const statusId = 'tb_pitch_status';
+  const commentId = 'tb_pitch_comment';
+
+  if (!pitch) {
+    tb_setBadge(statusId, '–', '');
+    tb_setText(
+      commentId,
+      'Tu peux saisir ici l’entraxe centre-à-centre, utile pour comparer plusieurs footprints pour un même composant.'
+    );
+    return;
+  }
+
+  if (!type || type === 'autre') {
+    tb_setBadge(statusId, '–', '');
+    tb_setText(
+      commentId,
+      'Entraxe P = ' + tb_fmt(pitch, 3) +
+      ' mm. Sans type de composant, l’évaluation reste générale (se référer aux empreintes IPC / constructeur).'
+    );
+    return;
+  }
+
+  // Plages "confort" approximatives par type (à ajuster si besoin)
+  const ranges = {
+    '0201': {min: 0.40, max: 0.70},
+    '0402': {min: 0.80, max: 1.10},
+    '0603': {min: 1.20, max: 1.80},
+    '0805': {min: 1.60, max: 2.20}
+  };
+
+  const r = ranges[type];
+  if (!r) {
+    tb_setBadge(statusId, '–', '');
+    tb_setText(
+      commentId,
+      'Entraxe P = ' + tb_fmt(pitch, 3) +
+      ' mm. Type non pris en compte pour l’instant dans l’évaluation de pitch.'
+    );
+    return;
+  }
+
+  const comp = 'composant ' + type;
+  let status, label, text;
+
+  if (pitch < 0.9 * r.min) {
+    status = 'warn';
+    label = 'Pitch court';
+    text = 'Entraxe assez court pour ' + comp + ' (P ≈ ' + tb_fmt(pitch, 3) +
+      ' mm, plage confort ~ ' + tb_fmt(r.min, 3) + '–' + tb_fmt(r.max, 3) +
+      ' mm). À surveiller côté ponts / mouillage.';
+  } else if (pitch >= r.min && pitch <= r.max) {
+    status = 'ok';
+    label = 'Pitch dans la plage';
+    text = 'Entraxe dans une plage confortable pour ' + comp +
+      ' (P ≈ ' + tb_fmt(pitch, 3) + ' mm, plage confort ~ ' +
+      tb_fmt(r.min, 3) + '–' + tb_fmt(r.max, 3) + ' mm).';
+  } else if (pitch <= 1.2 * r.max) {
+    status = 'warn';
+    label = 'Pitch grand';
+    text = 'Entraxe plutôt grand pour ' + comp + ' (P ≈ ' + tb_fmt(pitch, 3) +
+      ' mm, plage confort ~ ' + tb_fmt(r.min, 3) + '–' + tb_fmt(r.max, 3) +
+      ' mm). Auto-alignement un peu moins efficace, risque tombstoning légèrement augmenté.';
+  } else {
+    status = 'bad';
+    label = 'Pitch très grand';
+    text = 'Entraxe très grand pour ' + comp + ' (P ≈ ' + tb_fmt(pitch, 3) +
+      ' mm, plage confort ~ ' + tb_fmt(r.min, 3) + '–' + tb_fmt(r.max, 3) +
+      ' mm). Auto-alignement beaucoup plus faible → risque tombstoning / décentrage nettement accru.';
+  }
+
+  tb_setBadge(statusId, label, status);
+  tb_setText(commentId, text);
+}
+
+function tb_calculate() {
+  const t     = tb_parse('tb_t');
+  const pitch = tb_parse('tb_pitch');
+  const type  = document.getElementById('tb_type').value || '';
+
+  const L1 = tb_parse('tb_L1');
+  const W1 = tb_parse('tb_W1');
+  const L2 = tb_parse('tb_L2');
+  const W2 = tb_parse('tb_W2');
+
+  const a1 = tb_parse('tb_a1');
+  const b1 = tb_parse('tb_b1');
+  const a2 = tb_parse('tb_a2');
+  const b2 = tb_parse('tb_b2');
+
+  // Entraxe
+  tb_setText('tb_pitch_val', pitch ? tb_fmt(pitch, 3) : '–');
+  tb_evaluatePitch(type, pitch);
+
+  // Surfaces cuivre
+  const cu1 = (L1 && W1) ? L1 * W1 : null;
+  const cu2 = (L2 && W2) ? L2 * W2 : null;
+
+  tb_setText('tb_cu1', cu1 ? tb_fmt(cu1, 3) : '–');
+  tb_setText('tb_cu2', cu2 ? tb_fmt(cu2, 3) : '–');
+
+  const cuRatio = (cu1 && cu2) ? tb_ratio_and_delta(cu1, cu2) : null;
+  if (cuRatio) {
+    tb_setText('tb_cu_ratio',
+      tb_fmt(cuRatio.ratio, 3) + ' (Δ ≈ ' + tb_fmt(cuRatio.deltaPct, 1) + ' %)'
+    );
+  } else {
+    tb_setText('tb_cu_ratio', '–');
+  }
+
+  // Surfaces ouvertures pochoir
+  const st1 = (a1 && b1) ? a1 * b1 : null;
+  const st2 = (a2 && b2) ? a2 * b2 : null;
+
+  tb_setText('tb_st1', st1 ? tb_fmt(st1, 3) : '–');
+  tb_setText('tb_st2', st2 ? tb_fmt(st2, 3) : '–');
+
+  const stRatio = (st1 && st2) ? tb_ratio_and_delta(st1, st2) : null;
+  if (stRatio) {
+    tb_setText('tb_st_ratio',
+      tb_fmt(stRatio.ratio, 3) + ' (Δ ≈ ' + tb_fmt(stRatio.deltaPct, 1) + ' %)'
+    );
+  } else {
+    tb_setText('tb_st_ratio', '–');
+  }
+
+  // Volumes de pâte
+  let v1 = null, v2 = null, vRatio = null, vMean = null;
+  if (t && st1) v1 = st1 * t;
+  if (t && st2) v2 = st2 * t;
+
+  tb_setText('tb_v1', v1 ? tb_fmt(v1, 4) : '–');
+  tb_setText('tb_v2', v2 ? tb_fmt(v2, 4) : '–');
+
+  if (v1 && v2) {
+    vRatio = tb_ratio_and_delta(v1, v2);
+    tb_setText('tb_v_ratio',
+      tb_fmt(vRatio.ratio, 3) + ' (Δ ≈ ' + tb_fmt(vRatio.deltaPct, 1) + ' %)'
+    );
+    vMean = (v1 + v2) / 2;
+  } else if (v1 || v2) {
+    const v = v1 || v2;
+    tb_setText('tb_v_ratio', '–');
+    vMean = v;
+  } else {
+    tb_setText('tb_v_ratio', '–');
+  }
+
+  tb_setText('tb_v_mean', vMean ? tb_fmt(vMean, 4) : '–');
+  tb_evaluateVolumeGlobal(type, t, vMean);
+
+  // Évaluation symétrie
+  let ref = null;
+  let source = '';
+
+  if (vRatio) {
+    ref = vRatio;
+    source = 'volumes de pâte';
+  } else if (stRatio) {
+    ref = stRatio;
+    source = 'surfaces d’ouverture';
+  } else if (cuRatio) {
+    ref = cuRatio;
+    source = 'surfaces cuivre';
+  }
+
+  if (!ref) {
+    tb_setBadge('tb_risk_status', '–', '');
+    tb_setText('tb_risk_comment', 'Saisir au moins les dimensions des deux pads et des ouvertures pochoir.');
+    return;
+  }
+
+  const r = ref.ratio;
+  const delta = ref.deltaPct;
+
+  if (r >= 0.9) {
+    tb_setBadge('tb_risk_status', 'Risque faible', 'ok');
+    tb_setText(
+      'tb_risk_comment',
+      'Les ' + source + ' sont très proches (différence ≈ ' +
+      tb_fmt(delta, 1) + ' %). Symétrie favorable pour limiter le tombstoning.'
+    );
+  } else if (r >= 0.8) {
+    tb_setBadge('tb_risk_status', 'À surveiller', 'warn');
+    tb_setText(
+      'tb_risk_comment',
+      'Différence modérée entre les deux pads (≈ ' + tb_fmt(delta, 1) +
+      ' % sur les ' + source +
+      '). Pour petits passifs (0201/0402), à surveiller et à corréler avec la refusion.'
+    );
+  } else {
+    tb_setBadge('tb_risk_status', 'Risque accru', 'bad');
+    tb_setText(
+      'tb_risk_comment',
+      'Déséquilibre important (≈ ' + tb_fmt(delta, 1) + ' % sur les ' + source +
+      '). Revoir si possible la géométrie des pads et/ou les ouvertures pochoir pour rapprocher les volumes.'
+    );
+  }
+}
+
+// Initialisation
+window.addEventListener('load', () => {
+  tb_updateShapeVisibility();
+  tb_syncPadsFromCheckbox();
+});
+
+// Service worker pour mode hors-ligne
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(err => {
+      console.log('SW registration failed', err);
+    });
+  });
+}
+</script>
+</body>
+</html>
