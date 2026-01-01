@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Assistant profil de refusion</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Outils CMS">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color-scheme: light;
+    }
+    body {
+      margin: 0;
+      padding: 1rem;
+      background: #f5f5f5;
+    }
+    .app {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 1.25rem 1.5rem 1.5rem;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+    .subtitle {
+      font-size: 0.8rem;
+      color: #555;
+    }
+    a.back {
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: #007aff;
+      margin-top: 0.2rem;
+      white-space: nowrap;
+    }
+
+    .section-title {
+      font-weight: 600;
+      margin-top: 0.8rem;
+      margin-bottom: 0.3rem;
+      font-size: 0.95rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+    label {
+      font-size: 0.85rem;
+      display: block;
+    }
+    input, select {
+      width: 100%;
+      margin-top: 0.25rem;
+      padding: 0.4rem 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+    }
+    .outputs {
+      margin-top: 0.4rem;
+      font-size: 0.9rem;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin: 0.2rem 0;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+    .value {
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+    .range {
+      font-size: 0.8rem;
+      color: #666;
+    }
+    .badge {
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      background: #e9ecef;
+      color: #495057;
+    }
+    .ok {
+      background: #d4edda;
+      color: #155724;
+    }
+    .warn {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .bad {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .note {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.6rem;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Assistant profil de refusion</h1>
+      <div class="subtitle">
+        Contrôle rapide du profil : préchauffe (soak), temps au-dessus du liquidus (TAL) et pic.
+      </div>
+    </div>
+    <a href="index.html" class="back">← Ratio pochoir</a>
+  </header>
+
+  <div class="section-title">1. Type de brasure</div>
+  <div class="grid">
+    <label>
+      Alliage
+      <select id="rh_alloy" onchange="rh_calculate()">
+        <option value="snpb">SnPb (Sn63/Pb37)</option>
+        <option value="sac">Sans plomb (SAC, SnAgCu)</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="section-title">2. Paramètres mesurés du profil</div>
+  <div class="grid">
+    <label>
+      Pente de montée (ramp rate) [°C/s]<br>
+      <span style="font-size:0.75rem;color:#666;">De l'ambiante jusqu'à la zone de soak.</span>
+      <input id="rh_ramp" type="number" step="0.01" inputmode="decimal" oninput="rh_calculate()">
+    </label>
+    <label>
+      Température de soak min [°C]<br>
+      <span style="font-size:0.75rem;color:#666;">Début du plateau de préchauffe, en dessous du liquidus.</span>
+      <input id="rh_soak_min" type="number" step="0.1" inputmode="decimal" oninput="rh_calculate()">
+    </label>
+    <label>
+      Température de soak max [°C]<br>
+      <span style="font-size:0.75rem;color:#666;">Fin du plateau de préchauffe, avant la fusion de la brasure.</span>
+      <input id="rh_soak_max" type="number" step="0.1" inputmode="decimal" oninput="rh_calculate()">
+    </label>
+    <label>
+      Temps de soak [s]<br>
+      <span style="font-size:0.75rem;color:#666;">Durée totale passée sur ce plateau de préchauffe.</span>
+      <input id="rh_soak_time" type="number" step="1" inputmode="numeric" oninput="rh_calculate()">
+    </label>
+    <label>
+      Temps au-dessus de la fusion (TAL) [s]<br>
+      <span style="font-size:0.75rem;color:#666;">
+        Temps au-dessus de la température de liquidus de l’alliage
+        (≈183&nbsp;°C SnPb, ≈217&nbsp;°C SAC).
+      </span>
+      <input id="rh_tal" type="number" step="1" inputmode="numeric" oninput="rh_calculate()">
+    </label>
+    <label>
+      Température de pic [°C]<br>
+      <span style="font-size:0.75rem;color:#666;">Température maximale atteinte sur le profil.</span>
+      <input id="rh_peak" type="number" step="0.1" inputmode="decimal" oninput="rh_calculate()">
+    </label>
+  </div>
+
+  <div class="section-title">3. Analyse</div>
+  <div class="outputs">
+    <div class="row">
+      <div>
+        <div>Température de liquidus de l’alliage [°C]</div>
+      </div>
+      <div>
+        <span class="value" id="rh_liq_val">–</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <div>Pente de montée (ramp) [°C/s]</div>
+        <div class="range" id="rh_ramp_range">–</div>
+      </div>
+      <div>
+        <span class="value" id="rh_ramp_val">–</span>
+        &nbsp;
+        <span class="badge" id="rh_ramp_status">–</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <div>Température de soak [°C]</div>
+        <div class="range" id="rh_soakT_range">–</div>
+      </div>
+      <div>
+        <span class="value" id="rh_soakT_val">–</span>
+        &nbsp;
+        <span class="badge" id="rh_soakT_status">–</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <div>Temps de soak [s]</div>
+        <div class="range" id="rh_soakTime_range">–</div>
+      </div>
+      <div>
+        <span class="value" id="rh_soakTime_val">–</span>
+        &nbsp;
+        <span class="badge" id="rh_soakTime_status">–</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <div>TAL – temps au-dessus de la fusion [s]</div>
+        <div class="range" id="rh_tal_range">–</div>
+      </div>
+      <div>
+        <span class="value" id="rh_tal_val">–</span>
+        &nbsp;
+        <span class="badge" id="rh_tal_status">–</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <div>Température de pic [°C]</div>
+        <div class="range" id="rh_peak_range">–</div>
+      </div>
+      <div>
+        <span class="value" id="rh_peak_val">–</span>
+        &nbsp;
+        <span class="badge" id="rh_peak_status">–</span>
+      </div>
+    </div>
+
+    <p class="note">
+      Interprétation des couleurs :<br>
+      • <span style="background:#d4edda;color:#155724;padding:0 0.3rem;border-radius:999px;font-size:0.75rem;">OK</span>&nbsp;:
+        dans la plage recommandée.<br>
+      • <span style="background:#fff3cd;color:#856404;padding:0 0.3rem;border-radius:999px;font-size:0.75rem;">Attention</span>&nbsp;:
+        dans une zone élargie, à valider selon la pâte et les composants.<br>
+      • <span style="background:#f8d7da;color:#721c24;padding:0 0.3rem;border-radius:999px;font-size:0.75rem;">Hors plage</span>&nbsp;:
+        profil à revoir (risque de défauts de brasure ou de stress composants).
+    </p>
+
+    <p class="note">
+      Définitions :<br>
+      • <strong>Liquidus</strong> : température à partir de laquelle la brasure est fondue
+        (≈183&nbsp;°C pour Sn63/Pb37, ≈217&nbsp;°C pour un SAC courant).<br>
+      • <strong>Soak</strong> : plateau de préchauffe en dessous du liquidus. Il sert à homogénéiser la température du PCB
+        et à évaporer les solvants avant la fusion.<br>
+      • <strong>TAL (Time Above Liquidus)</strong> : durée pendant laquelle la brasure est au-dessus du liquidus
+        (zone réellement fondue).
+    </p>
+
+    <p class="note">
+      Hypothèses (ordres de grandeur usuels, à ajuster selon les datasheets pâte / composants) :<br>
+      • SnPb&nbsp;: soak ~140–160&nbsp;°C, 60–120&nbsp;s ; TAL ~30–60&nbsp;s ; pic ~205–225&nbsp;°C.<br>
+      • SAC sans plomb&nbsp;: soak ~150–180&nbsp;°C, 60–120&nbsp;s ; TAL ~40–80&nbsp;s ; pic ~235–250&nbsp;°C.<br>
+      • Pente de montée typique ~0,5–2&nbsp;°C/s (max ~3&nbsp;°C/s).<br>
+      Toujours valider avec les spécifications du fournisseur de pâte à braser et la sensibilité des composants.
+    </p>
+  </div>
+</div>
+
+<script>
+function rh_fmt(x, digits = 1) {
+  return Number.isFinite(x) ? x.toFixed(digits) : '–';
+}
+
+function rh_setRangeText(id, text) {
+  document.getElementById(id).textContent = text;
+}
+
+function rh_setValueAndStatus(valId, badgeId, value, status) {
+  document.getElementById(valId).textContent = value !== null && value !== undefined
+    ? rh_fmt(value)
+    : '–';
+  const badge = document.getElementById(badgeId);
+  if (status === null) {
+    badge.textContent = '–';
+    badge.className = 'badge';
+  } else {
+    let txt, cls;
+    if (status === 'ok') {
+      txt = 'OK';
+      cls = 'badge ok';
+    } else if (status === 'warn') {
+      txt = 'Attention';
+      cls = 'badge warn';
+    } else {
+      txt = 'Hors plage';
+      cls = 'badge bad';
+    }
+    badge.textContent = txt;
+    badge.className = cls;
+  }
+}
+
+function rh_evalRange(val, okMin, okMax, warnMin, warnMax) {
+  if (!Number.isFinite(val)) return null;
+  if (val < warnMin || val > warnMax) return 'bad';
+  if (val < okMin || val > okMax) return 'warn';
+  return 'ok';
+}
+
+function rh_calculate() {
+  const alloy = document.getElementById('rh_alloy').value;
+  const ramp = parseFloat(document.getElementById('rh_ramp').value);
+  const soakMin = parseFloat(document.getElementById('rh_soak_min').value);
+  const soakMax = parseFloat(document.getElementById('rh_soak_max').value);
+  const soakTime = parseFloat(document.getElementById('rh_soak_time').value);
+  const tal = parseFloat(document.getElementById('rh_tal').value);
+  const peak = parseFloat(document.getElementById('rh_peak').value);
+
+  // éléments DOM
+  const liqEl = document.getElementById('rh_liq_val');
+
+  // Plages par défaut (SnPb)
+  let ramp_ok_min = 0.5, ramp_ok_max = 2.0, ramp_warn_min = 0.2, ramp_warn_max = 3.0;
+  let soakT_ok_min, soakT_ok_max, soakT_warn_min, soakT_warn_max;
+  let soakTime_ok_min = 60, soakTime_ok_max = 120, soakTime_warn_min = 40, soakTime_warn_max = 150;
+  let tal_ok_min, tal_ok_max, tal_warn_min, tal_warn_max;
+  let peak_ok_min, peak_ok_max, peak_warn_min, peak_warn_max;
+  let liquidusTemp;
+
+  if (alloy === 'snpb') {
+    liquidusTemp = 183;
+    soakT_ok_min = 140; soakT_ok_max = 160;
+    soakT_warn_min = 130; soakT_warn_max = 170;
+    tal_ok_min = 30; tal_ok_max = 60;
+    tal_warn_min = 20; tal_warn_max = 80;
+    peak_ok_min = 205; peak_ok_max = 225;
+    peak_warn_min = 200; peak_warn_max = 235;
+    rh_setRangeText('rh_soakT_range', 'Cible SnPb : 140–160 °C (zone étendue 130–170 °C)');
+    rh_setRangeText('rh_soakTime_range', 'Cible SnPb : 60–120 s (zone étendue 40–150 s)');
+    rh_setRangeText('rh_tal_range', 'Cible SnPb : 30–60 s (zone étendue 20–80 s)');
+    rh_setRangeText('rh_peak_range', 'Cible SnPb : 205–225 °C (zone étendue 200–235 °C)');
+  } else {
+    liquidusTemp = 217;
+    soakT_ok_min = 150; soakT_ok_max = 180;
+    soakT_warn_min = 140; soakT_warn_max = 190;
+    tal_ok_min = 40; tal_ok_max = 80;
+    tal_warn_min = 30; tal_warn_max = 90;
+    peak_ok_min = 235; peak_ok_max = 250;
+    peak_warn_min = 230; peak_warn_max = 255;
+    rh_setRangeText('rh_soakT_range', 'Cible sans plomb : 150–180 °C (zone étendue 140–190 °C)');
+    rh_setRangeText('rh_soakTime_range', 'Cible sans plomb : 60–120 s (zone étendue 40–150 s)');
+    rh_setRangeText('rh_tal_range', 'Cible sans plomb : 40–80 s (zone étendue 30–90 s)');
+    rh_setRangeText('rh_peak_range', 'Cible sans plomb : 235–250 °C (zone étendue 230–255 °C)');
+  }
+
+  // afficher le liquidus
+  liqEl.textContent = rh_fmt(liquidusTemp, 0);
+
+  rh_setRangeText('rh_ramp_range', 'Cible : 0,5–2,0 °C/s (zone étendue 0,2–3,0 °C/s)');
+
+  // Pente
+  if (isFinite(ramp)) {
+    const st = rh_evalRange(ramp, ramp_ok_min, ramp_ok_max, ramp_warn_min, ramp_warn_max);
+    rh_setValueAndStatus('rh_ramp_val', 'rh_ramp_status', ramp, st);
+  } else {
+    rh_setValueAndStatus('rh_ramp_val', 'rh_ramp_status', null, null);
+  }
+
+  // Temp soak : moyenne min/max si dispo
+  if (isFinite(soakMin) && isFinite(soakMax) && soakMax >= soakMin) {
+    const soakAvg = (soakMin + soakMax) / 2;
+    const st = rh_evalRange(soakAvg, soakT_ok_min, soakT_ok_max, soakT_warn_min, soakT_warn_max);
+    rh_setValueAndStatus('rh_soakT_val', 'rh_soakT_status', soakAvg, st);
+  } else if (isFinite(soakMin)) {
+    const st = rh_evalRange(soakMin, soakT_ok_min, soakT_ok_max, soakT_warn_min, soakT_warn_max);
+    rh_setValueAndStatus('rh_soakT_val', 'rh_soakT_status', soakMin, st);
+  } else if (isFinite(soakMax)) {
+    const st = rh_evalRange(soakMax, soakT_ok_min, soakT_ok_max, soakT_warn_min, soakT_warn_max);
+    rh_setValueAndStatus('rh_soakT_val', 'rh_soakT_status', soakMax, st);
+  } else {
+    rh_setValueAndStatus('rh_soakT_val', 'rh_soakT_status', null, null);
+  }
+
+  // Temps soak
+  if (isFinite(soakTime)) {
+    const st = rh_evalRange(soakTime, soakTime_ok_min, soakTime_ok_max, soakTime_warn_min, soakTime_warn_max);
+    rh_setValueAndStatus('rh_soakTime_val', 'rh_soakTime_status', soakTime, st);
+  } else {
+    rh_setValueAndStatus('rh_soakTime_val', 'rh_soakTime_status', null, null);
+  }
+
+  // TAL
+  if (isFinite(tal)) {
+    const st = rh_evalRange(tal, tal_ok_min, tal_ok_max, tal_warn_min, tal_warn_max);
+    rh_setValueAndStatus('rh_tal_val', 'rh_tal_status', tal, st);
+  } else {
+    rh_setValueAndStatus('rh_tal_val', 'rh_tal_status', null, null);
+  }
+
+  // Pic
+  if (isFinite(peak)) {
+    const st = rh_evalRange(peak, peak_ok_min, peak_ok_max, peak_warn_min, peak_warn_max);
+    rh_setValueAndStatus('rh_peak_val', 'rh_peak_status', peak, st);
+  } else {
+    rh_setValueAndStatus('rh_peak_val', 'rh_peak_status', null, null);
+  }
+}
+
+// Service worker pour mode hors-ligne
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(err => {
+      console.log('SW registration failed', err);
+    });
+  });
+}
+</script>
+</body>
+</html>
