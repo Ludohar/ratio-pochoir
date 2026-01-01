@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Réglage impression – Ligne CMS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Outils CMS">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color-scheme: light;
+    }
+    body {
+      margin: 0;
+      padding: 1rem;
+      background: #f5f5f5;
+    }
+    .app {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 1.25rem 1.5rem 1.5rem;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+    .subtitle {
+      font-size: 0.8rem;
+      color: #555;
+    }
+    a.back {
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: #007aff;
+      margin-top: 0.2rem;
+      white-space: nowrap;
+    }
+
+    .section-title {
+      font-weight: 600;
+      margin-top: 0.8rem;
+      margin-bottom: 0.3rem;
+      font-size: 0.95rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+    label {
+      font-size: 0.85rem;
+      display: block;
+    }
+    input, select {
+      width: 100%;
+      margin-top: 0.25rem;
+      padding: 0.4rem 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+    }
+    .outputs {
+      margin-top: 0.4rem;
+      font-size: 0.9rem;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin: 0.2rem 0;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+    .value {
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+    .badge {
+      padding: 0.15rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      background: #e9ecef;
+      color: #495057;
+    }
+    .ok {
+      background: #d4edda;
+      color: #155724;
+    }
+    .warn {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .bad {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    .note {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.6rem;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Réglage impression – Ligne CMS</h1>
+      <div class="subtitle">
+        Repères pour la racle, la vitesse d’impression et quelques contrôles process.
+      </div>
+    </div>
+    <a href="index.html" class="back">← Ratio pochoir</a>
+  </header>
+
+  <!-- 1. Racle et longueur carte -->
+  <div class="section-title">1. Racle et largeur de carte</div>
+  <div class="grid">
+    <label>
+      Largeur carte / panneau [mm]
+      <input id="ps_board_width" type="number" step="0.1" inputmode="decimal" oninput="ps_calculate()">
+    </label>
+    <label>
+      Longueur de la racle montée [mm]
+      <input id="ps_squeegee_length" type="number" step="0.1" inputmode="decimal" oninput="ps_calculate()">
+    </label>
+  </div>
+
+  <div class="outputs">
+    <div class="row">
+      <span>Longueur racle recommandée (min / max) [mm]</span>
+      <span class="value">
+        <span id="ps_len_min">–</span>
+        &nbsp;/&nbsp;
+        <span id="ps_len_max">–</span>
+      </span>
+    </div>
+    <div class="row">
+      <span>Longueur racle “confort” (milieu de plage) [mm]</span>
+      <span class="value" id="ps_len_mid">–</span>
+    </div>
+    <div class="row">
+      <span>Évaluation de la racle montée</span>
+      <span class="badge" id="ps_len_status">–</span>
+    </div>
+
+    <div class="row" style="margin-top:0.4rem;">
+      <span>Pression de départ recommandée [kg]</span>
+      <span class="value" id="ps_press_nom_kg">–</span>
+    </div>
+    <div class="row">
+      <span>Pression de départ recommandée [N]</span>
+      <span class="value" id="ps_press_nom_N">–</span>
+    </div>
+    <div class="row">
+      <span>Plage pression de travail (min / max) [kg]</span>
+      <span class="value">
+        <span id="ps_press_min_kg">–</span>
+        &nbsp;/&nbsp;
+        <span id="ps_press_max_kg">–</span>
+      </span>
+    </div>
+    <div class="row">
+      <span>Plage pression de travail (min / max) [N]</span>
+      <span class="value">
+        <span id="ps_press_min_N">–</span>
+        &nbsp;/&nbsp;
+        <span id="ps_press_max_N">–</span>
+      </span>
+    </div>
+    <div class="row">
+      <span>Pression de départ (2–3 N/cm) [N] <span style="font-size:0.75rem;">(Expérience Ludo)</span></span>
+      <span class="value" id="ps_press_ludo_nom_N">–</span>
+    </div>
+    <div class="row">
+      <span>Pression de départ (2–3 N/cm) [kg] <span style="font-size:0.75rem;">(Expérience Ludo)</span></span>
+      <span class="value" id="ps_press_ludo_nom_kg">–</span>
+    </div>
+    <div class="row">
+      <span>Plage pression (2–3 N/cm) [N] <span style="font-size:0.75rem;">(Expérience Ludo)</span></span>
+      <span class="value" id="ps_press_ludo_N">–</span>
+    </div>
+    <div class="row">
+      <span>Plage pression (2–3 N/cm) [kg] <span style="font-size:0.75rem;">(Expérience Ludo)</span></span>
+      <span class="value" id="ps_press_ludo_kg">–</span>
+    </div>
+
+    <p class="note">
+      Hypothèses :<br>
+      • Longueur de racle recommandée ≈ largeur carte + 10 à 25&nbsp;mm de débord de chaque côté.<br>
+      • Pression de départ basée sur la littérature : environ 0,5 à 1,0&nbsp;kg par 50&nbsp;mm de racle,
+        avec un point milieu vers 0,75&nbsp;kg / 50&nbsp;mm. À ajuster selon la pâte, le pochoir et le retour SPI.<br>
+      • <strong>Expérience Ludo :</strong> plage cible environ 2 à 3&nbsp;N/cm sur la longueur de racle, avec un point milieu ~2,5&nbsp;N/cm.
+    </p>
+  </div>
+
+  <!-- 2. Vitesse de racle et séparation -->
+  <div class="section-title">2. Vitesse de racle et séparation</div>
+  <div class="grid">
+    <label>
+      Plus petite ouverture / pas le plus fin [mm]<br>
+      <span style="font-size:0.75rem;color:#666;">(optionnel, pour ajuster les plages)</span>
+      <input id="ps_min_aperture" type="number" step="0.01" inputmode="decimal" oninput="ps_calculate()">
+    </label>
+  </div>
+
+  <div class="outputs">
+    <div class="row">
+      <span>Vitesse de racle recommandée [mm/s]</span>
+      <span class="value" id="ps_speed_range">–</span>
+    </div>
+    <div class="row">
+      <span>Mode de séparation</span>
+      <span class="value" id="ps_sep_mode">–</span>
+    </div>
+    <div class="row">
+      <span>Vitesse de séparation recommandée [mm/s]</span>
+      <span class="value" id="ps_sep_speed_range">–</span>
+    </div>
+    <div class="row">
+      <span>Distance totale de séparation [mm]</span>
+      <span class="value" id="ps_sep_dist_range">–</span>
+    </div>
+
+    <p class="note">
+      Hypothèses :<br>
+      • Plus les ouvertures sont fines, plus on tend à réduire la vitesse de racle pour favoriser le remplissage.<br>
+      • Beaucoup de process modernes utilisent une impression en contact (snap-off ≈ 0&nbsp;mm) avec une séparation lente
+        et contrôlée (souvent 0,3–0,7&nbsp;mm/s sur ~0,5–1&nbsp;mm).
+    </p>
+  </div>
+
+  <!-- 3. Contrôles rapides : tension pochoir et SPI -->
+  <div class="section-title">3. Contrôles rapides (tension pochoir & SPI)</div>
+  <div class="grid">
+    <label>
+      Tension pochoir mesurée [N/cm]
+      <input id="ps_stencil_tension" type="number" step="0.1" inputmode="decimal" oninput="ps_calculate()">
+    </label>
+  </div>
+
+  <div class="outputs">
+    <div class="row">
+      <span>Évaluation tension pochoir</span>
+      <span>
+        <span class="badge" id="ps_tension_status">–</span>
+      </span>
+    </div>
+    <div class="row">
+      <span>Commentaire</span>
+      <span class="value" id="ps_tension_comment">–</span>
+    </div>
+  </div>
+
+  <div class="section-title">4. Efficacité de transfert SPI (par pad)</div>
+  <div class="grid">
+    <label>
+      Volume théorique par pad
+      <input id="ps_spi_theo" type="number" step="0.0001" inputmode="decimal" oninput="ps_calculate()">
+    </label>
+    <label>
+      Unité volume théorique
+      <select id="ps_spi_theo_unit" onchange="ps_calculate()">
+        <option value="mm3">mm³</option>
+        <option value="nl">nL</option>
+      </select>
+    </label>
+    <label>
+      Volume mesuré SPI par pad
+      <input id="ps_spi_meas" type="number" step="0.0001" inputmode="decimal" oninput="ps_calculate()">
+    </label>
+    <label>
+      Unité volume mesuré
+      <select id="ps_spi_meas_unit" onchange="ps_calculate()">
+        <option value="mm3">mm³</option>
+        <option value="nl">nL</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="outputs">
+    <div class="row">
+      <span>Efficacité de transfert TE [%]</span>
+      <span class="value" id="ps_te_percent">–</span>
+    </div>
+    <div class="row">
+      <span>Interprétation</span>
+      <span>
+        <span class="badge" id="ps_te_status">–</span>
+      </span>
+    </div>
+
+    <p class="note">
+      Hypothèses :<br>
+      • Volumes exprimés soit en mm³, soit en nL (1&nbsp;mm³ = 1000&nbsp;nL).<br>
+      • TE = V<sub>SPI</sub> / V<sub>théorique</sub> × 100&nbsp;%.<br>
+      • Zones indicatives : TE &lt; 80&nbsp;% = trop faible ; 80–120&nbsp;% = OK ; 120–140&nbsp;% = élevé ; &gt; 140&nbsp;% = très élevé.<br>
+      • À corréler avec la qualité visuelle des joints de brasure et les défauts constatés.
+    </p>
+  </div>
+
+  <p class="note">
+    Tous ces calculs donnent des <strong>points de départ</strong> cohérents avec les recommandations
+    fabricants / IPC et ton retour d’expérience, mais les réglages finaux doivent toujours être validés
+    par l’expérience terrain (SPI, AOI, X-ray, etc.).
+  </p>
+</div>
+
+<script>
+function ps_parse(id) {
+  const v = parseFloat(document.getElementById(id).value);
+  return isFinite(v) && v > 0 ? v : null;
+}
+
+function ps_fmt(x, digits = 2) {
+  return Number.isFinite(x) ? x.toFixed(digits) : '–';
+}
+
+function ps_calculate() {
+  // DOM refs
+  const lenMinEl = document.getElementById('ps_len_min');
+  const lenMaxEl = document.getElementById('ps_len_max');
+  const lenMidEl = document.getElementById('ps_len_mid');
+  const lenStatusEl = document.getElementById('ps_len_status');
+
+  const pressNomKgEl      = document.getElementById('ps_press_nom_kg');
+  const pressNomNEl       = document.getElementById('ps_press_nom_N');
+  const pressMinKgEl      = document.getElementById('ps_press_min_kg');
+  const pressMaxKgEl      = document.getElementById('ps_press_max_kg');
+  const pressMinNEl       = document.getElementById('ps_press_min_N');
+  const pressMaxNEl       = document.getElementById('ps_press_max_N');
+  const pressLudoNomNEl   = document.getElementById('ps_press_ludo_nom_N');
+  const pressLudoNomKgEl  = document.getElementById('ps_press_ludo_nom_kg');
+  const pressLudoNEl      = document.getElementById('ps_press_ludo_N');
+  const pressLudoKgEl     = document.getElementById('ps_press_ludo_kg');
+
+  const speedRangeEl      = document.getElementById('ps_speed_range');
+  const sepModeEl         = document.getElementById('ps_sep_mode');
+  const sepSpeedRangeEl   = document.getElementById('ps_sep_speed_range');
+  const sepDistRangeEl    = document.getElementById('ps_sep_dist_range');
+
+  const tensionStatusEl   = document.getElementById('ps_tension_status');
+  const tensionCommentEl  = document.getElementById('ps_tension_comment');
+
+  const tePercentEl       = document.getElementById('ps_te_percent');
+  const teStatusEl        = document.getElementById('ps_te_status');
+
+  function setBadge(el, text, cls) {
+    el.textContent = text;
+    el.className = 'badge' + (cls ? ' ' + cls : '');
+  }
+
+  // 1. Longueur racle / pression
+  const boardWidth = ps_parse('ps_board_width');
+  const squeegeeLen = ps_parse('ps_squeegee_length');
+
+  // Longueur recommandée
+  if (boardWidth) {
+    const lenMin = boardWidth + 2 * 10;
+    const lenMax = boardWidth + 2 * 25;
+    const lenMid = (lenMin + lenMax) / 2;
+    lenMinEl.textContent = ps_fmt(lenMin, 0);
+    lenMaxEl.textContent = ps_fmt(lenMax, 0);
+    lenMidEl.textContent = ps_fmt(lenMid, 0);
+
+    if (squeegeeLen) {
+      if (squeegeeLen < lenMin) {
+        setBadge(lenStatusEl, 'Plus courte que recommandé', 'warn');
+      } else if (squeegeeLen > lenMax) {
+        setBadge(lenStatusEl, 'Plus longue que recommandé', 'warn');
+      } else {
+        setBadge(lenStatusEl, 'Dans la plage recommandée', 'ok');
+      }
+    } else {
+      setBadge(lenStatusEl, 'Saisir la longueur montée', '');
+    }
+  } else {
+    lenMinEl.textContent = lenMaxEl.textContent = lenMidEl.textContent = '–';
+    setBadge(lenStatusEl, 'Saisir la largeur carte', '');
+  }
+
+  // Pression
+  if (squeegeeLen) {
+    const P_min_kg = 0.5 * (squeegeeLen / 50);
+    const P_max_kg = 1.0 * (squeegeeLen / 50);
+    const P_nom_kg = 0.75 * (squeegeeLen / 50);
+    const N_PER_KG = 9.81;
+
+    pressNomKgEl.textContent = ps_fmt(P_nom_kg, 2);
+    pressNomNEl.textContent  = ps_fmt(P_nom_kg * N_PER_KG, 1);
+
+    pressMinKgEl.textContent = ps_fmt(P_min_kg, 2);
+    pressMaxKgEl.textContent = ps_fmt(P_max_kg, 2);
+    pressMinNEl.textContent  = ps_fmt(P_min_kg * N_PER_KG, 1);
+    pressMaxNEl.textContent  = ps_fmt(P_max_kg * N_PER_KG, 1);
+
+    // Plage Ludo 2–3 N/cm
+    const len_cm = squeegeeLen / 10;
+    const F_ludo_min_N = 2 * len_cm;
+    const F_ludo_max_N = 3 * len_cm;
+    const F_ludo_nom_N = 2.5 * len_cm; // point milieu
+    const F_ludo_min_kg = F_ludo_min_N / N_PER_KG;
+    const F_ludo_max_kg = F_ludo_max_N / N_PER_KG;
+    const F_ludo_nom_kg = F_ludo_nom_N / N_PER_KG;
+
+    pressLudoNEl.textContent =
+      ps_fmt(F_ludo_min_N, 1) + ' – ' + ps_fmt(F_ludo_max_N, 1);
+    pressLudoKgEl.textContent =
+      ps_fmt(F_ludo_min_kg, 2) + ' – ' + ps_fmt(F_ludo_max_kg, 2);
+
+    pressLudoNomNEl.textContent  = ps_fmt(F_ludo_nom_N, 1);
+    pressLudoNomKgEl.textContent = ps_fmt(F_ludo_nom_kg, 2);
+  } else {
+    pressNomKgEl.textContent = pressNomNEl.textContent = '–';
+    pressMinKgEl.textContent = pressMaxKgEl.textContent = '–';
+    pressMinNEl.textContent  = pressMaxNEl.textContent  = '–';
+    pressLudoNEl.textContent = pressLudoKgEl.textContent = '–';
+    pressLudoNomNEl.textContent = pressLudoNomKgEl.textContent = '–';
+  }
+
+  // 2. Vitesse de racle et séparation
+  const a_min = ps_parse('ps_min_aperture');
+
+  let speedLow, speedHigh;
+  if (a_min) {
+    if (a_min <= 0.25) {
+      speedLow = 20;
+      speedHigh = 30;
+    } else if (a_min <= 0.5) {
+      speedLow = 25;
+      speedHigh = 40;
+    } else {
+      speedLow = 30;
+      speedHigh = 60;
+    }
+  } else {
+    speedLow = 25;
+    speedHigh = 40;
+  }
+  speedRangeEl.textContent = ps_fmt(speedLow, 0) + ' – ' + ps_fmt(speedHigh, 0);
+
+  let sepSpeedLow, sepSpeedHigh, sepDistLow, sepDistHigh;
+  if (a_min && a_min <= 0.25) {
+    sepSpeedLow = 0.3;
+    sepSpeedHigh = 0.5;
+    sepDistLow = 0.5;
+    sepDistHigh = 0.8;
+  } else {
+    sepSpeedLow = 0.4;
+    sepSpeedHigh = 0.7;
+    sepDistLow = 0.5;
+    sepDistHigh = 1.0;
+  }
+  sepModeEl.textContent = 'Impression en contact (snap-off ≈ 0 mm), séparation contrôlée.';
+  sepSpeedRangeEl.textContent = ps_fmt(sepSpeedLow, 1) + ' – ' + ps_fmt(sepSpeedHigh, 1);
+  sepDistRangeEl.textContent  = ps_fmt(sepDistLow, 1) + ' – ' + ps_fmt(sepDistHigh, 1);
+
+  // 3. Tension pochoir
+  const tension = ps_parse('ps_stencil_tension');
+  if (tension) {
+    if (tension < 20) {
+      setBadge(tensionStatusEl, 'Très faible', 'bad');
+      tensionCommentEl.textContent = "Risque élevé de défauts (bridging, manque de pâte, variations).";
+    } else if (tension < 25) {
+      setBadge(tensionStatusEl, 'Faible', 'warn');
+      tensionCommentEl.textContent = "À surveiller : risque de contact imparfait entre pochoir et PCB.";
+    } else if (tension <= 35) {
+      setBadge(tensionStatusEl, 'OK', 'ok');
+      tensionCommentEl.textContent = "Tension pochoir généralement acceptable pour une impression stable.";
+    } else {
+      setBadge(tensionStatusEl, 'Haute (OK)', 'ok');
+      tensionCommentEl.textContent = "Bonne tension, à condition que le cadre et le pochoir supportent ces contraintes.";
+    }
+  } else {
+    setBadge(tensionStatusEl, '–', '');
+    tensionCommentEl.textContent = 'Saisir la tension mesurée (N/cm) si disponible.';
+  }
+
+  // 4. TE SPI
+  const V_theo_in  = parseFloat(document.getElementById('ps_spi_theo').value);
+  const V_meas_in  = parseFloat(document.getElementById('ps_spi_meas').value);
+  const unitTheo   = document.getElementById('ps_spi_theo_unit').value;
+  const unitMeas   = document.getElementById('ps_spi_meas_unit').value;
+
+  tePercentEl.textContent = '–';
+  setBadge(teStatusEl, '–', '');
+
+  if (isFinite(V_theo_in) && V_theo_in > 0 && isFinite(V_meas_in) && V_meas_in > 0) {
+    let V_theo_mm3, V_meas_mm3;
+
+    V_theo_mm3 = (unitTheo === 'mm3') ? V_theo_in : V_theo_in / 1000;
+    V_meas_mm3 = (unitMeas === 'mm3') ? V_meas_in : V_meas_in / 1000;
+
+    const TE = V_meas_mm3 / V_theo_mm3 * 100;
+    tePercentEl.textContent = ps_fmt(TE, 1);
+
+    if (TE < 80) {
+      setBadge(teStatusEl, 'Trop faible', 'bad');
+    } else if (TE <= 120) {
+      setBadge(teStatusEl, 'OK', 'ok');
+    } else if (TE <= 140) {
+      setBadge(teStatusEl, 'Élevé', 'warn');
+    } else {
+      setBadge(teStatusEl, 'Très élevé', 'bad');
+    }
+  }
+}
+
+// Service worker pour mode hors-ligne
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(err => {
+      console.log('SW registration failed', err);
+    });
+  });
+}
+</script>
+</body>
+</html>

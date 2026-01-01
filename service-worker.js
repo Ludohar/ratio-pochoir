@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stencil-ratio-v12';
+const CACHE_NAME = 'stencil-ratio-v13';
 const URLS_TO_CACHE = [
   './',
   './index.html',
@@ -6,6 +6,7 @@ const URLS_TO_CACHE = [
   './tmax.html',
   './convert.html',
   './cms_volume.html',
+  './print_setup.html',
   './info.html',
   './manifest.json',
   './icon_180.png',
