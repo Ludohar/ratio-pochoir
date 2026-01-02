@@ -171,7 +171,7 @@
         ou de dimensions (composants spécifiques / exotiques).
       </div>
     </div>
-    <a href="index.html" class="back">← Ratio pochoir</a>
+    <a href="index.html" class="back">← Accueil outils CMS</a>
   </header>
 
   <div class="section-title">1. Sélection par famille (optionnel)</div>
@@ -251,8 +251,9 @@
     • Cet écran est un <strong>assistant de choix</strong> : les règles de sélection (dimensions, poids) sont heuristiques,
       basées sur les tableaux Mycronic et ton expérience. Ce n’est pas la sélection “officielle” de Mycronic.<br>
     • Mode <strong>famille</strong> : utilise les descriptions “Typical components” des tables Hydra / Midas (generic + special tools).<br>
-    • Mode <strong>dimensions</strong> : propose des buses dont le Ø externe reste compatible avec le composant, puis les classe
-      par pertinence géométrique et par tête recommandée (Hydra vs Midas).<br>
+    • Mode <strong>dimensions</strong> : propose des buses dont le Ø externe reste compatible avec le composant,
+      puis les classe par pertinence géométrique et par tête recommandée (Hydra vs Midas). Pour les composants grands,
+      les très petites buses sont filtrées pour ne garder que les Ø réalistes.<br>
     • Avant d’appliquer un changement en prod, toujours confronter ces suggestions à la documentation Mycronic,
       aux datasheets et aux retours SPI / AOI / rebuts.
   </p>
@@ -825,7 +826,6 @@ function renderTools() {
     return;
   }
 
-  // Point de départ : tous les outils
   let tools = TOOL_DATA.slice();
 
   // Filtre famille
@@ -846,18 +846,37 @@ function renderTools() {
     });
   }
 
-  // Filtre / scoring géométrique si dimensions
+  // Filtre géométrique + score si dimensions
   if (hasDims) {
     const sideMin = dimInfo.sideMin;
+    const sideMax = dimInfo.sideMax;
+
+    // Ratio minimal Ø externe / plus petit côté
+    let minRatio = 0.05;
+    if (sideMax >= 15) {
+      minRatio = 0.20;        // gros composants : on veut des buses qui couvrent une bonne partie
+    } else if (sideMax >= 8) {
+      minRatio = 0.10;
+    }
 
     tools = tools.filter(t => {
+      // Exclure les outils LED si aucune famille LED n'est sélectionnée
+      if (t.group === 'LED' && (!family || !family.startsWith('led_'))) {
+        return false;
+      }
+
       if (t.od_mm == null) {
-        // Si on n’a que la famille (pas de dimensions), on garde quand même.
-        // Si on est uniquement en mode dimensions, on élimine (pas d’info de Ø).
+        // Pas d’OD : on garde uniquement si on est en mode "famille" (sinon on ne sait pas comparer).
         return !!family;
       }
-      if (!family && t.od_mm > sideMin * 1.05) return false;     // mode dimensions seul : Ø > composant → on écarte
-      if (family && t.od_mm > sideMin * 1.20) return false;      // mode famille + dimensions : on tolère un peu plus
+
+      // Ø trop grand par rapport au composant
+      if (!family && t.od_mm > sideMin * 1.05) return false;
+      if (family && t.od_mm > sideMin * 1.20) return false;
+
+      // Ø trop petit : busette ridicule pour un gros composant → on écarte.
+      if (t.od_mm < minRatio * sideMin) return false;
+
       return true;
     });
 
@@ -866,8 +885,8 @@ function renderTools() {
 
       if (t.od_mm != null) {
         const ratio = t.od_mm / sideMin;      // idéal ~ 0,7
-        const diff = Math.abs(ratio - 0.7);   // plus c’est proche, mieux c’est
-        score += 10 - diff * 20;              // 10 au mieux, chute rapide ensuite
+        const diff = Math.abs(ratio - 0.7);
+        score += 10 - diff * 20;             // max ~10, puis décroissance rapide
       }
 
       if (dimInfo.preference === 'Hydra') {
@@ -911,7 +930,15 @@ function renderTools() {
     return (a.code || '').localeCompare(b.code || '');
   });
 
-  countEl.textContent = tools.length + ' outil(s) trouvé(s).';
+  const total = tools.length;
+
+  // En mode dimensions seules (aucune famille), on affiche uniquement les 10 premiers
+  if (hasDims && !family && tools.length > 10) {
+    tools = tools.slice(0, 10);
+    countEl.textContent = tools.length + ' outil(s) affiché(s) (top 10 sur ' + total + ' candidats).';
+  } else {
+    countEl.textContent = tools.length + ' outil(s) trouvé(s).';
+  }
 
   tools.forEach(t => {
     const card = document.createElement('div');
