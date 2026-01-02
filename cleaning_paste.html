@@ -141,7 +141,7 @@
   <div class="grid">
     <label>
       Nombre de panneaux entre deux nettoyages
-      <span class="help">(impressions consécutives avant nettoyage)</span>
+      <span class="help">(sérigraphies consécutives avant nettoyage)</span>
       <input id="cp_panels_between_clean" type="number" step="1" inputmode="numeric" oninput="cp_calculate()">
     </label>
     <label>
@@ -150,8 +150,8 @@
       <input id="cp_boards_per_panel" type="number" step="1" inputmode="numeric" oninput="cp_calculate()">
     </label>
     <label>
-      Cycle impression imprimante [s/panneau]
-      <span class="help">(temps entre deux impressions consécutives d’un panneau)</span>
+      Cycle de sérigraphie [s/panneau]
+      <span class="help">(temps entre deux sérigraphies consécutives d’un panneau)</span>
       <input id="cp_cycle_time" type="number" step="0.1" inputmode="decimal" oninput="cp_calculate()">
     </label>
     <label>
@@ -163,7 +163,7 @@
 
   <div class="outputs">
     <div class="row">
-      <span>Nombre total de cartes imprimées entre deux nettoyages</span>
+      <span>Nombre total de cartes sérigraphiées entre deux nettoyages</span>
       <span class="value" id="cp_boards_between_clean">–</span>
     </div>
     <div class="row">
@@ -224,7 +224,7 @@
       Repères indiqués :<br>
       • &lt; 70&nbsp;% de la durée max&nbsp;: <strong>OK</strong> (sous réserve de la SPI et de l’aspect de la pâte).<br>
       • 70–100&nbsp;%&nbsp;: <strong>à surveiller</strong> (finir le pot / la cartouche, éviter de prolonger encore beaucoup).<br>
-      • &gt; 100&nbsp;%&nbsp;: <strong>au-delà de la limite</strong> datasheet (risque sur l’imprimabilité et la qualité des joints).<br>
+      • &gt; 100&nbsp;%&nbsp;: <strong>au-delà de la limite</strong> datasheet (risque sur la sérigraphie et la qualité des joints).<br>
       Toujours se référer aux recommandations du fournisseur de pâte à braser.
     </p>
   </div>
@@ -289,7 +289,7 @@ function cp_calculate() {
       if (a_min <= 0.30) {
         if (totalTime_min > 30 || panels > 20) {
           status = 'bad';
-          msg = "Pour du pas ≤ 0,30 mm, un nettoyage toutes les 5–10 impressions (~10–20 min) est souvent préférable.";
+          msg = "Pour du pas ≤ 0,30 mm, un nettoyage toutes les 5–10 sérigraphies (~10–20 min) est souvent préférable.";
         } else if (totalTime_min > 20 || panels > 10) {
           status = 'warn';
           msg = "Pour du pas fin, la fréquence semble un peu espacée. À valider avec la SPI.";

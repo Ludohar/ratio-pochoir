@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Réglage impression – Ligne CMS</title>
+  <title>Réglage sérigraphie – Ligne CMS</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <link rel="manifest" href="manifest.json">
@@ -124,9 +124,9 @@
 <div class="app">
   <header>
     <div>
-      <h1>Réglage impression – Ligne CMS</h1>
+      <h1>Réglage sérigraphie – Ligne CMS</h1>
       <div class="subtitle">
-        Repères pour la racle, la vitesse d’impression et quelques contrôles process.
+        Repères pour la racle, la vitesse de la sérigraphie et quelques contrôles process.
       </div>
     </div>
     <a href="index.html" class="back">← Ratio pochoir</a>
@@ -244,7 +244,7 @@
     <p class="note">
       Hypothèses :<br>
       • Plus les ouvertures sont fines, plus on tend à réduire la vitesse de racle pour favoriser le remplissage.<br>
-      • Beaucoup de process modernes utilisent une impression en contact (snap-off ≈ 0&nbsp;mm) avec une séparation lente
+      • Beaucoup de process modernes utilisent une sérigraphie en contact (snap-off ≈ 0&nbsp;mm) avec une séparation lente
         et contrôlée (souvent 0,3–0,7&nbsp;mm/s sur ~0,5–1&nbsp;mm).
     </p>
   </div>
@@ -470,7 +470,7 @@ function ps_calculate() {
     sepDistLow = 0.5;
     sepDistHigh = 1.0;
   }
-  sepModeEl.textContent = 'Impression en contact (snap-off ≈ 0 mm), séparation contrôlée.';
+  sepModeEl.textContent = 'Sérigraphie en contact (snap-off ≈ 0 mm), séparation contrôlée.';
   sepSpeedRangeEl.textContent = ps_fmt(sepSpeedLow, 1) + ' – ' + ps_fmt(sepSpeedHigh, 1);
   sepDistRangeEl.textContent  = ps_fmt(sepDistLow, 1) + ' – ' + ps_fmt(sepDistHigh, 1);
 
@@ -485,7 +485,7 @@ function ps_calculate() {
       tensionCommentEl.textContent = "À surveiller : risque de contact imparfait entre pochoir et PCB.";
     } else if (tension <= 35) {
       setBadge(tensionStatusEl, 'OK', 'ok');
-      tensionCommentEl.textContent = "Tension pochoir généralement acceptable pour une impression stable.";
+      tensionCommentEl.textContent = "Tension pochoir généralement acceptable pour une sérigraphie stable.";
     } else {
       setBadge(tensionStatusEl, 'Haute (OK)', 'ok');
       tensionCommentEl.textContent = "Bonne tension, à condition que le cadre et le pochoir supportent ces contraintes.";

@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Outils MY300 – Buses Hydra / Midas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Outils CMS">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color-scheme: light;
+    }
+    body {
+      margin: 0;
+      padding: 1rem;
+      background: #f5f5f5;
+    }
+    .app {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 1.25rem 1.5rem 1.5rem;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+    .subtitle {
+      font-size: 0.8rem;
+      color: #555;
+    }
+    a.back {
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: #007aff;
+      margin-top: 0.2rem;
+      white-space: nowrap;
+    }
+
+    .section-title {
+      font-weight: 600;
+      margin-top: 0.8rem;
+      margin-bottom: 0.3rem;
+      font-size: 0.95rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+    label {
+      font-size: 0.85rem;
+      display: block;
+    }
+    select, input[type="search"], input[type="number"] {
+      width: 100%;
+      margin-top: 0.25rem;
+      padding: 0.4rem 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 0.9rem;
+      box-sizing: border-box;
+    }
+    .help {
+      font-size: 0.75rem;
+      color: #666;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.4rem;
+      margin-bottom: 0.15rem;
+      font-size: 0.85rem;
+    }
+    .results-count {
+      color: #555;
+    }
+
+    .dim-advice {
+      font-size: 0.78rem;
+      color: #555;
+      margin-bottom: 0.2rem;
+    }
+
+    .tool-list {
+      margin-top: 0.4rem;
+    }
+    .tool-card {
+      border-radius: 12px;
+      border: 1px solid #e3e3e3;
+      padding: 0.6rem 0.75rem;
+      margin-bottom: 0.45rem;
+      background: #fafafa;
+      font-size: 0.85rem;
+    }
+    .tool-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.5rem;
+      margin-bottom: 0.2rem;
+    }
+    .tool-main {
+      font-weight: 600;
+    }
+    .badge {
+      padding: 0.1rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      background: #e9ecef;
+      color: #495057;
+    }
+    .badge.hydra {
+      background: #e0f0ff;
+      color: #0050a8;
+    }
+    .badge.midas {
+      background: #fbe9e7;
+      color: #c0392b;
+    }
+    .badge.special {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .tool-body {
+      margin-top: 0.2rem;
+      line-height: 1.35;
+    }
+    .tool-meta {
+      margin-top: 0.15rem;
+      font-size: 0.75rem;
+      color: #555;
+    }
+
+    .note {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.7rem;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Outils MY300 – Buses Hydra / Midas</h1>
+      <div class="subtitle">
+        Assistant indicatif pour choisir des buses MY300 à partir de familles de composants
+        ou de dimensions (composants spécifiques / exotiques).
+      </div>
+    </div>
+    <a href="index.html" class="back">← Ratio pochoir</a>
+  </header>
+
+  <div class="section-title">1. Sélection par famille (optionnel)</div>
+  <div class="grid">
+    <label>
+      Famille de composant
+      <select id="compFamily" onchange="renderTools()">
+        <option value="">— aucune (mode dimensions) —</option>
+        <option value="chip_01005">Chip 01005</option>
+        <option value="chip_0201">Chip 0201</option>
+        <option value="chip_0402">Chip 0402</option>
+        <option value="chip_0603_1210">Chip 0603 à 1210 (1206, 1812…)</option>
+        <option value="melf_sod80">MELF / MiniMELF / SOD80</option>
+        <option value="so_small">SO8 / SO14 / SO16</option>
+        <option value="so_big">SO16 / SO20 / SO24 / QFP</option>
+        <option value="led_cree_xp">LED Cree XP-E / XP-G / XT-E</option>
+        <option value="led_cree_xb">LED Cree XB</option>
+        <option value="led_luxeon_rebel">LED Luxeon Rebel / Rebel ES</option>
+        <option value="led_luxeon_z">LED Luxeon Z</option>
+        <option value="led_luxeon_c">LED Luxeon C</option>
+        <option value="led_avago_almd">LED Broadcom / Avago ALMD</option>
+        <option value="led_osram_oslon">LED Osram Oslon Square</option>
+        <option value="connector_small">Connecteurs / petits headers</option>
+        <option value="connector_large">Connecteurs / gros blocs, borniers, QFP/BGA lourds</option>
+        <option value="odd_shape">Pièces spéciales / odd shape / fragile</option>
+      </select>
+    </label>
+
+    <label>
+      Tête / système
+      <select id="headFilter" onchange="renderTools()">
+        <option value="both">Hydra + Midas</option>
+        <option value="Hydra">Hydra uniquement</option>
+        <option value="Midas">Midas uniquement</option>
+      </select>
+    </label>
+
+    <label>
+      Filtre texte (optionnel)
+      <span class="help">Recherche dans le nom, la référence et la description (ex. "MELF", "Cree", "connector").</span>
+      <input id="searchText" type="search" oninput="renderTools()" placeholder="Filtrer…">
+    </label>
+  </div>
+
+  <div class="section-title">2. Composant spécifique / exotique (optionnel)</div>
+  <div class="grid">
+    <label>
+      Longueur L [mm]
+      <span class="help">Dimension du composant dans le sens X (≈ plus grand côté).</span>
+      <input id="compL" type="number" step="0.01" inputmode="decimal" oninput="renderTools()">
+    </label>
+    <label>
+      Largeur W [mm]
+      <span class="help">Dimension du composant dans le sens Y.</span>
+      <input id="compW" type="number" step="0.01" inputmode="decimal" oninput="renderTools()">
+    </label>
+    <label>
+      Hauteur H [mm] (optionnel)
+      <input id="compH" type="number" step="0.01" inputmode="decimal" oninput="renderTools()">
+    </label>
+    <label>
+      Poids [g] (optionnel)
+      <span class="help">Utile pour les gros connecteurs, transformateurs, blindages…</span>
+      <input id="compWeight" type="number" step="0.001" inputmode="decimal" oninput="renderTools()">
+    </label>
+  </div>
+
+  <div class="section-title">3. Outils suggérés</div>
+  <div class="results-header">
+    <div class="results-count" id="resultsCount">Choisir une famille ou saisir au moins L et W.</div>
+  </div>
+  <div id="dimAdvice" class="dim-advice"></div>
+
+  <div id="toolResults" class="tool-list"></div>
+
+  <p class="note">
+    • Cet écran est un <strong>assistant de choix</strong> : les règles de sélection (dimensions, poids) sont heuristiques,
+      basées sur les tableaux Mycronic et ton expérience. Ce n’est pas la sélection “officielle” de Mycronic.<br>
+    • Mode <strong>famille</strong> : utilise les descriptions “Typical components” des tables Hydra / Midas (generic + special tools).<br>
+    • Mode <strong>dimensions</strong> : propose des buses dont le Ø externe reste compatible avec le composant, puis les classe
+      par pertinence géométrique et par tête recommandée (Hydra vs Midas).<br>
+    • Avant d’appliquer un changement en prod, toujours confronter ces suggestions à la documentation Mycronic,
+      aux datasheets et aux retours SPI / AOI / rebuts.
+  </p>
+</div>
+
+<script>
+// --- Données outils (simplifiées à partir des tables Mycronic) ---
+
+const TOOL_DATA = [
+  // HYDRA – Generic
+  {
+    head: 'Hydra',
+    group: 'Generic',
+    code: 'H08',
+    partNumber: 'L-012-1346',
+    color: 'Purple',
+    id_mm: 0.13,
+    od_mm: 0.4,
+    description: 'For 01005. Ceramic.',
+    families: ['chip_01005']
+  },
+  {
+    head: 'Hydra',
+    group: 'Generic',
+    code: 'H06',
+    partNumber: 'L-012-0816',
+    color: 'Green',
+    id_mm: 0.25,
+    od_mm: 0.6,
+    description: 'For 0201.',
+    families: ['chip_0201']
+  },
+  {
+    head: 'Hydra',
+    group: 'Generic',
+    code: 'H09',
+    partNumber: 'L-012-1361',
+    color: 'Yellow-white',
+    id_mm: 0.25,
+    od_mm: 0.6,
+    description: 'For 0201. Ceramic.',
+    families: ['chip_0201']
+  },
+  {
+    head: 'Hydra',
+    group: 'Generic',
+    code: 'H01',
+    partNumber: 'L-012-0533B',
+    color: 'White',
+    id_mm: 0.5,
+    od_mm: 1.2,
+    description: 'For 0402.',
+    families: ['chip_0402']
+  },
+  {
+    head: 'Hydra',
+    group: 'Generic',
+    code: 'H07',
+    partNumber: '4058968',
+    color: 'Orange',
+    id_mm: 0.4,
+    od_mm: 1.0,
+    description: 'For 0402. Ceramic.',
+    families: ['chip_0402']
+  },
+  {
+    head: 'Hydra',
+    group: 'Generic',
+    code: 'H02',
+    partNumber: 'L-012-0534B',
+    color: 'Yellow',
+    id_mm: 0.7,
+    od_mm: 1.5,
+    description: 'For 0603–1210.',
+    families: ['chip_0603_1210']
+  },
+  {
+    head: 'Hydra',
+    group: 'Generic',
+    code: 'H10',
+    partNumber: '4058969',
+    color: 'Red-white',
+    id_mm: 0.7,
+    od_mm: 1.2,
+    description: 'For 0603–0805. Ceramic.',
+    families: ['chip_0603_1210']
+  },
+  {
+    head: 'Hydra',
+    group: 'Generic',
+    code: 'H04',
+    partNumber: 'L-012-0592',
+    color: 'Blue',
+    id_mm: 0.9,
+    od_mm: 1.5,
+    description: 'For SOD80 / MiniMELF.',
+    families: ['melf_sod80']
+  },
+  {
+    head: 'Hydra',
+    group: 'Generic',
+    code: 'H03',
+    partNumber: 'L-012-0535B',
+    color: 'Red',
+    id_mm: 1.0,
+    od_mm: 3.0,
+    description: 'For SO8 / SO14 / SO16.',
+    families: ['so_small']
+  },
+  {
+    head: 'Hydra',
+    group: 'Generic',
+    code: 'H05',
+    partNumber: 'L-012-0824',
+    color: 'Brown',
+    id_mm: 2.8,
+    od_mm: 5.2,
+    description: 'For SO16 / SO20 / SO24.',
+    families: ['so_big']
+  },
+
+  // HYDRA – LED special tools
+  {
+    head: 'Hydra',
+    group: 'LED',
+    code: 'Hydra LED Cree XP/XT (no blow)',
+    partNumber: 'L-012-0971',
+    id_mm: 3.45,
+    od_mm: 4.0,
+    description: 'Hydra LED tool for Cree XP-E, XP-G, XT-E or compatible parts. With evacuation holes. Suitable for Hydra without blow function.',
+    families: ['led_cree_xp']
+  },
+  {
+    head: 'Hydra',
+    group: 'LED',
+    code: 'Hydra LED Luxxon Rebel',
+    partNumber: 'L-012-0972',
+    id_mm: 2.8,
+    od_mm: 3.3,
+    description: 'Hydra LED tool for Luxeon Rebel ES/Rebel Plus, Cree XH-B/XH-G, Osram Oslon Square GW CSSRM1/LW/LD/LUW or compatible parts.',
+    families: ['led_luxeon_rebel', 'led_osram_oslon']
+  },
+  {
+    head: 'Hydra',
+    group: 'LED',
+    code: 'Hydra LED Luxeon Z',
+    partNumber: 'L-012-0997',
+    id_mm: 0.5,
+    od_mm: 1.2,
+    description: 'Hydra LED tool for Luxeon Z or compatible parts.',
+    families: ['led_luxeon_z']
+  },
+  {
+    head: 'Hydra',
+    group: 'LED',
+    code: 'Hydra LED Luxeon C',
+    partNumber: 'L-012-1006',
+    id_mm: 1.75,
+    od_mm: 2.0,
+    description: 'Hydra LED tool for Luxeon C or compatible parts.',
+    families: ['led_luxeon_c']
+  },
+  {
+    head: 'Hydra',
+    group: 'LED',
+    code: 'Hydra LED Cree XP/XT (blow)',
+    partNumber: 'L-012-1010',
+    id_mm: 3.45,
+    od_mm: 4.0,
+    description: 'Hydra LED tool for Cree XP-E, XP-G, XT-E or compatible parts. Suitable for Hydra with blow function.',
+    families: ['led_cree_xp']
+  },
+  {
+    head: 'Hydra',
+    group: 'LED',
+    code: 'Hydra LED Cree XB',
+    partNumber: 'L-012-0948',
+    id_mm: 1.8,
+    od_mm: 2.2,
+    description: 'Hydra LED tool for Cree LEDs type XB or compatible parts.',
+    families: ['led_cree_xb']
+  },
+  {
+    head: 'Hydra',
+    group: 'LED',
+    code: 'Hydra LED Avago ALMD',
+    partNumber: 'L-012-0950',
+    id_mm: 3.9,
+    od_mm: 4.4,
+    description: 'Hydra LED tool for Broadcom (Avago) LEDs type ALMD or compatible parts.',
+    families: ['led_avago_almd']
+  },
+  {
+    head: 'Hydra',
+    group: 'LED',
+    code: 'Hydra LED Osram Oslon',
+    partNumber: 'L-012-1011',
+    id_mm: 3.0,
+    od_mm: 3.3,
+    description: 'Hydra LED tool for Osram Oslon Sq GW CSSRM2 or compatible parts.',
+    families: ['led_osram_oslon']
+  },
+
+  // MIDAS – Generic tools
+  {
+    head: 'Midas',
+    group: 'Generic',
+    code: 'Tool A12',
+    partNumber: 'L-012-0011E',
+    description: 'Spring-suspended tool with 0.8 mm internal diameter tip.',
+    families: ['chip_0402', 'chip_0603_1210']
+  },
+  {
+    head: 'Midas',
+    group: 'Generic',
+    code: 'Tool A13',
+    partNumber: 'L-012-0012F',
+    description: 'Spring-suspended tool with 1.2 mm internal diameter tip. Typical component types: 1206, 1812, SOT-89.',
+    families: ['chip_0603_1210']
+  },
+  {
+    head: 'Midas',
+    group: 'Generic',
+    code: 'Tool A145',
+    partNumber: 'L-012-0109C',
+    description: 'Spring-suspended tool with 2.0 mm internal diameter tip.',
+    families: ['chip_0603_1210', 'connector_small']
+  },
+  {
+    head: 'Midas',
+    group: 'Generic',
+    code: 'Tool A23',
+    partNumber: 'L-012-0014D',
+    description: 'Stiff tool with 3.0 mm internal diameter tip. Typical components: SO-18, SO-20, Flat Pack-80.',
+    families: ['so_big']
+  },
+  {
+    head: 'Midas',
+    group: 'Generic',
+    code: 'Tool A235',
+    partNumber: 'L-012-0515B',
+    description: 'Spring-suspended tool with 3.0 mm internal diameter tip (includes spare tip and puller).',
+    families: ['so_big']
+  },
+  {
+    head: 'Midas',
+    group: 'Generic',
+    code: 'Tool A24',
+    partNumber: 'L-012-0515D',
+    description: 'Stiff tool with 5.0 mm internal diameter tip. Typical components: LCCC, PLCC, QFP.',
+    families: ['so_big', 'connector_large']
+  },
+  {
+    head: 'Midas',
+    group: 'Generic',
+    code: 'Tool A245',
+    partNumber: 'L-012-0525B',
+    description: 'Spring-suspended tool with 5.0 mm internal diameter tip (includes spare tip and puller).',
+    families: ['so_big', 'connector_large']
+  },
+  {
+    head: 'Midas',
+    group: 'Generic',
+    code: 'Tool A344',
+    partNumber: 'L-012-0016E',
+    description: 'Spring-suspended MELF tool for 1.5 mm diameter. Typical component type: MINIMELF.',
+    families: ['melf_sod80']
+  },
+  {
+    head: 'Midas',
+    group: 'Generic',
+    code: 'Tool B12',
+    partNumber: 'L-012-0884',
+    description: 'Spring-suspended tool with tip 0.13 mm ID / 0.45 mm OD. Typical component: 01005 and 0201.',
+    families: ['chip_01005', 'chip_0201']
+  },
+  {
+    head: 'Midas',
+    group: 'Generic',
+    code: 'Tool B13 short',
+    partNumber: 'L-012-0839',
+    description: 'Stiff, extra short tool with 0.8 mm internal diameter tip and 1.0 mm outer diameter. Typical components: Connectors.',
+    families: ['connector_small']
+  },
+  {
+    head: 'Midas',
+    group: 'Generic',
+    code: 'Tool B22',
+    partNumber: 'L-012-0020E',
+    description: 'Spring-suspended MELF tool for 2.5 mm diameter. Typical component: SOD80.',
+    families: ['melf_sod80']
+  },
+  {
+    head: 'Midas',
+    group: 'Generic',
+    code: 'Tool B24',
+    partNumber: 'L-012-0021E',
+    description: 'Spring-suspended MELF tool for 3.2 mm diameter. Typical component: MELF.',
+    families: ['melf_sod80']
+  },
+  {
+    head: 'Midas',
+    group: 'Generic',
+    code: 'Tool B34',
+    partNumber: 'L-012-0022E',
+    description: 'Spring-suspended MELF tool for 2.0 mm diameter. Typical component: MELF.',
+    families: ['melf_sod80']
+  },
+  {
+    head: 'Midas',
+    group: 'Generic',
+    code: 'Tool C14',
+    partNumber: 'L-012-0802',
+    description: 'Stiff tool with 2.5 mm internal diameter tip. Typical component: Large heavy odd components.',
+    families: ['connector_large', 'odd_shape']
+  },
+  {
+    head: 'Midas',
+    group: 'Generic',
+    code: 'Tool C23',
+    partNumber: 'L-012-026D',
+    description: 'Stiff tool with 8.0 mm internal diameter tip. For large components mounted using optical centering.',
+    families: ['connector_large', 'odd_shape']
+  },
+  {
+    head: 'Midas',
+    group: 'Generic',
+    code: 'Tool C235',
+    partNumber: 'L-012-0838C',
+    description: 'Spring-suspended tool with 8.0 mm internal diameter tip. For large components mounted with optical centering.',
+    families: ['connector_large', 'odd_shape']
+  },
+
+  // MIDAS – Special tools (extraits)
+  {
+    head: 'Midas',
+    group: 'Special',
+    code: 'Tool C24 flat nozzle 4.5×1.0',
+    partNumber: 'L-012-0846',
+    description: 'Nozzle outer dimensions 4.5 mm × 1.0 mm. Typical components: Connectors.',
+    families: ['connector_small']
+  },
+  {
+    head: 'Midas',
+    group: 'Special',
+    code: 'Tool C24 flat nozzle 7.0×1.0',
+    partNumber: 'L-012-0847',
+    description: 'Nozzle outer dimensions 7.2 mm × 1.2 mm. Typical components: Connectors.',
+    families: ['connector_large']
+  },
+  {
+    head: 'Midas',
+    group: 'Special',
+    code: 'Tool C24 flat nozzle 1.5×1.0',
+    partNumber: 'L-009-0357',
+    description: 'Nozzle outer dimensions 1.5 mm × 1.0 mm. Typical components: Connectors.',
+    families: ['connector_small']
+  },
+  {
+    head: 'Midas',
+    group: 'Special',
+    code: 'Tool C24 MELF 3.3',
+    partNumber: 'L-012-0848',
+    description: 'Tool tip curve radius 1.65 mm. Typical components: MELF, diodes.',
+    families: ['melf_sod80']
+  },
+  {
+    head: 'Midas',
+    group: 'Special',
+    code: 'Tool C24 MELF 4.5',
+    partNumber: 'L-012-0849',
+    description: 'Tool tip curve radius 2.25 mm. Typical components: MELF, diodes.',
+    families: ['melf_sod80']
+  },
+  {
+    head: 'Midas',
+    group: 'Special',
+    code: 'Tool C24 MELF 7.7',
+    partNumber: 'L-012-0850',
+    description: 'Tool tip curve radius 3.85 mm. Typical components: MELF, diodes.',
+    families: ['melf_sod80']
+  },
+  {
+    head: 'Midas',
+    group: 'Special',
+    code: 'Tool double nozzle cc 3.8',
+    partNumber: 'L-009-0019',
+    description: 'Double nozzle d = 2×1.5 mm, cc 3.8 mm, height 8 mm. Typical components: Connector, coils or components with a centre hole.',
+    families: ['connector_small']
+  },
+  {
+    head: 'Midas',
+    group: 'Special',
+    code: 'Tool double nozzle cc 4.1',
+    partNumber: 'L-009-0350',
+    description: 'Double nozzle d = 2×1.5 mm, cc 4.1 mm, height 8 mm. Typical components: Connectors with leads on the side, coils or components with a centre hole.',
+    families: ['connector_small']
+  },
+  {
+    head: 'Midas',
+    group: 'Special',
+    code: 'Tool double nozzle cc 4.3',
+    partNumber: 'L-009-0457',
+    description: 'Double nozzle d = 2×1.2 mm, cc 4.3 mm, height 8 mm. Typical components: Connectors with leads on the side, coils or components with a centre hole.',
+    families: ['connector_small']
+  },
+  {
+    head: 'Midas',
+    group: 'Special',
+    code: 'Tool double nozzle cc 6',
+    partNumber: 'L-009-0511B',
+    description: 'Double nozzle d = 2×3 mm, cc 6 mm, height 8 mm. Typical components: Connectors with leads on the side, coils or components with a centre hole.',
+    families: ['connector_large']
+  },
+  {
+    head: 'Midas',
+    group: 'Special',
+    code: 'Tool double nozzle cc 8',
+    partNumber: 'L-009-0003',
+    description: 'Double nozzle cc 8 mm. Typical components: Connectors with leads on the side, coils or components with a centre hole.',
+    families: ['connector_large']
+  },
+  {
+    head: 'Midas',
+    group: 'Special',
+    code: 'Tool gripper 2–5 mm',
+    partNumber: 'L-009-011',
+    description: 'Grip 2–5 mm jaws, width 5 mm, height 4 mm. Typical components: Connectors, odd shape components.',
+    families: ['connector_small', 'odd_shape']
+  },
+  {
+    head: 'Midas',
+    group: 'Special',
+    code: 'Tool gripper 2–6 mm',
+    partNumber: 'L-009-0089',
+    description: 'Grip 2–6 mm jaws, width 4 mm, height 5 mm. Typical components: Connectors, odd shape components.',
+    families: ['connector_small', 'odd_shape']
+  },
+  {
+    head: 'Midas',
+    group: 'Special',
+    code: 'Tool gripper for dip switch',
+    partNumber: 'L-009-0091',
+    description: 'Grip 5–8 mm jaws, width 4 mm, height 15 mm. Typical components: Dip switch, connectors.',
+    families: ['connector_small', 'odd_shape']
+  },
+  {
+    head: 'Midas',
+    group: 'Special',
+    code: 'Tool gripper wedge jaws',
+    partNumber: 'L-009-0163',
+    description: 'Grip 3.6–4.6 mm jaws, width 5 mm, height 3.2 mm. Typical components: Connectors, odd shape components.',
+    families: ['connector_small', 'odd_shape']
+  },
+  {
+    head: 'Midas',
+    group: 'Special',
+    code: 'Tool low force',
+    partNumber: 'L-009-0071',
+    description: 'Placement force 0.25 N. Tool tip not included. Typical components: Fragile components or substrates.',
+    families: ['odd_shape']
+  },
+  {
+    head: 'Midas',
+    group: 'Special',
+    code: 'Tool Midas for Hydra nozzles',
+    partNumber: 'L-012-1332',
+    description: 'Spring loaded mount tool for Midas head to be used with Hydra nozzles (e.g. Hydra LED).',
+    families: ['led_cree_xp', 'led_luxeon_rebel', 'led_luxeon_z', 'led_luxeon_c', 'led_cree_xb', 'led_avago_almd', 'led_osram_oslon']
+  },
+  {
+    head: 'Midas',
+    group: 'Special',
+    code: 'Tool below suction cup',
+    partNumber: 'L-009-0308',
+    description: 'Special tool for uneven surface of heavy components. Outer diameter 10.0 mm, inner diameter 9.2 mm.',
+    families: ['connector_large', 'odd_shape']
+  },
+  {
+    head: 'Midas',
+    group: 'Special',
+    code: 'Tool QFP 22 mm',
+    partNumber: 'L-009-0255',
+    description: 'Diameter 22 mm. Special large tool bank required. Typical components: Large and heavy QFP/BGA.',
+    families: ['connector_large']
+  },
+  {
+    head: 'Midas',
+    group: 'Special',
+    code: 'Tool thin nozzle',
+    partNumber: 'L-009-0063',
+    description: 'Tool for mounting of small components in narrow areas or close to tall components. Tip length 5.0 mm, diameter 0.5 mm.',
+    families: ['odd_shape', 'connector_small']
+  }
+];
+
+// --- Utilitaires ---
+
+function parsePositive(id) {
+  const v = parseFloat(document.getElementById(id).value);
+  return isFinite(v) && v > 0 ? v : null;
+}
+
+function getDimensionInfo() {
+  const L = parsePositive('compL');
+  const W = parsePositive('compW');
+  const H = parsePositive('compH');
+  const weight = parsePositive('compWeight');
+
+  if (!L || !W) {
+    return {
+      hasDims: false,
+      text: 'Pas de dimensions saisies : l’outil se base uniquement sur les familles de composants et les tables Mycronic.'
+    };
+  }
+
+  const sideMin = Math.min(L, W);
+  const sideMax = Math.max(L, W);
+
+  let preference = 'Neutral';
+  let text = '';
+
+  if (sideMax <= 3 && (!weight || weight <= 0.005)) {
+    preference = 'Hydra';
+    text = `Composant petit (L ≈ ${L.toFixed(2)} mm, W ≈ ${W.toFixed(2)} mm, poids faible). ` +
+           `Hydra plutôt recommandée. Midas possible uniquement si contrainte spéciale (forme, fragilité…).`;
+  } else if (sideMax <= 6 && (!weight || weight <= 0.02)) {
+    preference = 'Hydra';
+    text = `Composant de petite à moyenne taille (L ≈ ${L.toFixed(2)} mm, W ≈ ${W.toFixed(2)} mm). ` +
+           `Hydra privilégiée ; Midas envisageable pour composants fragiles ou formes particulières.`;
+  } else if (sideMax <= 15 && (!weight || weight <= 0.1)) {
+    preference = 'Neutral';
+    text = `Composant de taille intermédiaire (L ≈ ${L.toFixed(2)} mm, W ≈ ${W.toFixed(2)} mm). ` +
+           `Hydra ou Midas possibles : choisir selon centre optique, rigidité du composant et charge du support.`;
+  } else {
+    preference = 'Midas';
+    text = `Composant large / potentiellement lourd (L ≈ ${L.toFixed(2)} mm, W ≈ ${W.toFixed(2)} mm). ` +
+           `Midas plutôt recommandée pour le placement ; Hydra uniquement si la géométrie s’y prête vraiment.`;
+  }
+
+  text += ' (Rappel : aide empirique, à valider avec la doc Mycronic et l’expérience de ligne.)';
+
+  return {
+    hasDims: true,
+    L, W, H, weight,
+    sideMin,
+    sideMax,
+    preference,
+    text
+  };
+}
+
+function renderTools() {
+  const family = document.getElementById('compFamily').value;
+  const headFilter = document.getElementById('headFilter').value;
+  const search = document.getElementById('searchText').value.trim().toLowerCase();
+  const container = document.getElementById('toolResults');
+  const countEl = document.getElementById('resultsCount');
+  const dimAdviceEl = document.getElementById('dimAdvice');
+
+  const dimInfo = getDimensionInfo();
+  const hasDims = dimInfo.hasDims;
+
+  dimAdviceEl.textContent = dimInfo.text || '';
+
+  container.innerHTML = '';
+
+  if (!family && !hasDims) {
+    countEl.textContent = 'Choisir une famille de composant ou saisir au moins L et W.';
+    return;
+  }
+
+  // Point de départ : tous les outils
+  let tools = TOOL_DATA.slice();
+
+  // Filtre famille
+  if (family) {
+    tools = tools.filter(t => t.families.includes(family));
+  }
+
+  // Filtre tête
+  if (headFilter !== 'both') {
+    tools = tools.filter(t => t.head === headFilter);
+  }
+
+  // Filtre texte
+  if (search) {
+    tools = tools.filter(t => {
+      const txt = (t.code + ' ' + t.partNumber + ' ' + (t.description || '')).toLowerCase();
+      return txt.includes(search);
+    });
+  }
+
+  // Filtre / scoring géométrique si dimensions
+  if (hasDims) {
+    const sideMin = dimInfo.sideMin;
+
+    tools = tools.filter(t => {
+      if (t.od_mm == null) {
+        // Si on n’a que la famille (pas de dimensions), on garde quand même.
+        // Si on est uniquement en mode dimensions, on élimine (pas d’info de Ø).
+        return !!family;
+      }
+      if (!family && t.od_mm > sideMin * 1.05) return false;     // mode dimensions seul : Ø > composant → on écarte
+      if (family && t.od_mm > sideMin * 1.20) return false;      // mode famille + dimensions : on tolère un peu plus
+      return true;
+    });
+
+    tools.forEach(t => {
+      let score = 0;
+
+      if (t.od_mm != null) {
+        const ratio = t.od_mm / sideMin;      // idéal ~ 0,7
+        const diff = Math.abs(ratio - 0.7);   // plus c’est proche, mieux c’est
+        score += 10 - diff * 20;              // 10 au mieux, chute rapide ensuite
+      }
+
+      if (dimInfo.preference === 'Hydra') {
+        if (t.head === 'Hydra') score += 4;
+        else if (t.head === 'Midas') score -= 1;
+      } else if (dimInfo.preference === 'Midas') {
+        if (t.head === 'Midas') score += 4;
+        else if (t.head === 'Hydra') score -= 1;
+      }
+
+      if (t.group === 'Generic') score += 0.5;
+      if (t.group === 'LED') score += 0.3;
+      if (t.group === 'Special') score -= 0.2;
+
+      t._score = score;
+    });
+  }
+
+  if (!tools.length) {
+    countEl.textContent = 'Aucun outil trouvé pour cette combinaison (famille / dimensions / tête / filtre).';
+    return;
+  }
+
+  // Tri
+  tools.sort((a, b) => {
+    if (hasDims) {
+      const sa = Number.isFinite(a._score) ? a._score : -1e9;
+      const sb = Number.isFinite(b._score) ? b._score : -1e9;
+      if (sa !== sb) return sb - sa;
+    }
+
+    if (a.head !== b.head) {
+      if (a.head === 'Hydra') return -1;
+      if (b.head === 'Hydra') return 1;
+    }
+    const groupOrder = { 'Generic': 0, 'LED': 1, 'Special': 2 };
+    const ga = groupOrder[a.group] ?? 99;
+    const gb = groupOrder[b.group] ?? 99;
+    if (ga !== gb) return ga - gb;
+
+    return (a.code || '').localeCompare(b.code || '');
+  });
+
+  countEl.textContent = tools.length + ' outil(s) trouvé(s).';
+
+  tools.forEach(t => {
+    const card = document.createElement('div');
+    card.className = 'tool-card';
+
+    const titleDiv = document.createElement('div');
+    titleDiv.className = 'tool-title';
+
+    const left = document.createElement('div');
+    left.innerHTML = '<span class="tool-main">' +
+      (t.code || '') + '</span> – ' + (t.partNumber || '');
+
+    const right = document.createElement('div');
+    const badgeHead = document.createElement('span');
+    badgeHead.className = 'badge ' + (t.head === 'Hydra' ? 'hydra' : 'midas');
+    badgeHead.textContent = t.head;
+    right.appendChild(badgeHead);
+
+    if (t.group !== 'Generic') {
+      const badgeGroup = document.createElement('span');
+      badgeGroup.className = 'badge special';
+      badgeGroup.textContent = t.group;
+      right.appendChild(document.createTextNode(' '));
+      right.appendChild(badgeGroup);
+    }
+
+    titleDiv.appendChild(left);
+    titleDiv.appendChild(right);
+
+    const body = document.createElement('div');
+    body.className = 'tool-body';
+    body.textContent = t.description || '';
+
+    const meta = document.createElement('div');
+    meta.className = 'tool-meta';
+    const bits = [];
+    if (typeof t.id_mm === 'number') bits.push('ID ' + t.id_mm.toFixed(2) + ' mm');
+    if (typeof t.od_mm === 'number') bits.push('OD ' + t.od_mm.toFixed(2) + ' mm');
+    if (t.color) bits.push('Couleur Hydra : ' + t.color);
+    if (bits.length) meta.textContent = bits.join(' · ');
+
+    card.appendChild(titleDiv);
+    card.appendChild(body);
+    if (bits.length) card.appendChild(meta);
+
+    container.appendChild(card);
+  });
+}
+
+// Initialisation
+window.addEventListener('load', () => {
+  renderTools();
+});
+
+// Service worker (hors-ligne)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(err => {
+      console.log('SW registration failed', err);
+    });
+  });
+}
+</script>
+</body>
+</html>

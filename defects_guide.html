@@ -134,13 +134,13 @@
     quels réglages et quels outils de l’application peuvent aider à analyser la situation.
   </p>
 
-  <div class="section-title">1. Défauts liés à l’impression de pâte</div>
+  <div class="section-title">1. Défauts liés à la sérigraphie de pâte</div>
 
   <!-- 1. Manque de pâte -->
   <div class="defect-card">
     <div class="defect-header">
       <div class="defect-title">1. Manque de pâte / ouverture partiellement remplie</div>
-      <div class="defect-tag">Étape : impression</div>
+      <div class="defect-tag">Étape : sérigraphie</div>
     </div>
     <div class="defect-desc">
       Pâte insuffisante sur certains pads, souvent plus marqué sur les petites ouvertures ou aux bords du PCB.
@@ -159,7 +159,7 @@
     <ul>
       <li><span class="tool-name">Ratio pochoir</span> : vérifier l’aspect ratio et l’area ratio des ouvertures critiques.</li>
       <li><span class="tool-name">tmax (épaisseur max pochoir)</span> : confirmer que l’épaisseur choisie reste compatible avec les ouvertures.</li>
-      <li><span class="tool-name">Réglage impression</span> : ajuster pression, vitesse, tension pochoir, TE SPI.</li>
+      <li><span class="tool-name">Réglage sérigraphie</span> : ajuster pression, vitesse, tension pochoir, TE SPI.</li>
       <li><span class="tool-name">Nettoyage & pâte</span> : vérifier l’intervalle de nettoyage et la durée d’utilisation de la pâte.</li>
       <li><span class="tool-name">Volume pâte CMS / PiP</span> : comparer volumes théoriques et volumes SPI mesurés.</li>
     </ul>
@@ -169,7 +169,7 @@
   <div class="defect-card">
     <div class="defect-header">
       <div class="defect-title">2. Excès de pâte / ponts de brasure (bridging)</div>
-      <div class="defect-tag">Étape : impression + refusion</div>
+      <div class="defect-tag">Étape : sérigraphie + refusion</div>
     </div>
     <div class="defect-desc">
       Pâte en trop, joint de brasure qui relie deux pads adjacents (surtout entre pattes fines).
@@ -187,7 +187,7 @@
     <ul>
       <li><span class="tool-name">Ratio pochoir</span> : vérifier l’area ratio et ajuster les ouvertures si nécessaire.</li>
       <li><span class="tool-name">tmax</span> : revoir l’épaisseur de pochoir pour les pas fins.</li>
-      <li><span class="tool-name">Réglage impression</span> : diminuer la pression de racle, ajuster la vitesse et la séparation.</li>
+      <li><span class="tool-name">Réglage sérigraphie</span> : diminuer la pression de racle, ajuster la vitesse et la séparation.</li>
       <li><span class="tool-name">Profil refusion</span> : contrôler TAL et pic par rapport aux plages recommandées.</li>
     </ul>
   </div>
@@ -196,7 +196,7 @@
   <div class="defect-card">
     <div class="defect-header">
       <div class="defect-title">3. Solder balls / boules de brasure</div>
-      <div class="defect-tag">Étape : impression + refusion</div>
+      <div class="defect-tag">Étape : sérigraphie + refusion</div>
     </div>
     <div class="defect-desc">
       Petites billes de brasure autour des pads ou entre pistes après refusion.
@@ -211,24 +211,24 @@
     <div class="sub-heading">Outils de l’application utiles</div>
     <ul>
       <li><span class="tool-name">Nettoyage & pâte</span> : vérifier la durée d’utilisation de la pâte vs. limite datasheet.</li>
-      <li><span class="tool-name">Volume pâte CMS / PiP</span> : contrôler les volumes imprimés.</li>
+      <li><span class="tool-name">Volume pâte CMS / PiP</span> : contrôler les volumes sérigraphiés.</li>
       <li><span class="tool-name">Profil refusion</span> : vérifier la pente, le soak et le TAL par rapport aux plages.</li>
-      <li><span class="tool-name">Réglage impression</span> : ajuster pression/vitesse si la pâte “bave” en impression.</li>
+      <li><span class="tool-name">Réglage sérigraphie</span> : ajuster pression/vitesse si la pâte “bave” après sérigraphie.</li>
     </ul>
   </div>
 
-  <!-- 4. Décalage d’impression -->
+  <!-- 4. Décalage de la sérigraphie -->
   <div class="defect-card">
     <div class="defect-header">
-      <div class="defect-title">4. Décalage d’impression (offset)</div>
-      <div class="defect-tag">Étape : impression</div>
+      <div class="defect-title">4. Décalage de la sérigraphie (offset)</div>
+      <div class="defect-tag">Étape : sérigraphie</div>
     </div>
     <div class="defect-desc">
       Pâte déposée décalée par rapport aux pads cuivre, parfois dans une direction dominante.
     </div>
     <div class="sub-heading">À vérifier sur la ligne</div>
     <ul>
-      <li>Réglage d’alignement de l’imprimante (fiducials, offset X/Y).</li>
+      <li>Réglage d’alignement de la sérigraphie (fiducials, offset X/Y).</li>
       <li>Fixation du pochoir, jeu mécanique, tension insuffisante.</li>
       <li>Planéité du support PCB / outillage (support central, pins).</li>
       <li>Pression racle trop élevée ou trop faible entraînant un glissement du pochoir.</li>
@@ -236,7 +236,7 @@
     </ul>
     <div class="sub-heading">Outils de l’application utiles</div>
     <ul>
-      <li><span class="tool-name">Réglage impression</span> : tension pochoir, pression, TE SPI, vitesse de séparation.</li>
+      <li><span class="tool-name">Réglage sérigraphie</span> : tension pochoir, pression, TE SPI, vitesse de séparation.</li>
       <li><span class="tool-name">Nettoyage & pâte</span> : ajuster la fréquence de nettoyage pour limiter les résidus.</li>
       <li><span class="tool-name">Infos PCB & pochoir</span> : rappeler la configuration couche cuivre / vernis pour l’appui.</li>
     </ul>
@@ -246,7 +246,7 @@
   <div class="defect-card">
     <div class="defect-header">
       <div class="defect-title">5. Tombstoning / composants verticaux</div>
-      <div class="defect-tag">Étape : refusion (lié impression + design)</div>
+      <div class="defect-tag">Étape : refusion (lié sérigraphie + design)</div>
     </div>
     <div class="defect-desc">
       Petits passifs (0201, 0402, 0603…) qui se relèvent et restent soudés sur un seul pad.
@@ -270,7 +270,7 @@
   <div class="defect-card">
     <div class="defect-header">
       <div class="defect-title">6. Voids importants sur pads de puissance / thermal pads</div>
-      <div class="defect-tag">Étape : impression + refusion</div>
+      <div class="defect-tag">Étape : sérigraphie + refusion</div>
     </div>
     <div class="defect-desc">
       Cavités de gaz dans la brasure sous un boîtier de puissance (QFN, DPAK, etc.).
@@ -294,7 +294,7 @@
   <div class="defect-card">
     <div class="defect-header">
       <div class="defect-title">7. Broches / trous PiP insuffisamment remplis</div>
-      <div class="defect-tag">Étape : impression + refusion</div>
+      <div class="defect-tag">Étape : sérigraphie + refusion</div>
     </div>
     <div class="defect-desc">
       Pâte insuffisante pour remplir correctement les trous métallisés des composants Pin-in-Paste.
@@ -334,7 +334,7 @@
     <ul>
       <li><span class="tool-name">Profil refusion</span> : contrôler rampe, soak, TAL, pic vs plage recommandée.</li>
       <li><span class="tool-name">Nettoyage & pâte</span> : vérifier la durée d’utilisation de la pâte vs limite fournisseur.</li>
-      <li><span class="tool-name">Volume pâte CMS</span> : confirmer que le volume imprimé n’est pas trop faible.</li>
+      <li><span class="tool-name">Volume pâte CMS</span> : confirmer que le volume sérigraphié n’est pas trop faible.</li>
     </ul>
   </div>
 
