@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Défauts pâte à braser & joints de soudure</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Défauts CMS">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color-scheme: light;
+    }
+    body {
+      margin: 0;
+      padding: 1rem;
+      background: #f5f5f5;
+    }
+    .app {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 1.25rem 1.5rem 1.5rem;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+    .subtitle {
+      font-size: 0.8rem;
+      color: #555;
+    }
+    a.back {
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: #007aff;
+      margin-top: 0.2rem;
+      white-space: nowrap;
+    }
+
+    .section-title {
+      font-weight: 600;
+      margin-top: 0.8rem;
+      margin-bottom: 0.3rem;
+      font-size: 0.95rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+    label {
+      font-size: 0.85rem;
+      display: block;
+    }
+    select, input[type="search"] {
+      width: 100%;
+      margin-top: 0.25rem;
+      padding: 0.4rem 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 0.9rem;
+      box-sizing: border-box;
+    }
+    .help {
+      font-size: 0.75rem;
+      color: #666;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.4rem;
+      margin-bottom: 0.15rem;
+      font-size: 0.85rem;
+    }
+    .results-count {
+      color: #555;
+    }
+
+    .defect-panel {
+      margin-top: 0.4rem;
+      border-radius: 14px;
+      border: 1px solid #e3e3e3;
+      background: #fafafa;
+      padding: 0.75rem 0.8rem 0.8rem;
+      font-size: 0.9rem;
+    }
+
+    .defect-title {
+      margin: 0 0 0.25rem 0;
+      font-size: 1.05rem;
+    }
+    .defect-subtitle {
+      font-size: 0.8rem;
+      color: #666;
+      margin-bottom: 0.35rem;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-bottom: 0.5rem;
+    }
+    .badge {
+      padding: 0.1rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      background: #e9ecef;
+      color: #495057;
+    }
+    .badge.cat {
+      background: #e0f7fa;
+      color: #006064;
+    }
+    .badge.kind {
+      background: #ede7f6;
+      color: #4527a0;
+    }
+    .badge.tag {
+      background: #f3e5f5;
+      color: #4a148c;
+    }
+
+    .block-title {
+      font-weight: 600;
+      margin: 0.4rem 0 0.2rem;
+      font-size: 0.9rem;
+    }
+    ul {
+      margin: 0 0 0.3rem 1.1rem;
+      padding: 0;
+    }
+    li {
+      margin-bottom: 0.15rem;
+    }
+
+    .note {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.7rem;
+      line-height: 1.4;
+    }
+    .placeholder {
+      font-size: 0.85rem;
+      color: #777;
+      padding: 0.5rem 0.2rem 0.2rem;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Défauts pâte à braser & joints de soudure</h1>
+      <div class="subtitle">
+        Assistant indicatif : types de défauts, causes probables et pistes de solutions
+        (pâte à braser, pochoir, profil four, PCB, composants…).
+      </div>
+    </div>
+    <a href="index.html" class="back">← Accueil outils CMS</a>
+  </header>
+
+  <div class="section-title">1. Choisir un défaut</div>
+  <div class="grid">
+    <label>
+      Catégorie
+      <select id="categoryFilter" onchange="updateDefectList()">
+        <option value="all">Tous les types</option>
+        <option value="depot">Dépôt de pâte (avant refusion)</option>
+        <option value="joint">Joints de soudure (après refusion)</option>
+        <option value="residus">Résidus / vieillissement</option>
+      </select>
+    </label>
+
+    <label>
+      Type de défaut
+      <span class="help">Nom français et anglais pour faciliter les échanges avec fournisseurs / doc.</span>
+      <select id="defectSelect" onchange="renderDefect()">
+        <!-- options remplies en JS -->
+      </select>
+    </label>
+
+    <label>
+      Filtre texte (optionnel)
+      <span class="help">Recherche dans les noms FR/EN, la catégorie, les tags, les causes et les solutions.</span>
+      <input id="searchText" type="search" oninput="updateDefectList()" placeholder="Rechercher (ex: void, non-wetting, fissure)...">
+    </label>
+  </div>
+
+  <div class="section-title">2. Analyse & pistes de résolution</div>
+  <div class="results-header">
+    <div class="results-count" id="resultsCount">Aucun défaut sélectionné.</div>
+  </div>
+
+  <div id="defectPanel" class="defect-panel">
+    <div class="placeholder">
+      Sélectionner un défaut dans la liste pour afficher la description, les causes probables
+      et les pistes de solutions possibles.
+    </div>
+  </div>
+
+  <p class="note">
+    • Cet écran est un <strong>assistant</strong> : les causes et actions sont indicatives et doivent être croisées
+      avec ton expérience de ligne, les datasheets, les specs alliage/profil et la documentation du fournisseur de pâte.<br>
+    • Pour un même défaut, l’origine peut être multiple (pâte, pochoir, profil, PCB, composants, environnement).  
+      L’outil vise à donner rapidement une checklist d’éléments à vérifier et des directions de réglage.
+  </p>
+</div>
+
+<script>
+const CATEGORIES = {
+  depot: "Dépôt de pâte (avant refusion)",
+  joint: "Joints de soudure (après refusion)",
+  residus: "Résidus / vieillissement"
+};
+
+const DEFECTS = [
+  // --- A. Dépôt de pâte ---
+  {
+    id: "low_volume",
+    name_fr: "Volume de pâte insuffisant",
+    name_en: "Insufficient solder paste / low volume",
+    categoryKey: "depot",
+    kind: "Volume / couverture",
+    tags: ["Pochoir", "Pâte", "Impression"],
+    causes: [
+      "Epaisseur de pochoir trop faible pour ce composant.",
+      "Réduction d ouverture trop forte ou géométrie d ouverture défavorable.",
+      "Pression de racle trop faible ou vitesse trop élevée.",
+      "Pâte trop sèche ou trop visqueuse (stockage, vieillissement).",
+      "Ouvertures partiellement bouchées, nettoyage pochoir insuffisant."
+    ],
+    actions: [
+      "Vérifier l aspect ratio et l area ratio des ouvertures et réduire moins si possible.",
+      "Ajuster pression de racle, vitesse et paramètres d impression dans la plage recommandée.",
+      "Contrôler la gestion de la pâte (stockage, temps sur pochoir, mélange).",
+      "Augmenter la fréquence et la qualité du nettoyage pochoir.",
+      "Revoir l empreinte ou utiliser un step de pochoir si le problème est localisé."
+    ]
+  },
+  {
+    id: "high_volume",
+    name_fr: "Volume de pâte excessif",
+    name_en: "Excess solder paste / high volume",
+    categoryKey: "depot",
+    kind: "Volume / couverture",
+    tags: ["Pochoir", "Footprint"],
+    causes: [
+      "Pochoir trop épais pour les composants concernés.",
+      "Aucune réduction d ouverture dans les zones sensibles (chip, QFP, pas fin).",
+      "Pression de racle trop élevée ou racle trop souple.",
+      "Pads cuivre très larges ou surdimensionnés sur le PCB."
+    ],
+    actions: [
+      "Réduire les ouvertures de pochoir (pourcentage, formes type window pane ou home plate).",
+      "Si possible, utiliser un pochoir plus fin pour les lignes critiques.",
+      "Diminuer la pression de racle ou changer de dureté de racle.",
+      "Revoir la conception footprint pour les prochaines révisions (pads plus courts ou plus étroits)."
+    ]
+  },
+  {
+    id: "offset_print",
+    name_fr: "Décalage du dépôt de pâte",
+    name_en: "Misalignment / offset printing",
+    categoryKey: "depot",
+    kind: "Alignement",
+    tags: ["Impression", "Pochoir", "Support PCB"],
+    causes: [
+      "Mauvais réglage d alignement entre pochoir et PCB.",
+      "Fixation ou support carte instable ou mal adapté.",
+      "Pochoir déformé, détendu ou mal bridé dans le cadre.",
+      "Décalage d origine entre programme d impression et données Gerber."
+    ],
+    actions: [
+      "Refaire l alignement avec fiducials et vérifier la répétabilité.",
+      "Améliorer le support PCB (pins, supports, backup).",
+      "Contrôler tension, planéité et état mécanique du pochoir.",
+      "Vérifier les origines utilisées dans l imprimante par rapport aux Gerber."
+    ]
+  },
+  {
+    id: "paste_bridging",
+    name_fr: "Ponts de pâte entre pads",
+    name_en: "Paste bridging",
+    categoryKey: "depot",
+    kind: "Bridging pâte",
+    tags: ["Fine pitch", "Pochoir", "Pâte"],
+    causes: [
+      "Ouvertures trop grandes ou trop proches, spacing insuffisant.",
+      "Pâte qui s étale (slump) à cause d un flux trop fluide ou conditions T°/HR.",
+      "Pression de racle excessive remplissant les gaps.",
+      "Pochoir sale, résidus de pâte entre les ouvertures."
+    ],
+    actions: [
+      "Réduire les ouvertures de pochoir dans les zones de pas fin.",
+      "Adapter la pâte à braser (formulation adaptée au pas fin) et les conditions environnementales.",
+      "Ajuster pression et vitesse de racle pour limiter les débordements.",
+      "Augmenter la fréquence de nettoyage pochoir, notamment pour les zones critiques."
+    ]
+  },
+  {
+    id: "slump",
+    name_fr: "Pâte qui bave ou s étale",
+    name_en: "Slump / slumping",
+    categoryKey: "depot",
+    kind: "Stabilité pâte",
+    tags: ["Pâte", "Profil four", "Environnement"],
+    causes: [
+      "Pâte à braser trop fluide ou utilisée hors de sa fenêtre T°/HR.",
+      "Pression de racle trop élevée ou sur-remplissage des ouvertures.",
+      "Temps d attente long entre impression et refusion.",
+      "Profil de refusion avec préchauffe ou soak mal adaptés."
+    ],
+    actions: [
+      "Vérifier la spécification de la pâte vis à vis de la taille d ouverture et du pas.",
+      "Travailler dans la fenêtre de température et d humidité recommandée par le fournisseur.",
+      "Réduire la pression de racle et le volume de pâte si possible.",
+      "Limiter le temps entre impression et refusion ou mieux gérer le WIP.",
+      "Ajuster le profil four (préchauffe, soak) pour contrôler le comportement du flux."
+    ]
+  },
+  {
+    id: "smearing",
+    name_fr: "Taches ou bavures de pâte",
+    name_en: "Smearing / smudging",
+    categoryKey: "depot",
+    kind: "Propreté impression",
+    tags: ["Pochoir", "Nettoyage", "Support PCB"],
+    causes: [
+      "Pâte entraînée sous le pochoir faute d essuyage adapté.",
+      "Racle usée, abîmée ou avec trop de pâte à son extrémité.",
+      "Snap-off insuffisant, pochoir collé au PCB lors du retrait.",
+      "PCB contaminés (huile, poussières) avant impression."
+    ],
+    actions: [
+      "Améliorer la stratégie de nettoyage du pochoir (sec, humide, vacuum).",
+      "Contrôler l état de la racle et la remplacer si nécessaire.",
+      "Ajuster snap-off et vitesse de séparation pour un dégagement propre.",
+      "S assurer que les PCB arrivent propres sur l imprimante."
+    ]
+  },
+  {
+    id: "clogging",
+    name_fr: "Ouvertures bouchées",
+    name_en: "Clogging / clogged apertures",
+    categoryKey: "depot",
+    kind: "Remplissage ouvertures",
+    tags: ["Fine pitch", "Pochoir", "Pâte"],
+    causes: [
+      "Area ratio proche ou en dessous de la limite recommandée.",
+      "Pâte qui sèche dans le pochoir (arrêts, courant d air, température).",
+      "Nettoyage insuffisant des plus petites ouvertures.",
+      "Pâte non adaptée aux ouvertures très fines."
+    ],
+    actions: [
+      "Optimiser la géométrie des ouvertures (coins arrondis, home plate, etc.).",
+      "Augmenter la fréquence de nettoyage ciblée sur les zones fines.",
+      "Utiliser une pâte spécifique fine pitch ou microvias.",
+      "Réduire localement l épaisseur de pochoir si possible (step stencil)."
+    ]
+  },
+  {
+    id: "odd_deposit",
+    name_fr: "Forme de dépôt anormale",
+    name_en: "Odd deposit shape",
+    categoryKey: "depot",
+    kind: "Géométrie de dépôt",
+    tags: ["Pochoir", "Racle", "Support PCB"],
+    causes: [
+      "Ouverture complexe ou mal centrée sur le pad cuivre.",
+      "Pochoir déformé ou mal tendu.",
+      "Racle tordue ou usée, pression non uniforme.",
+      "PCB non plan ou support insuffisant sous la zone concernée."
+    ],
+    actions: [
+      "Simplifier ou optimiser la géométrie d ouverture.",
+      "Vérifier la tension et la planéité du pochoir.",
+      "Remplacer ou réaligner la racle.",
+      "Améliorer le support PCB dans les zones où les dépôts sont déformés."
+    ]
+  },
+  {
+    id: "dry_paste",
+    name_fr: "Pâte sèche ou craquelée avant refusion",
+    name_en: "Dry paste",
+    categoryKey: "depot",
+    kind: "Vieillissement pâte",
+    tags: ["Pâte", "Environnement", "WIP"],
+    causes: [
+      "Pâte au delà de sa durée de vie (frigo ou sur la machine).",
+      "Conditions environnementales trop sèches ou trop chaudes.",
+      "Temps trop long entre impression et refusion.",
+      "Mauvais mélange ou préparation de la pâte avant utilisation."
+    ],
+    actions: [
+      "Respecter les durées de vie de la pâte (stockage, stencil life).",
+      "Travailler dans la fenêtre de température et d humidité recommandée.",
+      "Réduire le temps entre impression et refusion.",
+      "Préparer correctement la pâte (mélange homogène, pas d introduction d air)."
+    ]
+  },
+
+  // --- B. Joints de soudure après refusion ---
+  {
+    id: "insufficient_solder",
+    name_fr: "Insuffisance de soudure",
+    name_en: "Insufficient solder / small fillet",
+    categoryKey: "joint",
+    kind: "Volume après refusion",
+    tags: ["Pochoir", "Profil four", "Propreté"],
+    causes: [
+      "Volume de pâte insuffisant au départ.",
+      "Mouillage incomplet à cause de surfaces oxydées ou contaminées.",
+      "Profil de refusion avec pic trop bas ou temps au dessus du liquidus trop court."
+    ],
+    actions: [
+      "Corriger le volume et la géométrie d ouverture du pochoir.",
+      "Améliorer la propreté des pads et des terminaisons (stockage, nettoyage, finition).",
+      "Adapter le profil de refusion (température de pic et temps au dessus du liquidus)."
+    ]
+  },
+  {
+    id: "excess_solder",
+    name_fr: "Excès de soudure",
+    name_en: "Excess solder",
+    categoryKey: "joint",
+    kind: "Volume après refusion",
+    tags: ["Pochoir", "Footprint"],
+    causes: [
+      "Volume de pâte excessif à l impression.",
+      "Pads cuivre surdimensionnés sur le PCB.",
+      "Pâte à braser avec taux de métal élevé et sur impression."
+    ],
+    actions: [
+      "Réduire le volume de pâte (ouvertures, épaisseur, réduction).",
+      "Ajuster la conception footprint pour les prochains circuits.",
+      "Adapter les limites SPI pour mieux contrôler les surplus de volume."
+    ]
+  },
+  {
+    id: "solder_bridging",
+    name_fr: "Ponts de soudure (court circuit)",
+    name_en: "Solder bridging / shorts",
+    categoryKey: "joint",
+    kind: "Bridging après refusion",
+    tags: ["Fine pitch", "Profil four", "Pâte"],
+    causes: [
+      "Ponts déjà présents à l étape pâte.",
+      "Profil de refusion favorisant la coalescence entre pads proches.",
+      "Flux ou contamination qui favorisent la migration de la soudure."
+    ],
+    actions: [
+      "Eliminer les ponts de pâte à la source (pochoir, impression).",
+      "Adapter le profil four pour limiter la coalescence entre pads.",
+      "Choisir une pâte mieux adaptée au pas fin et à la température de pic."
+    ]
+  },
+  {
+    id: "tombstoning",
+    name_fr: "Billboarding / tombstoning / skewing",
+    name_en: "Tombstoning / skewing",
+    categoryKey: "joint",
+    kind: "Equilibre de forces",
+    tags: ["Chip passifs", "Pochoir", "Profil four"],
+    causes: [
+      "Déséquilibre de volume de pâte entre les deux pads.",
+      "Entraxe des pads défavorable, auto alignement peu efficace.",
+      "Profil de refusion avec montée en température trop rapide ou gradient fort."
+    ],
+    actions: [
+      "Rendre les volumes d ouverture aussi symétriques que possible.",
+      "Rester dans une plage d entraxe raisonnable pour le type de composant.",
+      "Adoucir le profil de refusion (rampe plus douce, soak contrôlé)."
+    ]
+  },
+  {
+    id: "solder_beading",
+    name_fr: "Grosse bille au pied du composant",
+    name_en: "Solder beading",
+    categoryKey: "joint",
+    kind: "Billage local",
+    tags: ["Chip passifs", "Pochoir", "Profil four"],
+    causes: [
+      "Surplus de pâte sous le composant (pâte piégée entre pad et vernis).",
+      "Rampe de température trop rapide expulsant la soudure.",
+      "Pâte trop fluide ou inadaptée au design."
+    ],
+    actions: [
+      "Réduire légèrement l ouverture sous le composant (home plate, découpes).",
+      "Adapter le profil four (rampe plus douce, soak adapté).",
+      "Vérifier la compatibilité pâte / design (taille, vernis, pas)."
+    ]
+  },
+  {
+    id: "solder_balling",
+    name_fr: "Billes de soudure dispersées",
+    name_en: "Solder balling",
+    categoryKey: "joint",
+    kind: "Billage autour des joints",
+    tags: ["Pâte", "Profil four", "Nettoyage"],
+    causes: [
+      "Flux brûlé et résidus projetés pendant la refusion.",
+      "Pochoir sale ou surplus de pâte sur le vernis.",
+      "Température de pic trop élevée ou montée trop rapide."
+    ],
+    actions: [
+      "Nettoyer plus efficacement le pochoir et limiter les bavures de pâte.",
+      "Adapter le profil four pour éviter la vaporisation violente du flux.",
+      "Utiliser une pâte spécifiée avec un faible solder balling."
+    ]
+  },
+  {
+    id: "non_wetting",
+    name_fr: "Non mouillage / mouillage insuffisant",
+    name_en: "Non-wetting / insufficient wetting",
+    categoryKey: "joint",
+    kind: "Mouillage",
+    tags: ["Propreté", "Profil four", "Pâte"],
+    causes: [
+      "Pads ou terminaisons oxydés ou contaminés.",
+      "Flux insuffisant ou brûlé par un profil trop agressif.",
+      "Pâte à braser trop vieille ou hors spécification."
+    ],
+    actions: [
+      "Améliorer le stockage et la propreté des PCB et des composants.",
+      "Ajuster le profil pour respecter la fenêtre alliage / flux.",
+      "Utiliser une pâte plus active ou adaptée aux surfaces difficiles."
+    ]
+  },
+  {
+    id: "dewetting",
+    name_fr: "Démouillage / dewetting",
+    name_en: "Dewetting",
+    categoryKey: "joint",
+    kind: "Mouillage / retrait",
+    tags: ["Propreté", "Finition PCB", "Profil"],
+    causes: [
+      "Contamination de surface (silicones, huiles, résidus).",
+      "Problème de finition PCB (black pad, ENIG défectueux).",
+      "Profil trop long ou trop chaud qui décompose complètement le flux."
+    ],
+    actions: [
+      "Investiguer la chaîne de fabrication des PCB (finition, nettoyage).",
+      "Analyser la surface (coupons témoins, éventuellement coupe métallographique).",
+      "Adapter le profil (soak et température de pic) pour éviter la surchauffe."
+    ]
+  },
+  {
+    id: "open_bga",
+    name_fr: "Open sous BGA / QFN",
+    name_en: "Open joint under BGA / QFN",
+    categoryKey: "joint",
+    kind: "Défaut de connexion",
+    tags: ["BGA", "QFN", "Warpage", "Profil"],
+    causes: [
+      "Volume de pâte insuffisant sur certaines billes ou sur le pad central.",
+      "Warpage du PCB ou du composant pendant la refusion.",
+      "Contamination ou oxydation locale des surfaces de brasure."
+    ],
+    actions: [
+      "Adapter le pochoir (fenêtrage, apports multiples sur pad thermique).",
+      "Vérifier la planéité et le stockage des PCB et des boîtiers (MSL, humidité).",
+      "Ajuster le profil pour réduire le warpage et améliorer le mouillage global."
+    ]
+  },
+  {
+    id: "hip",
+    name_fr: "Head-in-pillow (HiP)",
+    name_en: "Head-in-pillow",
+    categoryKey: "joint",
+    kind: "Défaut spécifique BGA",
+    tags: ["BGA", "Warpage", "Pâte", "Profil"],
+    causes: [
+      "Warpage du BGA et du PCB non synchronisés pendant la refusion.",
+      "Oxydation des billes ou des pads empêchant la fusion avec la pâte.",
+      "Pâte vieillie ou flux insuffisant pour mouiller la bille."
+    ],
+    actions: [
+      "Optimiser le profil (soak adapté, montées et descentes moins brutales).",
+      "Améliorer le stockage BGA (MSL, rebaking si nécessaire selon les specs).",
+      "Utiliser une pâte orientée anti HiP si le problème est récurrent."
+    ]
+  },
+  {
+    id: "voids",
+    name_fr: "Vides / porosités dans le joint",
+    name_en: "Voids",
+    categoryKey: "joint",
+    kind: "Porosité interne",
+    tags: ["Pads thermiques", "Power", "Profil", "Pâte"],
+    causes: [
+      "Gaz piégés dans de gros volumes de pâte (flux, solvants).",
+      "Profil inadapté (soak insuffisant, dégazage incomplet).",
+      "Pâte à braser avec forte volatilité ou non adaptée aux gros pads."
+    ],
+    actions: [
+      "Modifier la géométrie du pad et du pochoir (fenêtrage, trous de dégazage).",
+      "Adapter le profil pour favoriser le dégazage (soak plus long, pic maîtrisé).",
+      "Utiliser une pâte low voiding pour les applications critiques."
+    ]
+  },
+  {
+    id: "pinhole",
+    name_fr: "Pinhole / blow hole",
+    name_en: "Pinhole / blow hole",
+    categoryKey: "joint",
+    kind: "Trou dans le joint",
+    tags: ["Humidité", "PCB", "Flux"],
+    causes: [
+      "Ejection de gaz lors de la refusion (humidité, vernis sous la soudure).",
+      "Flux ou contamination piégés et liberés brutalement.",
+      "Perçage ou via sous la zone de brasure mal maîtrisés."
+    ],
+    actions: [
+      "Assécher les PCB si nécessaire (baking selon les recommandations).",
+      "Adapter le profil pour limiter l ébullition violente du flux.",
+      "Vérifier le process vernis et le design des vias sous pad."
+    ]
+  },
+  {
+    id: "imc_abnormal",
+    name_fr: "Intermétalliques anormales",
+    name_en: "Abnormal intermetallic layers",
+    categoryKey: "joint",
+    kind: "Métallurgie du joint",
+    tags: ["Profil", "Rework", "Alliage"],
+    causes: [
+      "Température de pic trop élevée ou temps au dessus du liquidus trop long.",
+      "Multiples refusions (cartes passées plusieurs fois au four, rework).",
+      "Combinaison alliage / finition peu favorable, surtout à haute température."
+    ],
+    actions: [
+      "Réduire la température de pic et le temps au dessus du liquidus dans la fenêtre alliage.",
+      "Limiter le nombre de cycles de refusion et optimiser les procédures de rework.",
+      "Si nécessaire, revoir la combinaison alliage / finition cuivre / ENIG / OSP."
+    ]
+  },
+  {
+    id: "grainy_joint",
+    name_fr: "Aspect mat, granuleux ou sablé",
+    name_en: "Grainy / dull / cold solder joint",
+    categoryKey: "joint",
+    kind: "Aspect de surface",
+    tags: ["Profil", "Pâte", "Atmosphère"],
+    causes: [
+      "Refusion incomplète (pic trop bas, temps au dessus du liquidus trop court).",
+      "Refroidissement mal maîtrisé en fonction de l alliage.",
+      "Oxydation en atmosphère non contrôlée pendant la refusion."
+    ],
+    actions: [
+      "Vérifier et ajuster le profil (pic, temps au dessus du liquidus).",
+      "Adapter la vitesse de refroidissement à l alliage utilisé.",
+      "Comparer le comportement en air et en N2 si possible."
+    ]
+  },
+  {
+    id: "discoloration",
+    name_fr: "Couleur de joint inhabituelle",
+    name_en: "Unusual joint colour",
+    categoryKey: "joint",
+    kind: "Aspect / chimie",
+    tags: ["Profil", "Flux", "Finition PCB"],
+    causes: [
+      "Flux brûlé par une surchauffe (profil trop chaud ou trop long).",
+      "Oxydation ou contamination de surface (polluants, atmosphère agressive).",
+      "Problèmes de finition PCB (par exemple phénomènes type black pad)."
+    ],
+    actions: [
+      "Ajuster le profil pour éviter la surchauffe des joints et du flux.",
+      "Vérifier la propreté et l environnement de refusion.",
+      "En cas de doute important, faire analyser des joints (labo, analyse de surface)."
+    ]
+  },
+  {
+    id: "cracks",
+    name_fr: "Fissures dans le joint de soudure",
+    name_en: "Cracks / microcracks",
+    categoryKey: "joint",
+    kind: "Fiabilité mécanique / thermique",
+    tags: ["Mécanique", "Cycles thermiques", "Void / IMC"],
+    causes: [
+      "Contraintes mécaniques après refusion (flexion, choc, manipulation).",
+      "Cycles thermiques sévères en service ou en test.",
+      "Joints fragilisés par des voids importants ou des intermétalliques épais."
+    ],
+    actions: [
+      "Limiter la flexion des PCB (outillage de dépanelling, manipulation).",
+      "Adapter le design mécanique (renforts, points de fixation, relieves).",
+      "Réduire voids et maîtriser les intermétalliques via profil et choix de matériaux."
+    ]
+  },
+  {
+    id: "pad_cratering",
+    name_fr: "Pad cratering / arrachement de pad",
+    name_en: "Pad cratering / pad lift-off",
+    categoryKey: "joint",
+    kind: "Endommagement PCB",
+    tags: ["Mécanique", "PCB", "Dépanelling"],
+    causes: [
+      "Contraintes mécaniques fortes (dépanelling, insertion de connecteurs, flexion).",
+      "Résine du PCB fragile ou empilement inadapté.",
+      "Trous ou zones de faiblesse sous le pad."
+    ],
+    actions: [
+      "Adapter le process de dépanelling et de manipulation des cartes.",
+      "Renforcer la conception PCB (épaisseur, ancrages, teardrops).",
+      "Limiter les contraintes mécaniques appliquées aux connecteurs et composants lourds."
+    ]
+  },
+
+  // --- C. Résidus / vieillissement ---
+  {
+    id: "flux_residues",
+    name_fr: "Résidus de flux excessifs",
+    name_en: "Excess flux residues",
+    categoryKey: "residus",
+    kind: "Résidus en surface",
+    tags: ["Flux", "Nettoyage", "Profil"],
+    causes: [
+      "Utilisation d un flux ou d une pâte no clean hors de sa fenêtre process.",
+      "Flux pas assez activé ou au contraire brûlé localement.",
+      "Absence de nettoyage alors que le flux n est pas vraiment no clean."
+    ],
+    actions: [
+      "Aligner le profil four avec les recommandations du fournisseur de pâte / flux.",
+      "Mettre en place un nettoyage approprié si nécessaire.",
+      "Contrôler la propreté ionique globale du process."
+    ]
+  },
+  {
+    id: "corrosion",
+    name_fr: "Corrosion / oxydation prématurée",
+    name_en: "Corrosion / early oxidation",
+    categoryKey: "residus",
+    kind: "Vieillissement chimique",
+    tags: ["Résidus ioniques", "Humidité", "Stockage"],
+    causes: [
+      "Résidus ioniques combinés à une humidité ambiante.",
+      "Atmosphère agressive ou stockage des cartes inadapté.",
+      "Flux ou produits de nettoyage mal rincés."
+    ],
+    actions: [
+      "Réduire la contamination ionique (choix flux, process de nettoyage).",
+      "Stocker les cartes dans un environnement maîtrisé (sachets, dessicants).",
+      "Vérifier les conditions d utilisation finales (condensation, pollution)."
+    ]
+  },
+  {
+    id: "ecm_dendrites",
+    name_fr: "Migration électrochimique / dendrites",
+    name_en: "Electrochemical migration / dendrites",
+    categoryKey: "residus",
+    kind: "Fiabilité électrique",
+    tags: ["Résidus ioniques", "Humidité", "Tension"],
+    causes: [
+      "Résidus ioniques entre pads associés à de l humidité.",
+      "Présence d une tension électrique entre conducteurs voisins.",
+      "Protection de surface insuffisante dans un environnement sévère."
+    ],
+    actions: [
+      "Améliorer la propreté ionique (process de nettoyage, flux adaptés).",
+      "Utiliser un vernis de tropicalisation si l environnement est critique.",
+      "Limiter les risques de condensation et de pollution sur le produit fini."
+    ]
+  }
+];
+
+function updateDefectList() {
+  const category = document.getElementById("categoryFilter").value;
+  const search = document.getElementById("searchText").value.trim().toLowerCase();
+  const select = document.getElementById("defectSelect");
+  const countEl = document.getElementById("resultsCount");
+
+  const previousId = select.value || null;
+
+  let filtered = DEFECTS.slice();
+
+  if (category !== "all") {
+    filtered = filtered.filter(d => d.categoryKey === category);
+  }
+
+  if (search) {
+    filtered = filtered.filter(d => {
+      const text = (
+        d.name_fr + " " +
+        d.name_en + " " +
+        (CATEGORIES[d.categoryKey] || "") + " " +
+        (d.kind || "") + " " +
+        (d.tags || []).join(" ") + " " +
+        (d.causes || []).join(" ") + " " +
+        (d.actions || []).join(" ")
+      ).toLowerCase();
+      return text.includes(search);
+    });
+  }
+
+  select.innerHTML = "";
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "— choisir un défaut —";
+  select.appendChild(placeholder);
+
+  filtered.forEach(d => {
+    const opt = document.createElement("option");
+    opt.value = d.id;
+    opt.textContent = d.name_fr + " – " + d.name_en;
+    select.appendChild(opt);
+  });
+
+  if (!filtered.length) {
+    countEl.textContent = "Aucun défaut ne correspond au filtre.";
+  } else {
+    countEl.textContent = filtered.length + " défaut(s) dans la liste.";
+  }
+
+  if (previousId && filtered.some(d => d.id === previousId)) {
+    select.value = previousId;
+    renderDefect();
+  } else {
+    select.value = "";
+    renderDefect(true);
+  }
+}
+
+function renderDefect(skipCountUpdate) {
+  const select = document.getElementById("defectSelect");
+  const id = select.value;
+  const panel = document.getElementById("defectPanel");
+
+  if (!id) {
+    panel.innerHTML = "<div class=\"placeholder\">Sélectionner un défaut dans la liste pour afficher la description, les causes probables et les pistes de solutions possibles.</div>";
+    return;
+  }
+
+  const defect = DEFECTS.find(d => d.id === id);
+  if (!defect) {
+    panel.innerHTML = "<div class=\"placeholder\">Défaut non trouvé dans la base.</div>";
+    return;
+  }
+
+  const catLabel = CATEGORIES[defect.categoryKey] || "";
+  const tags = defect.tags || [];
+  const causes = defect.causes || [];
+  const actions = defect.actions || [];
+
+  const tagsHtml = tags.map(t => "<span class=\"badge tag\">" + t + "</span>").join(" ");
+
+  const causesHtml = causes.map(c => "<li>" + c + "</li>").join("");
+  const actionsHtml = actions.map(a => "<li>" + a + "</li>").join("");
+
+  const kindHtml = defect.kind ? "<span class=\"badge kind\">" + defect.kind + "</span>" : "";
+
+  panel.innerHTML = `
+    <h2 class="defect-title">${defect.name_fr}</h2>
+    <div class="defect-subtitle">${defect.name_en}</div>
+    <div class="badge-row">
+      <span class="badge cat">${catLabel}</span>
+      ${kindHtml}
+      ${tagsHtml}
+    </div>
+
+    <div class="block-title">Causes probables (à vérifier) :</div>
+    <ul>${causesHtml}</ul>
+
+    <div class="block-title">Pistes de solutions possibles :</div>
+    <ul>${actionsHtml}</ul>
+
+    <div class="note">
+      Cet assistant ne remplace pas l analyse de cause racine. Il sert de pense bête structuré
+      pour orienter les vérifications sur la pâte à braser, le pochoir, le profil de refusion,
+      le PCB, les composants et l environnement de production.
+    </div>
+  `;
+}
+
+window.addEventListener("load", () => {
+  updateDefectList();
+});
+
+// Service worker (hors-ligne)
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js").catch(err => {
+      console.log("SW registration failed", err);
+    });
+  });
+}
+</script>
+</body>
+</html>
