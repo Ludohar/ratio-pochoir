@@ -7,12 +7,12 @@
   "theme_color": "#007aff",
   "icons": [
     {
-      "src": "icon_180.png",
+      "src": "03_Step-Stencil.png",
       "sizes": "180x180",
       "type": "image/png"
     },
     {
-      "src": "icon_512.png",
+      "src": "03_Step-Stencil.png",
       "sizes": "512x512",
       "type": "image/png"
     }
