@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Finitions PCB – Explications, avantages & inconvénients</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Finitions PCB">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color-scheme: light;
+    }
+    body {
+      margin: 0;
+      padding: 1rem;
+      background: #f5f5f5;
+    }
+    .app {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 1.25rem 1.5rem 1.5rem;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+    .subtitle {
+      font-size: 0.8rem;
+      color: #555;
+    }
+    a.back {
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: #007aff;
+      margin-top: 0.2rem;
+      white-space: nowrap;
+    }
+
+    .section-title {
+      font-weight: 600;
+      margin-top: 0.8rem;
+      margin-bottom: 0.3rem;
+      font-size: 0.95rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+    label {
+      font-size: 0.85rem;
+      display: block;
+    }
+    select, input[type="search"] {
+      width: 100%;
+      margin-top: 0.25rem;
+      padding: 0.4rem 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 0.9rem;
+      box-sizing: border-box;
+    }
+    .help {
+      font-size: 0.75rem;
+      color: #666;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.4rem;
+      margin-bottom: 0.15rem;
+      font-size: 0.85rem;
+    }
+    .results-count {
+      color: #555;
+    }
+
+    .finish-panel {
+      margin-top: 0.4rem;
+      border-radius: 14px;
+      border: 1px solid #e3e3e3;
+      background: #fafafa;
+      padding: 0.75rem 0.8rem 0.8rem;
+      font-size: 0.9rem;
+    }
+
+    .finish-title {
+      margin: 0 0 0.25rem 0;
+      font-size: 1.05rem;
+    }
+    .finish-subtitle {
+      font-size: 0.8rem;
+      color: #666;
+      margin-bottom: 0.35rem;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-bottom: 0.4rem;
+    }
+    .badge {
+      padding: 0.1rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      background: #e9ecef;
+      color: #495057;
+    }
+    .badge.family {
+      background: #e0f7fa;
+      color: #006064;
+    }
+    .badge.tag {
+      background: #f3e5f5;
+      color: #4a148c;
+    }
+    .badge.prop {
+      background: #ede7f6;
+      color: #4527a0;
+    }
+
+    .block-title {
+      font-weight: 600;
+      margin: 0.4rem 0 0.2rem;
+      font-size: 0.9rem;
+    }
+    ul {
+      margin: 0 0 0.3rem 1.1rem;
+      padding: 0;
+    }
+    li {
+      margin-bottom: 0.15rem;
+    }
+
+    .note {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.7rem;
+      line-height: 1.4;
+    }
+    .placeholder {
+      font-size: 0.85rem;
+      color: #777;
+      padding: 0.5rem 0.2rem 0.2rem;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Finitions PCB</h1>
+      <div class="subtitle">
+        Principales finitions de surface (HAL, Ni/Au, OSP, Sn, Ag, or dur) avec explication,
+        avantages, inconvénients et remarques pratiques pour la sérigraphie et la refusion.
+      </div>
+    </div>
+    <a href="index.html" class="back">← Accueil outils CMS</a>
+  </header>
+
+  <div class="section-title">1. Choisir une finition</div>
+  <div class="grid">
+    <label>
+      Type de finition PCB
+      <span class="help">Nom français + anglais (pour échanges avec fournisseurs / datasheets).</span>
+      <select id="finishSelect" onchange="renderFinish()">
+        <!-- options remplies en JS -->
+      </select>
+    </label>
+
+    <label>
+      Filtre texte (optionnel)
+      <span class="help">Recherche dans les noms, usages, avantages, inconvénients (ex : BGA, RoHS, fine pitch...).</span>
+      <input id="searchText" type="search" oninput="updateFinishList()" placeholder="Rechercher (ex: ENIG, HAL, BGA, RoHS)...">
+    </label>
+  </div>
+
+  <div class="section-title">2. Description, avantages & inconvénients</div>
+  <div class="results-header">
+    <div class="results-count" id="resultsCount">Aucune finition sélectionnée.</div>
+  </div>
+
+  <div id="finishPanel" class="finish-panel">
+    <div class="placeholder">
+      Sélectionner une finition dans la liste pour afficher la description, les avantages,
+      les inconvénients et quelques remarques pratiques pour la sérigraphie et la refusion.
+    </div>
+  </div>
+
+  <p class="note">
+    • Cette fiche est un <strong>rappel synthétique</strong> : les choix de finition dépendent aussi du
+      coût, des contraintes environnementales, de la fiabilité, des exigences de test, etc.<br>
+    • Pour un projet donné, il est toujours utile de confronter ces éléments avec les
+      recommandations du fabricant de PCB et les besoins réels (fine pitch, BGA, PIP, stockage long, wire bonding...).
+  </p>
+</div>
+
+<script>
+const FINISHES = [
+  {
+    id: "hal_sn_pb",
+    name_fr: "HAL étain-plomb (HASL SnPb)",
+    name_en: "HASL SnPb – Hot Air Solder Leveling (tin-lead)",
+    family: "HAL / étain fondu",
+    tags: ["Historique", "Non RoHS", "Économique"],
+    props: ["Planéité moyenne", "Bonne mouillabilité avec SnPb", "Surface robuste"],
+    summary: "Revêtement d'étain-plomb fondu sur le cuivre, égalisé par couteaux d'air chaud. "
+           + "Très répandu historiquement, mais quasiment abandonné sur les produits RoHS.",
+    usage: "Assemblages non RoHS, applications industrielles spécifiques, maintenance de vieux produits.",
+    pros: [
+      "Coût faible et process bien maîtrisé chez de nombreux fabricants historiques.",
+      "Excellente mouillabilité initiale avec les alliages SnPb classiques.",
+      "Surface relativement robuste aux manipulations et à la corrosion à court terme."
+    ],
+    cons: [
+      "Non conforme RoHS (présence de plomb) : très limité sur les nouveaux produits.",
+      "Planéité moyenne à mauvaise : peu adapté aux BGA, QFN, pitch fin.",
+      "Variabilité d'épaisseur d'étain et de coplanarité entre pads.",
+      "Compatibilité et fiabilité discutables si utilisé avec brasures sans plomb."
+    ],
+    paste_notes: [
+      "Très bien adapté aux pâtes SnPb.",
+      "Pour des pâtes sans plomb, ce n'est pas recommandé en production série (questions de fiabilité et de conformité)."
+    ]
+  },
+  {
+    id: "hal_leadfree",
+    name_fr: "HAL sans plomb (HASL lead-free)",
+    name_en: "Lead-free HASL – Hot Air Solder Leveling",
+    family: "HAL / étain fondu sans plomb",
+    tags: ["RoHS", "Économique", "Robuste"],
+    props: ["Planéité moyenne", "Coût bas à moyen"],
+    summary: "Revêtement d'alliage sans plomb (typiquement SnCu, SnAgCu) fondu et égalisé par air chaud. "
+           + "Version RoHS du HAL classique.",
+    usage: "Cartes grand public / industrielles où la planéité extrême n'est pas critique (peu de BGA très fins).",
+    pros: [
+      "Coût encore relativement faible pour une finition RoHS.",
+      "Mouillabilité correcte avec les pâtes sans plomb modernes.",
+      "Surface robuste mécaniquement et compatible avec plusieurs refusions."
+    ],
+    cons: [
+      "Planéité moyenne : moins adaptée aux BGA pas fin, QFN, composants très petits.",
+      "Variabilité d'épaisseur d'alliage sur les pads.",
+      "Aspect visuel parfois moins 'propre' que les finitions Ni/Au ou OSP."
+    ],
+    paste_notes: [
+      "Très utilisé avec des pâtes sans plomb SnAgCu standard.",
+      "Attention aux hauteurs de pâte sur les très petits pads, surtout en présence de BGA ou QFN."
+    ]
+  },
+  {
+    id: "enig",
+    name_fr: "ENIG – Nickel chimique / Or immersion (Ni/Au)",
+    name_en: "ENIG – Electroless Nickel Immersion Gold",
+    family: "Finition Ni/Au chimique",
+    tags: ["Fine pitch", "BGA", "RoHS", "Planéité excellente"],
+    props: ["Planéité excellente", "Bonne soudabilité", "Bon stockage"],
+    summary: "Couche de nickel chimique sur cuivre, recouverte d'une fine couche d'or par immersion. "
+           + "Très répandue pour les designs modernes avec BGA et pitch fin.",
+    usage: "Cartes avec BGA, QFN, pas fin, connecteurs à faible courant, surfaces où la planéité est critique.",
+    pros: [
+      "Planéité excellente : très adaptée aux BGA, QFN et composants fine pitch.",
+      "Bonne soudabilité avec les pâtes sans plomb si le process PCB est bien maîtrisé.",
+      "Très bonne stabilité au stockage (oxydation limitée).",
+      "Compatible avec certains besoins de contact mécanique léger (boutons, pads de test)."
+    ],
+    cons: [
+      "Coût plus élevé que HAL / OSP.",
+      "Process plus complexe chez le fabricant de PCB (sensibilité au phénomène 'black pad' si mal contrôlé).",
+      "Présence d'une couche de Ni qui peut influencer certains phénomènes métallurgiques (IMC, fiabilité à long terme)."
+    ],
+    paste_notes: [
+      "Très bon comportement avec les pâtes sans plomb standard, y compris en fine pitch.",
+      "Profil four à soigner pour éviter les problèmes de mouillage si la finition Ni/Au est limite."
+    ]
+  },
+  {
+    id: "enepig",
+    name_fr: "ENEPIG – Ni / Pd / Au chimique",
+    name_en: "ENEPIG – Electroless Nickel Electroless Palladium Immersion Gold",
+    family: "Finition Ni / Pd / Au",
+    tags: ["Wire bonding", "BGA haute fiabilité", "RoHS"],
+    props: ["Surface polyvalente", "Planéité excellente"],
+    summary: "Couche de nickel chimique, puis palladium chimique, puis or immersion. "
+           + "Finition haut de gamme utilisée quand on combine soudure, wire bonding or et contacts.",
+    usage: "Produits haute fiabilité, modules RF, cartes où coexistent soudure classique et wire bonding or.",
+    pros: [
+      "Très bonne planéité, comparable à l'ENIG.",
+      "Compatible à la fois avec la brasure sans plomb et le wire bonding or.",
+      "Limitations de type 'black pad' mieux contrôlées grâce à la couche de palladium (si process maîtrisé)."
+    ],
+    cons: [
+      "Coût significativement plus élevé que ENIG ou HAL.",
+      "Process très exigeant côté fabricant de PCB.",
+      "Souvent surdimensionné pour des cartes standard sans wire bonding."
+    ],
+    paste_notes: [
+      "Se comporte très bien avec les pâtes sans plomb standards.",
+      "L'intérêt principal n'est pas la sérigraphie mais la polyvalence (soudure + wire bond)."
+    ]
+  },
+  {
+    id: "osp",
+    name_fr: "OSP – Organique (Organic Solderability Preservative)",
+    name_en: "OSP – Organic Solderability Preservative",
+    family: "Finition organique",
+    tags: ["Planarité très bonne", "Économique", "Stockage à surveiller"],
+    props: ["Planéité excellente", "Coût bas", "Couches très fines"],
+    summary: "Film organique très fin déposé sur le cuivre nu pour le protéger de l'oxydation jusqu'à la soudure. "
+           + "La couche est consommée au moment de la refusion.",
+    usage: "Grandes séries, cartes où la planéité est importante mais avec contrainte de coût.",
+    pros: [
+      "Très bonne planéité (cuivre pratiquement nu sous un film organique).",
+      "Coût faible à moyen, process relativement simple pour le fabricant de PCB.",
+      "Très bonne soudabilité tant que les conditions de stockage sont respectées."
+    ],
+    cons: [
+      "Sensibilité au stockage et aux manipulations (la couche organique peut se dégrader).",
+      "Moins adapté à des cycles multiples de refusion / rework intensif.",
+      "Moins approprié pour des zones de contact mécanique répétitif."
+    ],
+    paste_notes: [
+      "Très bon comportement avec les pâtes sans plomb si le PCB est récent et bien stocké.",
+      "À surveiller pour des cartes anciennes ou exposées à un environnement agressif (risque de non-mouillage)."
+    ]
+  },
+  {
+    id: "imm_tin",
+    name_fr: "Étain chimique – Immersion Sn",
+    name_en: "Immersion Tin",
+    family: "Finition étain chimique",
+    tags: ["Planarité bonne", "Bonne soudabilité initiale"],
+    props: ["Planéité bonne", "Soudabilité bonne au départ"],
+    summary: "Couche d'étain déposée chimiquement sur le cuivre. "
+           + "Utilisée notamment pour sa planéité correcte et sa bonne soudabilité initiale.",
+    usage: "Applications où l'on souhaite éviter le Ni/Au mais avec un bon comportement en soudure.",
+    pros: [
+      "Planéité meilleure que HAL, utilisable en fine pitch avec précautions.",
+      "Bonne soudabilité initiale avec pâtes sans plomb.",
+      "Process connu et disponible chez beaucoup de fabricants."
+    ],
+    cons: [
+      "Vieillissement possible (diffusion Cu/Sn, croissance d'intermétalliques) si le stockage est long.",
+      "Sensible aux rayures / manipulations (surface relativement tendre).",
+      "Conditions de stockage et de manipulation à respecter pour éviter l'oxydation."
+    ],
+    paste_notes: [
+      "Compatible avec les pâtes sans plomb classiques.",
+      "Préférer des cartes fraîches (peu de temps entre fabrication PCB et assemblage)."
+    ]
+  },
+  {
+    id: "imm_silver",
+    name_fr: "Argent chimique – Immersion Ag",
+    name_en: "Immersion Silver",
+    family: "Finition argent chimique",
+    tags: ["Planarité très bonne", "RF / HF", "Sensibilité à l'environnement"],
+    props: ["Planéité excellente", "Très bonnes performances électriques"],
+    summary: "Couche d'argent déposée chimiquement sur le cuivre. "
+           + "Appréciée pour les signaux haute fréquence et les performances électriques.",
+    usage: "Cartes RF / HF, designs sensibles aux pertes, applications où l'argent apporte un plus électrique.",
+    pros: [
+      "Planéité excellente, adaptée aux composants fine pitch.",
+      "Très bonnes propriétés électriques (pertes faibles, utile en RF).",
+      "Bonne soudabilité si la surface reste propre."
+    ],
+    cons: [
+      "Très sensible à la contamination et à l'environnement (soufre, pollution atmosphérique).",
+      "Aspect de surface pouvant évoluer au stockage.",
+      "Demande une bonne maîtrise des conditions de fabrication et de stockage."
+    ],
+    paste_notes: [
+      "Compatible avec les pâtes sans plomb, mais la propreté de la surface est clé.",
+      "Éviter les poussières et environnements soufrés qui ternissent l'argent."
+    ]
+  },
+  {
+    id: "hard_gold",
+    name_fr: "Or dur / Ni-Au électrolytique (contacts)",
+    name_en: "Hard Gold / Electrolytic Ni/Au",
+    family: "Finition or dur",
+    tags: ["Connecteurs", "Edge fingers", "Usure mécanique"],
+    props: ["Très bonne résistance à l'usure", "Coût élevé"],
+    summary: "Couche de nickel puis d'or déposée par électrolyse, souvent plus épaisse que ENIG. "
+           + "Utilisée surtout pour les zones de contact mécanique (connecteurs, edge fingers).",
+    usage: "Doigts de carte, contacts glissants, zones exposées à de nombreuses insertions / frottements.",
+    pros: [
+      "Excellente résistance à l'usure mécanique (connecteurs, edge fingers).",
+      "Bonne résistance à la corrosion dans le temps.",
+      "Peut coexister avec d'autres finitions sur la même carte (zones mixtes)."
+    ],
+    cons: [
+      "Coût élevé, surtout pour des grandes surfaces recouvertes.",
+      "Pas destiné à être une finition de soudure principale sur toute la carte.",
+      "Nécessite une étape d'électrolyse bien maîtrisée (masquage, homogénéité d'épaisseur)."
+    ],
+    paste_notes: [
+      "En général, les pads de soudure ne sont pas en or dur mais en ENIG / HAL / OSP, l'or dur étant réservé aux contacts.",
+      "Si des pads de soudure sont en or dur, bien vérifier l'épaisseur et les recommandations du fabricant (risque d'intermétalliques Au-Sn)."
+    ]
+  }
+];
+
+function updateFinishList() {
+  const select = document.getElementById("finishSelect");
+  const search = document.getElementById("searchText").value.trim().toLowerCase();
+  const countEl = document.getElementById("resultsCount");
+
+  const previousId = select.value || null;
+
+  let filtered = FINISHES.slice();
+
+  if (search) {
+    filtered = filtered.filter(f => {
+      const text = (
+        f.name_fr + " " +
+        f.name_en + " " +
+        (f.family || "") + " " +
+        (f.tags || []).join(" ") + " " +
+        (f.summary || "") + " " +
+        (f.usage || "") + " " +
+        (f.pros || []).join(" ") + " " +
+        (f.cons || []).join(" ")
+      ).toLowerCase();
+      return text.includes(search);
+    });
+  }
+
+  select.innerHTML = "";
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "— choisir une finition —";
+  select.appendChild(placeholder);
+
+  filtered.forEach(f => {
+    const opt = document.createElement("option");
+    opt.value = f.id;
+    opt.textContent = f.name_fr + " – " + f.name_en;
+    select.appendChild(opt);
+  });
+
+  if (!filtered.length) {
+    countEl.textContent = "Aucune finition ne correspond au filtre.";
+  } else {
+    countEl.textContent = filtered.length + " finition(s) dans la liste.";
+  }
+
+  if (previousId && filtered.some(f => f.id === previousId)) {
+    select.value = previousId;
+    renderFinish();
+  } else {
+    select.value = "";
+    renderFinish();
+  }
+}
+
+function renderFinish() {
+  const select = document.getElementById("finishSelect");
+  const id = select.value;
+  const panel = document.getElementById("finishPanel");
+
+  if (!id) {
+    panel.innerHTML = "<div class=\"placeholder\">Sélectionner une finition dans la liste pour afficher la description, les avantages, les inconvénients et les remarques pratiques.</div>";
+    return;
+  }
+
+  const finish = FINISHES.find(f => f.id === id);
+  if (!finish) {
+    panel.innerHTML = "<div class=\"placeholder\">Finition non trouvée dans la base.</div>";
+    return;
+  }
+
+  const tags = finish.tags || [];
+  const props = finish.props || [];
+  const pros = finish.pros || [];
+  const cons = finish.cons || [];
+  const notes = finish.paste_notes || [];
+
+  const tagsHtml = tags.map(t => "<span class=\"badge tag\">" + t + "</span>").join(" ");
+  const propsHtml = props.map(p => "<span class=\"badge prop\">" + p + "</span>").join(" ");
+  const prosHtml = pros.map(p => "<li>" + p + "</li>").join("");
+  const consHtml = cons.map(c => "<li>" + c + "</li>").join("");
+  const notesHtml = notes.map(n => "<li>" + n + "</li>").join("");
+
+  panel.innerHTML = `
+    <h2 class="finish-title">${finish.name_fr}</h2>
+    <div class="finish-subtitle">${finish.name_en}</div>
+    <div class="badge-row">
+      <span class="badge family">${finish.family || ""}</span>
+      ${propsHtml}
+      ${tagsHtml}
+    </div>
+
+    <div class="block-title">Principe & usage typique :</div>
+    <p>${finish.summary || ""}</p>
+    <p><strong>Usages typiques :</strong> ${finish.usage || ""}</p>
+
+    <div class="block-title">Avantages :</div>
+    <ul>${prosHtml}</ul>
+
+    <div class="block-title">Inconvénients / points de vigilance :</div>
+    <ul>${consHtml}</ul>
+
+    <div class="block-title">Remarques pratiques pour sérigraphie & refusion :</div>
+    <ul>${notesHtml}</ul>
+  `;
+}
+
+window.addEventListener("load", () => {
+  updateFinishList();
+});
+
+// Service worker (hors-ligne)
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js").catch(err => {
+      console.log("SW registration failed", err);
+    });
+  });
+}
+</script>
+</body>
+</html>

@@ -1,10 +1,11 @@
-const CACHE_NAME = 'stencil-ratio-v20';
+const CACHE_NAME = 'stencil-ratio-v21';
 const URLS_TO_CACHE = [
   './',
   './index.html',
   './pip.html',
   './tmax.html',
   './convert.html',
+  './finitions_pcb.html,
   './cms_volume.html',
   './print_setup.html',
   './reflow_helper.html',
