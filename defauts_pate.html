@@ -118,7 +118,7 @@
       display: flex;
       flex-wrap: wrap;
       gap: 0.3rem;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
     }
     .badge {
       padding: 0.1rem 0.55rem;
@@ -139,6 +139,23 @@
     .badge.tag {
       background: #f3e5f5;
       color: #4a148c;
+    }
+
+    .impact-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      align-items: center;
+      margin-bottom: 0.4rem;
+      font-size: 0.8rem;
+    }
+    .impact-label {
+      font-weight: 500;
+      margin-right: 0.2rem;
+    }
+    .badge.impact {
+      background: #e8f5e9;
+      color: #1b5e20;
     }
 
     .block-title {
@@ -222,8 +239,8 @@
   <p class="note">
     • Cet écran est un <strong>assistant</strong> : les causes et actions sont indicatives et doivent être croisées
       avec ton expérience de ligne, les datasheets, les specs alliage/profil et la documentation du fournisseur de pâte.<br>
-    • Pour un même défaut, l’origine peut être multiple (pâte, pochoir, profil, PCB, composants, environnement).  
-      L’outil vise à donner rapidement une checklist d’éléments à vérifier et des directions de réglage.
+    • Pour un même défaut, l origine peut être multiple (pâte, pochoir, profil, PCB, composants, environnement).  
+      L outil vise à donner rapidement une checklist d éléments à vérifier et des directions de réglage.
   </p>
 </div>
 
@@ -232,6 +249,13 @@ const CATEGORIES = {
   depot: "Dépôt de pâte (avant refusion)",
   joint: "Joints de soudure (après refusion)",
   residus: "Résidus / vieillissement"
+};
+
+const IMPACT_LABELS = {
+  paste: "Pâte",
+  stencil: "Pochoir",
+  oven: "Four de refusion",
+  pcb: "PCB"
 };
 
 const DEFECTS = [
@@ -243,6 +267,7 @@ const DEFECTS = [
     categoryKey: "depot",
     kind: "Volume / couverture",
     tags: ["Pochoir", "Pâte", "Impression"],
+    impacts: ["stencil", "paste"],
     causes: [
       "Epaisseur de pochoir trop faible pour ce composant.",
       "Réduction d ouverture trop forte ou géométrie d ouverture défavorable.",
@@ -265,6 +290,7 @@ const DEFECTS = [
     categoryKey: "depot",
     kind: "Volume / couverture",
     tags: ["Pochoir", "Footprint"],
+    impacts: ["stencil", "paste"],
     causes: [
       "Pochoir trop épais pour les composants concernés.",
       "Aucune réduction d ouverture dans les zones sensibles (chip, QFP, pas fin).",
@@ -285,6 +311,7 @@ const DEFECTS = [
     categoryKey: "depot",
     kind: "Alignement",
     tags: ["Impression", "Pochoir", "Support PCB"],
+    impacts: ["stencil", "pcb"],
     causes: [
       "Mauvais réglage d alignement entre pochoir et PCB.",
       "Fixation ou support carte instable ou mal adapté.",
@@ -305,6 +332,7 @@ const DEFECTS = [
     categoryKey: "depot",
     kind: "Bridging pâte",
     tags: ["Fine pitch", "Pochoir", "Pâte"],
+    impacts: ["stencil", "paste"],
     causes: [
       "Ouvertures trop grandes ou trop proches, spacing insuffisant.",
       "Pâte qui s étale (slump) à cause d un flux trop fluide ou conditions T°/HR.",
@@ -325,9 +353,10 @@ const DEFECTS = [
     categoryKey: "depot",
     kind: "Stabilité pâte",
     tags: ["Pâte", "Profil four", "Environnement"],
+    impacts: ["paste", "oven"],
     causes: [
       "Pâte à braser trop fluide ou utilisée hors de sa fenêtre T°/HR.",
-      "Pression de racle trop élevée ou sur-remplissage des ouvertures.",
+      "Pression de racle trop élevée ou sur remplissage des ouvertures.",
       "Temps d attente long entre impression et refusion.",
       "Profil de refusion avec préchauffe ou soak mal adaptés."
     ],
@@ -346,16 +375,17 @@ const DEFECTS = [
     categoryKey: "depot",
     kind: "Propreté impression",
     tags: ["Pochoir", "Nettoyage", "Support PCB"],
+    impacts: ["stencil", "paste"],
     causes: [
       "Pâte entraînée sous le pochoir faute d essuyage adapté.",
       "Racle usée, abîmée ou avec trop de pâte à son extrémité.",
-      "Snap-off insuffisant, pochoir collé au PCB lors du retrait.",
+      "Snap off insuffisant, pochoir collé au PCB lors du retrait.",
       "PCB contaminés (huile, poussières) avant impression."
     ],
     actions: [
       "Améliorer la stratégie de nettoyage du pochoir (sec, humide, vacuum).",
       "Contrôler l état de la racle et la remplacer si nécessaire.",
-      "Ajuster snap-off et vitesse de séparation pour un dégagement propre.",
+      "Ajuster snap off et vitesse de séparation pour un dégagement propre.",
       "S assurer que les PCB arrivent propres sur l imprimante."
     ]
   },
@@ -366,6 +396,7 @@ const DEFECTS = [
     categoryKey: "depot",
     kind: "Remplissage ouvertures",
     tags: ["Fine pitch", "Pochoir", "Pâte"],
+    impacts: ["stencil", "paste"],
     causes: [
       "Area ratio proche ou en dessous de la limite recommandée.",
       "Pâte qui sèche dans le pochoir (arrêts, courant d air, température).",
@@ -386,6 +417,7 @@ const DEFECTS = [
     categoryKey: "depot",
     kind: "Géométrie de dépôt",
     tags: ["Pochoir", "Racle", "Support PCB"],
+    impacts: ["stencil", "pcb"],
     causes: [
       "Ouverture complexe ou mal centrée sur le pad cuivre.",
       "Pochoir déformé ou mal tendu.",
@@ -406,6 +438,7 @@ const DEFECTS = [
     categoryKey: "depot",
     kind: "Vieillissement pâte",
     tags: ["Pâte", "Environnement", "WIP"],
+    impacts: ["paste"],
     causes: [
       "Pâte au delà de sa durée de vie (frigo ou sur la machine).",
       "Conditions environnementales trop sèches ou trop chaudes.",
@@ -428,6 +461,7 @@ const DEFECTS = [
     categoryKey: "joint",
     kind: "Volume après refusion",
     tags: ["Pochoir", "Profil four", "Propreté"],
+    impacts: ["stencil", "oven", "paste"],
     causes: [
       "Volume de pâte insuffisant au départ.",
       "Mouillage incomplet à cause de surfaces oxydées ou contaminées.",
@@ -446,6 +480,7 @@ const DEFECTS = [
     categoryKey: "joint",
     kind: "Volume après refusion",
     tags: ["Pochoir", "Footprint"],
+    impacts: ["stencil", "pcb"],
     causes: [
       "Volume de pâte excessif à l impression.",
       "Pads cuivre surdimensionnés sur le PCB.",
@@ -464,6 +499,7 @@ const DEFECTS = [
     categoryKey: "joint",
     kind: "Bridging après refusion",
     tags: ["Fine pitch", "Profil four", "Pâte"],
+    impacts: ["stencil", "oven", "paste"],
     causes: [
       "Ponts déjà présents à l étape pâte.",
       "Profil de refusion favorisant la coalescence entre pads proches.",
@@ -482,6 +518,7 @@ const DEFECTS = [
     categoryKey: "joint",
     kind: "Equilibre de forces",
     tags: ["Chip passifs", "Pochoir", "Profil four"],
+    impacts: ["stencil", "oven", "pcb"],
     causes: [
       "Déséquilibre de volume de pâte entre les deux pads.",
       "Entraxe des pads défavorable, auto alignement peu efficace.",
@@ -500,6 +537,7 @@ const DEFECTS = [
     categoryKey: "joint",
     kind: "Billage local",
     tags: ["Chip passifs", "Pochoir", "Profil four"],
+    impacts: ["stencil", "oven", "paste"],
     causes: [
       "Surplus de pâte sous le composant (pâte piégée entre pad et vernis).",
       "Rampe de température trop rapide expulsant la soudure.",
@@ -518,6 +556,7 @@ const DEFECTS = [
     categoryKey: "joint",
     kind: "Billage autour des joints",
     tags: ["Pâte", "Profil four", "Nettoyage"],
+    impacts: ["paste", "oven", "stencil"],
     causes: [
       "Flux brûlé et résidus projetés pendant la refusion.",
       "Pochoir sale ou surplus de pâte sur le vernis.",
@@ -536,6 +575,7 @@ const DEFECTS = [
     categoryKey: "joint",
     kind: "Mouillage",
     tags: ["Propreté", "Profil four", "Pâte"],
+    impacts: ["paste", "pcb", "oven"],
     causes: [
       "Pads ou terminaisons oxydés ou contaminés.",
       "Flux insuffisant ou brûlé par un profil trop agressif.",
@@ -554,6 +594,7 @@ const DEFECTS = [
     categoryKey: "joint",
     kind: "Mouillage / retrait",
     tags: ["Propreté", "Finition PCB", "Profil"],
+    impacts: ["pcb", "oven", "paste"],
     causes: [
       "Contamination de surface (silicones, huiles, résidus).",
       "Problème de finition PCB (black pad, ENIG défectueux).",
@@ -572,6 +613,7 @@ const DEFECTS = [
     categoryKey: "joint",
     kind: "Défaut de connexion",
     tags: ["BGA", "QFN", "Warpage", "Profil"],
+    impacts: ["stencil", "pcb", "oven"],
     causes: [
       "Volume de pâte insuffisant sur certaines billes ou sur le pad central.",
       "Warpage du PCB ou du composant pendant la refusion.",
@@ -590,6 +632,7 @@ const DEFECTS = [
     categoryKey: "joint",
     kind: "Défaut spécifique BGA",
     tags: ["BGA", "Warpage", "Pâte", "Profil"],
+    impacts: ["oven", "pcb", "paste"],
     causes: [
       "Warpage du BGA et du PCB non synchronisés pendant la refusion.",
       "Oxydation des billes ou des pads empêchant la fusion avec la pâte.",
@@ -608,6 +651,7 @@ const DEFECTS = [
     categoryKey: "joint",
     kind: "Porosité interne",
     tags: ["Pads thermiques", "Power", "Profil", "Pâte"],
+    impacts: ["paste", "oven", "pcb"],
     causes: [
       "Gaz piégés dans de gros volumes de pâte (flux, solvants).",
       "Profil inadapté (soak insuffisant, dégazage incomplet).",
@@ -626,6 +670,7 @@ const DEFECTS = [
     categoryKey: "joint",
     kind: "Trou dans le joint",
     tags: ["Humidité", "PCB", "Flux"],
+    impacts: ["pcb", "oven"],
     causes: [
       "Ejection de gaz lors de la refusion (humidité, vernis sous la soudure).",
       "Flux ou contamination piégés et liberés brutalement.",
@@ -644,6 +689,7 @@ const DEFECTS = [
     categoryKey: "joint",
     kind: "Métallurgie du joint",
     tags: ["Profil", "Rework", "Alliage"],
+    impacts: ["oven", "paste"],
     causes: [
       "Température de pic trop élevée ou temps au dessus du liquidus trop long.",
       "Multiples refusions (cartes passées plusieurs fois au four, rework).",
@@ -662,6 +708,7 @@ const DEFECTS = [
     categoryKey: "joint",
     kind: "Aspect de surface",
     tags: ["Profil", "Pâte", "Atmosphère"],
+    impacts: ["oven", "paste"],
     causes: [
       "Refusion incomplète (pic trop bas, temps au dessus du liquidus trop court).",
       "Refroidissement mal maîtrisé en fonction de l alliage.",
@@ -680,6 +727,7 @@ const DEFECTS = [
     categoryKey: "joint",
     kind: "Aspect / chimie",
     tags: ["Profil", "Flux", "Finition PCB"],
+    impacts: ["oven", "paste", "pcb"],
     causes: [
       "Flux brûlé par une surchauffe (profil trop chaud ou trop long).",
       "Oxydation ou contamination de surface (polluants, atmosphère agressive).",
@@ -698,6 +746,7 @@ const DEFECTS = [
     categoryKey: "joint",
     kind: "Fiabilité mécanique / thermique",
     tags: ["Mécanique", "Cycles thermiques", "Void / IMC"],
+    impacts: ["pcb", "oven"],
     causes: [
       "Contraintes mécaniques après refusion (flexion, choc, manipulation).",
       "Cycles thermiques sévères en service ou en test.",
@@ -716,6 +765,7 @@ const DEFECTS = [
     categoryKey: "joint",
     kind: "Endommagement PCB",
     tags: ["Mécanique", "PCB", "Dépanelling"],
+    impacts: ["pcb"],
     causes: [
       "Contraintes mécaniques fortes (dépanelling, insertion de connecteurs, flexion).",
       "Résine du PCB fragile ou empilement inadapté.",
@@ -736,6 +786,7 @@ const DEFECTS = [
     categoryKey: "residus",
     kind: "Résidus en surface",
     tags: ["Flux", "Nettoyage", "Profil"],
+    impacts: ["paste", "oven", "pcb"],
     causes: [
       "Utilisation d un flux ou d une pâte no clean hors de sa fenêtre process.",
       "Flux pas assez activé ou au contraire brûlé localement.",
@@ -754,6 +805,7 @@ const DEFECTS = [
     categoryKey: "residus",
     kind: "Vieillissement chimique",
     tags: ["Résidus ioniques", "Humidité", "Stockage"],
+    impacts: ["pcb", "paste"],
     causes: [
       "Résidus ioniques combinés à une humidité ambiante.",
       "Atmosphère agressive ou stockage des cartes inadapté.",
@@ -772,6 +824,7 @@ const DEFECTS = [
     categoryKey: "residus",
     kind: "Fiabilité électrique",
     tags: ["Résidus ioniques", "Humidité", "Tension"],
+    impacts: ["pcb", "paste"],
     causes: [
       "Résidus ioniques entre pads associés à de l humidité.",
       "Présence d une tension électrique entre conducteurs voisins.",
@@ -842,7 +895,7 @@ function updateDefectList() {
   }
 }
 
-function renderDefect(skipCountUpdate) {
+function renderDefect() {
   const select = document.getElementById("defectSelect");
   const id = select.value;
   const panel = document.getElementById("defectPanel");
@@ -860,15 +913,23 @@ function renderDefect(skipCountUpdate) {
 
   const catLabel = CATEGORIES[defect.categoryKey] || "";
   const tags = defect.tags || [];
+  const impacts = defect.impacts || [];
   const causes = defect.causes || [];
   const actions = defect.actions || [];
 
   const tagsHtml = tags.map(t => "<span class=\"badge tag\">" + t + "</span>").join(" ");
-
   const causesHtml = causes.map(c => "<li>" + c + "</li>").join("");
   const actionsHtml = actions.map(a => "<li>" + a + "</li>").join("");
-
   const kindHtml = defect.kind ? "<span class=\"badge kind\">" + defect.kind + "</span>" : "";
+
+  let impactsHtml = "";
+  if (impacts.length) {
+    const badges = impacts.map(k => {
+      const label = IMPACT_LABELS[k] || k;
+      return "<span class=\"badge impact\">" + label + "</span>";
+    }).join(" ");
+    impactsHtml = "<div class=\"impact-row\"><span class=\"impact-label\">Origine(s) principale(s) à investiguer :</span> " + badges + "</div>";
+  }
 
   panel.innerHTML = `
     <h2 class="defect-title">${defect.name_fr}</h2>
@@ -878,7 +939,7 @@ function renderDefect(skipCountUpdate) {
       ${kindHtml}
       ${tagsHtml}
     </div>
-
+    ${impactsHtml}
     <div class="block-title">Causes probables (à vérifier) :</div>
     <ul>${causesHtml}</ul>
 
