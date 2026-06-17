@@ -64,6 +64,34 @@
       gap: 0.75rem 1rem;
       margin-bottom: 0.75rem;
     }
+    .illustrations {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.75rem;
+      margin: 0.75rem 0 1rem;
+    }
+
+    .illustration-card {
+      background: #fafafa;
+      border: 1px solid #e3e3e3;
+      border-radius: 14px;
+      padding: 0.6rem;
+    }
+
+    .illustration-card img {
+      width: 100%;
+      display: block;
+      border-radius: 10px;
+     object-fit: contain;
+    }
+
+    .illustration-card .caption {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.35rem;
+      line-height: 1.35;
+    }
+
     label {
       font-size: 0.85rem;
       display: block;
@@ -180,6 +208,41 @@
     <a href="index.html" class="back">← Accueil outils CMS</a>
   </header>
 
+<div class="section-title">Résumé visuel</div>
+
+<section class="illustrations">
+  <div class="illustration-card">
+    <img src="img/finish_hasl_enig.png" alt="Comparaison HASL et ENIG pour BGA fine pitch">
+    <div class="caption">
+      HASL vs ENIG : la planéité des pads influence directement la régularité du dépôt de pâte,
+      surtout pour les BGA fine pitch.
+    </div>
+  </div>
+
+  <div class="illustration-card">
+    <img src="img/surface_finish_summary.png" alt="Comparaison des principales finitions PCB">
+    <div class="caption">
+      Comparaison rapide des finitions : HASL, ENIG, OSP, Immersion Silver et Immersion Tin.
+    </div>
+  </div>
+
+  <div class="illustration-card">
+    <img src="img/surface_finish_defects.png" alt="Défauts liés aux finitions PCB">
+    <div class="caption">
+      Défauts possibles liés aux finitions : black pad, mauvais mouillage, ternissement,
+      whiskers d’étain, etc.
+    </div>
+  </div>
+
+  <div class="illustration-card">
+    <img src="img/pcb_colors.png" alt="Impact des couleurs de PCB">
+    <div class="caption">
+      La couleur du PCB vient principalement du solder mask. Elle influence surtout l’inspection,
+      le contraste, l’esthétique et parfois l’AOI, pas les performances électriques du circuit.
+    </div>
+  </div>
+</section>
+
   <div class="section-title">1. Choisir une finition</div>
   <div class="grid">
     <label>
@@ -208,6 +271,41 @@
       les inconvénients et quelques remarques pratiques pour la sérigraphie et la refusion.
     </div>
   </div>
+
+<div class="section-title">Couleurs de PCB / solder mask</div>
+
+<div class="finish-panel">
+  <h2 class="finish-title">Impact de la couleur du PCB</h2>
+  <div class="finish-subtitle">
+    La couleur correspond principalement au solder mask. Elle n’améliore pas les performances électriques du circuit.
+  </div>
+
+  <div class="badge-row">
+    <span class="badge prop">Inspection</span>
+    <span class="badge prop">AOI</span>
+    <span class="badge prop">Coût</span>
+    <span class="badge prop">Esthétique</span>
+    <span class="badge prop">Applications LED</span>
+  </div>
+
+  <div class="block-title">Résumé rapide :</div>
+  <ul>
+    <li><strong>Vert :</strong> standard industriel, coût faible, très bonne disponibilité, inspection facile.</li>
+    <li><strong>Bleu :</strong> bon contraste, aspect moderne, utilisé pour différenciation produit.</li>
+    <li><strong>Noir :</strong> aspect premium, mais inspection plus difficile et AOI parfois moins confortable.</li>
+    <li><strong>Rouge :</strong> contraste fort, souvent utilisé pour prototypes, gaming ou différenciation visuelle.</li>
+    <li><strong>Jaune :</strong> très visible, utile pour applications spéciales, mais rare en production standard.</li>
+    <li><strong>Blanc :</strong> très réfléchissant, intéressant pour LED/éclairage, mais peut jaunir ou marquer avec le temps.</li>
+  </ul>
+
+  <div class="block-title">Point important :</div>
+  <ul>
+    <li>La couleur du solder mask influence surtout l’inspection, l’AOI, l’esthétique, le coût et la disponibilité.</li>
+    <li>Elle ne change pas directement les performances électriques du circuit.</li>
+    <li>Pour les cartes LED, le blanc est souvent choisi pour réfléchir la lumière.</li>
+    <li>Pour les cartes industrielles classiques, le vert reste le choix le plus simple, économique et robuste.</li>
+  </ul>
+</div>
 
   <p class="note">
     • Cette fiche est un <strong>rappel synthétique</strong> : les choix de finition dépendent aussi du

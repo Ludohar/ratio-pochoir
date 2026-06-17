@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stencil-ratio-v21';
+const CACHE_NAME = 'stencil-ratio-v22';
 const URLS_TO_CACHE = [
   './',
   './index.html',
@@ -23,6 +23,11 @@ const URLS_TO_CACHE = [
   './img_side.png',
   './pip_schema.png',
   './pcb_profile.png',
+  './finitions_pcb.html',
+  './img/finish_hasl_enig.png',
+  './img/surface_finish_summary.png',
+  './img/surface_finish_defects.png',
+  './img/pcb_colors.png',
   './pcb_printing.png'
 ];
 
