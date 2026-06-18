@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Nettoyage outils MY300</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Nettoyage MY300">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color-scheme: light;
+    }
+
+    body {
+      margin: 0;
+      padding: 1rem;
+      background: #f5f5f5;
+    }
+
+    .app {
+      max-width: 920px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 1.25rem 1.5rem 1.5rem;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    h1 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+
+    .subtitle {
+      font-size: 0.8rem;
+      color: #555;
+    }
+
+    a.back {
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: #007aff;
+      margin-top: 0.2rem;
+      white-space: nowrap;
+    }
+
+    .section-title {
+      font-weight: 600;
+      margin-top: 0.9rem;
+      margin-bottom: 0.35rem;
+      font-size: 0.95rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    label {
+      font-size: 0.85rem;
+      display: block;
+    }
+
+    select {
+      width: 100%;
+      margin-top: 0.25rem;
+      padding: 0.45rem 0.55rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+      background: white;
+    }
+
+    .help {
+      font-size: 0.75rem;
+      color: #666;
+      line-height: 1.35;
+    }
+
+    .photo-card {
+      background: #fafafa;
+      border: 1px solid #e3e3e3;
+      border-radius: 14px;
+      padding: 0.6rem;
+      margin-top: 0.4rem;
+    }
+
+    .photo-card img {
+      width: 100%;
+      display: block;
+      border-radius: 10px;
+      object-fit: contain;
+    }
+
+    .caption {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.4rem;
+      line-height: 1.4;
+    }
+
+    .panel {
+      border-radius: 14px;
+      border: 1px solid #e3e3e3;
+      background: #fafafa;
+      padding: 0.75rem 0.8rem;
+      margin-top: 0.45rem;
+      font-size: 0.9rem;
+    }
+
+    .summary {
+      background: #f8fbff;
+      border-color: #d6e8ff;
+    }
+
+    .warning {
+      background: #fff8e1;
+      border-color: #ffe082;
+    }
+
+    .placeholder {
+      background: #f5f5f5;
+      border-color: #ddd;
+      color: #666;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.6rem;
+      margin: 0.2rem 0;
+    }
+
+    .value {
+      font-weight: 700;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin: 0.35rem 0 0.55rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.12rem 0.58rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      background: #e9ecef;
+      color: #495057;
+    }
+
+    .badge.h01 {
+      background: #f1f1f1;
+      color: #222;
+      border: 1px solid #ccc;
+    }
+
+    .badge.h02 {
+      background: #fff3cd;
+      color: #7a5b00;
+    }
+
+    .badge.h06 {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .badge.x {
+      background: #e7f0ff;
+      color: #003f8c;
+    }
+
+    .badge.soft {
+      background: #e8f5e9;
+      color: #1b5e20;
+    }
+
+    .block-title {
+      font-weight: 700;
+      margin-top: 0.55rem;
+      margin-bottom: 0.25rem;
+      font-size: 0.92rem;
+    }
+
+    ol, ul {
+      margin: 0 0 0.35rem 1.2rem;
+      padding: 0;
+    }
+
+    li {
+      margin-bottom: 0.22rem;
+      line-height: 1.4;
+    }
+
+    .checklist {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 0.75rem;
+      margin-top: 0.45rem;
+    }
+
+    .check-card {
+      border-radius: 12px;
+      border: 1px solid #e3e3e3;
+      background: #fff;
+      padding: 0.65rem 0.7rem;
+    }
+
+    .check-card h3 {
+      margin: 0 0 0.35rem 0;
+      font-size: 0.9rem;
+    }
+
+    .check-item {
+      display: flex;
+      gap: 0.45rem;
+      align-items: flex-start;
+      font-size: 0.82rem;
+      margin: 0.28rem 0;
+      line-height: 1.35;
+    }
+
+    .check-item input {
+      margin-top: 0.1rem;
+    }
+
+    button.reset {
+      margin-top: 0.6rem;
+      padding: 0.45rem 0.75rem;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      background: #fff;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .note {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.7rem;
+      line-height: 1.4;
+    }
+
+    .software-select {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #0b5ed7;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Nettoyage outils de pose – MY300</h1>
+      <div class="subtitle">
+        Mémo opérateur pour le nettoyage des outils de pose. Lignes 1 et 3 opérationnelles.
+        Ligne 2 préparée, procédure détaillée à compléter.
+      </div>
+    </div>
+    <a href="index.html" class="back">← Accueil outils CMS</a>
+  </header>
+
+  <div class="section-title">1. Sélection</div>
+
+  <div class="grid">
+    <label>
+      Ligne de production
+      <select id="lineSelect" onchange="updatePage()">
+        <option value="L1">Ligne 1</option>
+        <option value="L2">Ligne 2 – procédure à compléter</option>
+        <option value="L3">Ligne 3</option>
+      </select>
+    </label>
+
+    <label>
+      Banque d’outils
+      <select id="bankSelect" onchange="updatePage()">
+        <option value="Left">Banque gauche / Left</option>
+        <option value="Right">Banque droite / Right</option>
+      </select>
+    </label>
+
+    <label>
+      Outil nettoyé
+      <select id="toolSelect" onchange="updatePage()">
+        <!-- rempli en JS -->
+      </select>
+      <span class="help" id="toolHelp"></span>
+    </label>
+  </div>
+
+  <div class="section-title">2. Photo de repérage</div>
+
+  <div class="photo-card">
+    <img id="lineImage" src="img/nettoyage_lignes_1_3.png" alt="Photo banque outils MY300">
+    <div class="caption" id="imageCaption"></div>
+  </div>
+
+  <div class="section-title">3. Résumé de l’intervention</div>
+
+  <div class="panel summary">
+    <div class="row">
+      <span>Ligne sélectionnée</span>
+      <span class="value" id="summaryLine">–</span>
+    </div>
+    <div class="row">
+      <span>Banque sélectionnée</span>
+      <span class="value" id="summaryBank">–</span>
+    </div>
+    <div class="row">
+      <span>Outil sélectionné</span>
+      <span class="value" id="summaryTool">–</span>
+    </div>
+    <div class="row">
+      <span>Sélection logiciel Mycronic</span>
+      <span class="value software-select" id="softwareChoice">–</span>
+    </div>
+    <div class="badge-row" id="toolBadges"></div>
+  </div>
+
+  <div id="procedureContainer"></div>
+
+  <div class="section-title">5. Checklist opérateur</div>
+
+  <div class="checklist">
+    <div class="check-card">
+      <h3>Avant nettoyage</h3>
+      <label class="check-item"><input type="checkbox">Ligne de production correctement identifiée.</label>
+      <label class="check-item"><input type="checkbox">Banque gauche / droite correctement identifiée.</label>
+      <label class="check-item"><input type="checkbox">Outil à nettoyer identifié.</label>
+      <label class="check-item"><input type="checkbox">Alcool isopropylique disponible.</label>
+      <label class="check-item"><input type="checkbox">Précelle disponible.</label>
+      <label class="check-item"><input type="checkbox">Chiffon doux non pelucheux disponible.</label>
+    </div>
+
+    <div class="check-card">
+      <h3>Pendant nettoyage</h3>
+      <label class="check-item"><input type="checkbox">Outil retiré délicatement avec la précelle.</label>
+      <label class="check-item"><input type="checkbox">Seule la pointe a été trempée dans l’alcool.</label>
+      <label class="check-item"><input type="checkbox">Trempage limité à 4–5 secondes maximum.</label>
+      <label class="check-item"><input type="checkbox">Outil soufflé du gros diamètre vers le petit diamètre.</label>
+      <label class="check-item"><input type="checkbox">Outil essuyé si nécessaire.</label>
+    </div>
+
+    <div class="check-card">
+      <h3>Après nettoyage</h3>
+      <label class="check-item"><input type="checkbox">Outil remonté correctement.</label>
+      <label class="check-item"><input type="checkbox">Couleur / référence respectée sur la ligne d’outils.</label>
+      <label class="check-item"><input type="checkbox">Cycle outil lancé dans le logiciel Mycronic.</label>
+      <label class="check-item"><input type="checkbox">Bonne sélection logiciel effectuée.</label>
+      <label class="check-item"><input type="checkbox">Nombre de cycles réglé entre 3 et 5, idéalement 4.</label>
+      <label class="check-item"><input type="checkbox">Cycle terminé sans anomalie.</label>
+    </div>
+  </div>
+
+  <button class="reset" onclick="resetChecklist()">Réinitialiser la checklist</button>
+
+  <p class="note">
+    Ce mémo sert d’aide opérateur. En cas de doute, défaut machine, outil abîmé, résistance anormale au démontage/remontage
+    ou consigne différente du responsable, arrêter l’intervention et demander confirmation.
+  </p>
+</div>
+
+<script>
+const TOOL_SETS = {
+  L1: [
+    { id: "H01", label: "H01 – blanc", colorClass: "h01", note: "Nettoyage hebdomadaire." },
+    { id: "H02", label: "H02 – jaune", colorClass: "h02", note: "Nettoyage hebdomadaire." },
+    { id: "H06", label: "H06 – vert, si demandé", colorClass: "h06", note: "Uniquement si demandé par le responsable." }
+  ],
+  L3: [
+    { id: "H01", label: "H01 – blanc", colorClass: "h01", note: "Nettoyage hebdomadaire." },
+    { id: "H02", label: "H02 – jaune", colorClass: "h02", note: "Nettoyage hebdomadaire." },
+    { id: "H06", label: "H06 – vert, si demandé", colorClass: "h06", note: "Uniquement si demandé par le responsable." }
+  ],
+  L2: [
+    { id: "X06", label: "X06", colorClass: "x", note: "Procédure ligne 2 à compléter." },
+    { id: "X12", label: "X12", colorClass: "x", note: "Procédure ligne 2 à compléter." }
+  ]
+};
+
+function getLineLabel(line) {
+  if (line === "L1") return "Ligne 1";
+  if (line === "L2") return "Ligne 2";
+  if (line === "L3") return "Ligne 3";
+  return "–";
+}
+
+function getBankLabel(bank) {
+  return bank === "Left" ? "Banque gauche / Left" : "Banque droite / Right";
+}
+
+function updateToolOptions() {
+  const line = document.getElementById("lineSelect").value;
+  const toolSelect = document.getElementById("toolSelect");
+  const current = toolSelect.value;
+
+  const tools = TOOL_SETS[line] || [];
+  toolSelect.innerHTML = "";
+
+  tools.forEach(t => {
+    const opt = document.createElement("option");
+    opt.value = t.id;
+    opt.textContent = t.label;
+    toolSelect.appendChild(opt);
+  });
+
+  if (tools.some(t => t.id === current)) {
+    toolSelect.value = current;
+  }
+}
+
+function getSelectedTool() {
+  const line = document.getElementById("lineSelect").value;
+  const toolId = document.getElementById("toolSelect").value;
+  const tools = TOOL_SETS[line] || [];
+  return tools.find(t => t.id === toolId) || tools[0];
+}
+
+function updatePage() {
+  updateToolOptions();
+
+  const line = document.getElementById("lineSelect").value;
+  const bank = document.getElementById("bankSelect").value;
+  const tool = getSelectedTool();
+
+  document.getElementById("summaryLine").textContent = getLineLabel(line);
+  document.getElementById("summaryBank").textContent = getBankLabel(bank);
+  document.getElementById("summaryTool").textContent = tool ? tool.label : "–";
+
+  if (tool) {
+    document.getElementById("softwareChoice").textContent = tool.id + " " + bank;
+    document.getElementById("toolHelp").textContent = tool.note || "";
+  }
+
+  const badges = document.getElementById("toolBadges");
+  badges.innerHTML = "";
+
+  if (tool) {
+    badges.innerHTML += `<span class="badge ${tool.colorClass}">${tool.label}</span>`;
+  }
+
+  if (line === "L1" || line === "L3") {
+    badges.innerHTML += `<span class="badge soft">Procédure lignes 1 et 3</span>`;
+    badges.innerHTML += `<span class="badge soft">Vendredi matin à partir de midi</span>`;
+  } else {
+    badges.innerHTML += `<span class="badge soft">Procédure ligne 2 à compléter</span>`;
+  }
+
+  updateImage(line);
+  renderProcedure(line, bank, tool);
+}
+
+function updateImage(line) {
+  const img = document.getElementById("lineImage");
+  const caption = document.getElementById("imageCaption");
+
+  if (line === "L2") {
+    img.src = "img/nettoyage_ligne_2.png";
+    img.alt = "Photo banque outils ligne 2";
+    caption.textContent = "Banque outils ligne 2. Les outils prévus pour le nettoyage seront X06 et X12. La procédure détaillée sera ajoutée après validation.";
+  } else {
+    img.src = "img/nettoyage_lignes_1_3.png";
+    img.alt = "Photo banque outils lignes 1 et 3";
+    caption.textContent = "Banque outils lignes 1 et 3. Nettoyage hebdomadaire principalement sur H01 blanc et H02 jaune. H06 vert uniquement si demandé par le responsable.";
+  }
+}
+
+function getRemovalInstruction(toolId) {
+  if (toolId === "H01") {
+    return "Exemple H01 – blanc : à l’aide d’une précelle, décaler l’outil vers le haut afin de le libérer, puis le retirer délicatement.";
+  }
+  if (toolId === "H02") {
+    return "H02 – jaune : à l’aide d’une précelle, décaler l’outil vers le bas afin de le libérer, puis le retirer délicatement.";
+  }
+  if (toolId === "H06") {
+    return "H06 – vert : nettoyage uniquement si demandé par le responsable. Retirer l’outil délicatement avec une précelle, sans forcer, en respectant le sens validé en production.";
+  }
+  return "Retirer l’outil délicatement avec une précelle, selon le sens validé pour la ligne concernée.";
+}
+
+function renderProcedure(line, bank, tool) {
+  const container = document.getElementById("procedureContainer");
+
+  if (line === "L2") {
+    container.innerHTML = `
+      <div class="section-title">4. Procédure ligne 2</div>
+
+      <div class="panel placeholder">
+        <div class="block-title">Procédure à compléter</div>
+        <p>
+          La ligne 2 possède une banque d’outils différente des lignes 1 et 3.
+          Le principe de nettoyage sera proche, mais les références et la procédure détaillée doivent encore être validées.
+        </p>
+
+        <div class="block-title">Outils prévus pour le nettoyage ligne 2 :</div>
+        <ul>
+          <li><strong>X06</strong></li>
+          <li><strong>X12</strong></li>
+        </ul>
+
+        <div class="block-title">À compléter plus tard :</div>
+        <ul>
+          <li>Sens de démontage pour X06.</li>
+          <li>Sens de démontage pour X12.</li>
+          <li>Validation logiciel spécifique ligne 2.</li>
+          <li>Points de vigilance propres à cette banque d’outils.</li>
+        </ul>
+      </div>
+    `;
+    return;
+  }
+
+  const toolId = tool ? tool.id : "H01";
+  const toolLabel = tool ? tool.label : "H01 – blanc";
+  const software = toolId + " " + bank;
+  const bankText = bank === "Left" ? "banque gauche" : "banque droite";
+
+  container.innerHTML = `
+    <div class="section-title">4. Procédure lignes 1 et 3</div>
+
+    <div class="panel">
+      <div class="block-title">Fréquence de nettoyage</div>
+      <ul>
+        <li>Le nettoyage des outils de pose est réalisé chaque vendredi par l’équipe du matin, à partir de midi.</li>
+        <li>Les lignes 1 et 3 utilisent la même banque d’outils et la même procédure.</li>
+        <li>La machine possède deux banques d’outils : une à gauche et une à droite. La procédure de nettoyage est identique.</li>
+      </ul>
+
+      <div class="block-title">Outils concernés</div>
+      <ul>
+        <li><strong>H01 – blanc :</strong> nettoyage hebdomadaire.</li>
+        <li><strong>H02 – jaune :</strong> nettoyage hebdomadaire.</li>
+        <li><strong>H06 – vert :</strong> nettoyage uniquement si l’outil a été beaucoup utilisé pendant la semaine, sur consigne du responsable.</li>
+      </ul>
+
+      <div class="block-title">Nettoyage ponctuel en production</div>
+      <ul>
+        <li>Si nécessaire, un outil peut être nettoyé en cours de semaine pendant une production, notamment en cas de problème de pose lié à l’encrassement.</li>
+        <li>Ce nettoyage ponctuel ne remplace pas le nettoyage de fin de semaine : l’outil devra quand même être nettoyé lors du nettoyage hebdomadaire.</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <div class="block-title">Procédure détaillée – ${toolLabel}, ${bankText}</div>
+      <ol>
+        <li>${getRemovalInstruction(toolId)}</li>
+        <li>Tremper uniquement la pointe de l’outil dans l’alcool isopropylique pendant <strong>4 à 5 secondes maximum</strong>.</li>
+        <li><strong>Ne jamais tremper l’outil en entier</strong>, afin de ne pas effacer les informations inscrites sur l’outil.</li>
+        <li>Souffler l’outil après trempage.</li>
+        <li>Toujours souffler du diamètre le plus gros vers le diamètre le plus petit, autrement dit depuis le côté couleur vers la pointe de l’outil.</li>
+        <li>Si nécessaire, essuyer délicatement avec un chiffon doux non pelucheux.</li>
+        <li>Remonter l’outil en procédant dans l’ordre inverse du démontage, toujours à l’aide d’une précelle.</li>
+        <li>L’outil ne doit pas obligatoirement être remis exactement à son emplacement d’origine.</li>
+        <li>En revanche, il faut impérativement respecter les couleurs et les lignes d’outils : sur la ligne H01 blanc, il ne doit y avoir que des outils H01 blancs ; ne jamais mélanger avec H02 jaune ou une autre référence.</li>
+      </ol>
+    </div>
+
+    <div class="panel">
+      <div class="block-title">Validation logiciel Mycronic après nettoyage</div>
+      <ol>
+        <li>Sur la machine Mycronic concernée, aller dans <strong>Utilitaires</strong>.</li>
+        <li>Aller dans <strong>Diagnostics</strong>, puis valider.</li>
+        <li>Appuyer sur <strong>Y</strong> ou sélectionner <strong>Cycle d’outils de tête à haute vitesse</strong>, puis valider.</li>
+        <li>Sélectionner directement la ligne correspondant à l’outil et à la banque : <strong class="software-select">${software}</strong>.</li>
+        <li>Faire <strong>CTRL + A</strong> pour sélectionner tous les outils de cette ligne.</li>
+        <li>Ou utiliser la <strong>barre d’espace</strong> pour sélectionner un seul outil si un seul outil a été nettoyé.</li>
+        <li>Choisir le nombre de cycles que la tête va effectuer pour prendre et déposer les outils.</li>
+        <li>Choisir entre <strong>3 et 5 cycles</strong>. Valeur recommandée : <strong>4 cycles</strong>.</li>
+        <li>Valider et laisser la machine effectuer le cycle.</li>
+        <li>Le nettoyage est terminé lorsque le cycle est fini sans anomalie.</li>
+      </ol>
+    </div>
+
+    <div class="panel warning">
+      <div class="block-title">Points de vigilance</div>
+      <ul>
+        <li>Ne jamais tremper l’outil entièrement dans l’alcool.</li>
+        <li>Ne pas forcer au démontage ou au remontage.</li>
+        <li>Respecter le sens de démontage selon l’outil : H01 vers le haut, H02 vers le bas.</li>
+        <li>Ne jamais mélanger les couleurs ou références d’outils dans une même ligne.</li>
+        <li>H06 vert : uniquement si demandé par le responsable.</li>
+        <li>Après nettoyage, toujours lancer le cycle outil dans le logiciel Mycronic.</li>
+      </ul>
+    </div>
+  `;
+}
+
+function resetChecklist() {
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.checked = false;
+  });
+}
+
+window.addEventListener("load", () => {
+  updateToolOptions();
+  updatePage();
+});
+
+// Service worker pour mode hors-ligne
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js").catch(err => {
+      console.log("SW registration failed", err);
+    });
+  });
+}
+</script>
+</body>
+</html>
