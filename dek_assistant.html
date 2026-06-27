@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Assistant DEK – Distance image</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Assistant DEK">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color-scheme: light;
+    }
+
+    body {
+      margin: 0;
+      padding: 1rem;
+      background: #f5f5f5;
+    }
+
+    .app {
+      max-width: 920px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 1.25rem 1.5rem 1.5rem;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    h1 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+
+    .subtitle {
+      font-size: 0.8rem;
+      color: #555;
+      line-height: 1.35;
+    }
+
+    a.back {
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: #007aff;
+      margin-top: 0.2rem;
+      white-space: nowrap;
+    }
+
+    .section-title {
+      font-weight: 700;
+      margin-top: 0.95rem;
+      margin-bottom: 0.4rem;
+      font-size: 0.95rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    label {
+      font-size: 0.85rem;
+      display: block;
+    }
+
+    input, select {
+      width: 100%;
+      margin-top: 0.25rem;
+      padding: 0.45rem 0.55rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+      background: white;
+    }
+
+    input:disabled {
+      background: #eeeeee;
+      color: #888;
+    }
+
+    .help {
+      font-size: 0.75rem;
+      color: #666;
+      line-height: 1.35;
+      margin-top: 0.25rem;
+      display: block;
+    }
+
+    .panel {
+      border-radius: 14px;
+      border: 1px solid #e3e3e3;
+      background: #fafafa;
+      padding: 0.75rem 0.8rem;
+      margin-top: 0.45rem;
+      font-size: 0.9rem;
+    }
+
+    .result {
+      background: #f8fbff;
+      border-color: #d6e8ff;
+    }
+
+    .warning {
+      background: #fff8e1;
+      border-color: #ffe082;
+    }
+
+    .ok {
+      background: #f1f8f3;
+      border-color: #cde9d4;
+    }
+
+    .error {
+      background: #fff0f0;
+      border-color: #ffc7c7;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.6rem;
+      margin: 0.25rem 0;
+    }
+
+    .value {
+      font-weight: 800;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .big-result {
+      font-size: 1.35rem;
+      color: #0b5ed7;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin: 0.35rem 0 0.55rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.12rem 0.58rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      background: #e9ecef;
+      color: #495057;
+    }
+
+    .badge.blue {
+      background: #e7f0ff;
+      color: #003f8c;
+    }
+
+    .badge.green {
+      background: #e8f5e9;
+      color: #1b5e20;
+    }
+
+    .badge.orange {
+      background: #fff3cd;
+      color: #7a5b00;
+    }
+
+    .block-title {
+      font-weight: 700;
+      margin-top: 0.55rem;
+      margin-bottom: 0.25rem;
+      font-size: 0.92rem;
+    }
+
+    ul {
+      margin: 0 0 0.35rem 1.2rem;
+      padding: 0;
+    }
+
+    li {
+      margin-bottom: 0.22rem;
+      line-height: 1.4;
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.75rem;
+      margin-top: 0.45rem;
+    }
+
+    .photo-card {
+      background: #fafafa;
+      border: 1px solid #e3e3e3;
+      border-radius: 14px;
+      padding: 0.6rem;
+    }
+
+    .photo-card img {
+      width: 100%;
+      display: block;
+      border-radius: 10px;
+      object-fit: contain;
+      background: #fff;
+    }
+
+    .caption {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.4rem;
+      line-height: 1.4;
+    }
+
+    .note {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.7rem;
+      line-height: 1.4;
+    }
+
+    .formula {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.8rem;
+      background: #f0f0f0;
+      border-radius: 8px;
+      padding: 0.45rem 0.55rem;
+      margin-top: 0.35rem;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Assistant DEK – Distance image</h1>
+      <div class="subtitle">
+        Calcul rapide de la distance à l’image pour les cadres VectorGuard et TensoRED.
+        Ajout d’un contrôle programme et d’un calcul indicatif de pression racle.
+      </div>
+    </div>
+    <a href="index.html" class="back">← Accueil outils CMS</a>
+  </header>
+
+  <div class="section-title">1. Repère de mesure</div>
+
+  <div class="panel warning">
+    <div class="block-title">Définition utilisée en production</div>
+    <ul>
+      <li><strong>Distance à l’image DEK</strong> = distance entre le <strong>bord extérieur arrière du cadre</strong> et le <strong>bord avant / inférieur de l’image PCB</strong> sur le pochoir.</li>
+      <li>Mesure à faire dans le sens <strong>Y machine</strong>, c’est-à-dire avant / arrière.</li>
+      <li>Ne pas mesurer depuis le bord intérieur du cadre.</li>
+      <li>Ne pas mesurer jusqu’au centre de l’image.</li>
+    </ul>
+  </div>
+
+  <div class="photo-grid">
+    <div class="photo-card">
+      <img src="img/dek_vectorguard.webp" alt="Cadre VectorGuard">
+      <div class="caption">VectorGuard : valeur utilisée pour l’instant = 584 mm dans le sens Y.</div>
+    </div>
+
+    <div class="photo-card">
+      <img src="img/dek_tensored.webp" alt="Cadre TensoRED">
+      <div class="caption">TensoRED : valeur mesurée = 587 mm dans le sens Y.</div>
+    </div>
+  </div>
+
+  <div class="section-title">2. Calcul distance à l’image</div>
+
+  <div class="grid">
+    <label>
+      Type de cadre
+      <select id="frameType" onchange="updateAll()">
+        <option value="vector">VectorGuard 584 × 584 mm</option>
+        <option value="tensored">TensoRED 587 × 587 mm</option>
+        <option value="custom">Autre dimension</option>
+      </select>
+    </label>
+
+    <label>
+      Dimension cadre Y personnalisée
+      <input id="customFrameY" type="number" step="0.1" value="584" oninput="updateAll()" disabled>
+      <span class="help">À utiliser uniquement si “Autre dimension” est sélectionné.</span>
+    </label>
+
+    <label>
+      Longueur PCB dans le sens Y
+      <input id="pcbY" type="number" step="0.1" value="200" oninput="updateAll()">
+      <span class="help">Longueur de la carte dans le sens avant / arrière machine.</span>
+    </label>
+
+    <label>
+      Position de l’image
+      <select id="imageMode" onchange="updateAll()">
+        <option value="centered">Image centrée dans le cadre</option>
+        <option value="bottom114">Bord inférieur image à 114 mm du bord inférieur cadre</option>
+      </select>
+    </label>
+
+    <label>
+      Distance bord inférieur cadre → bord inférieur image
+      <input id="bottomOffset" type="number" step="0.1" value="114" oninput="updateAll()">
+      <span class="help">Utilisé uniquement pour le mode “bord inférieur”. Valeur actuelle : 114 mm.</span>
+    </label>
+
+    <label>
+      Valeur présente dans le programme DEK
+      <input id="programValue" type="number" step="0.1" placeholder="Optionnel" oninput="updateAll()">
+      <span class="help">Permet de comparer la valeur calculée avec le programme existant.</span>
+    </label>
+  </div>
+
+  <div class="panel result">
+    <div class="row">
+      <span>Distance à l’image DEK calculée</span>
+      <span class="value big-result" id="distanceResult">–</span>
+    </div>
+    <div class="row">
+      <span>Marge arrière / haut</span>
+      <span class="value" id="rearMargin">–</span>
+    </div>
+    <div class="row">
+      <span>Marge avant / bas</span>
+      <span class="value" id="frontMargin">–</span>
+    </div>
+    <div class="row">
+      <span>Écart programme DEK</span>
+      <span class="value" id="programDiff">–</span>
+    </div>
+
+    <div class="badge-row" id="distanceBadges"></div>
+
+    <div class="formula" id="formulaText">
+      –
+    </div>
+  </div>
+
+  <div class="section-title">3. Pression racle indicative</div>
+
+  <div class="grid">
+    <label>
+      Longueur de racle montée
+      <select id="squeegeeLength" onchange="updateAll()">
+        <option value="300">300 mm</option>
+        <option value="350">350 mm</option>
+        <option value="custom">Autre longueur</option>
+      </select>
+    </label>
+
+    <label>
+      Longueur personnalisée
+      <input id="customSqueegee" type="number" step="1" value="300" oninput="updateAll()" disabled>
+      <span class="help">À utiliser uniquement si “Autre longueur” est sélectionné.</span>
+    </label>
+
+    <label>
+      Pression de départ
+      <select id="pressureRule" onchange="updateAll()">
+        <option value="2">2 N/cm</option>
+        <option value="2.5" selected>2,5 N/cm</option>
+        <option value="3">3 N/cm</option>
+      </select>
+      <span class="help">Règle indicative basée sur la longueur de racle montée.</span>
+    </label>
+  </div>
+
+  <div class="panel result">
+    <div class="row">
+      <span>Pression départ calculée</span>
+      <span class="value big-result" id="pressureStart">–</span>
+    </div>
+    <div class="row">
+      <span>Plage indicative 2 à 3 N/cm</span>
+      <span class="value" id="pressureRange">–</span>
+    </div>
+    <div class="row">
+      <span>Équivalent approximatif en kgf</span>
+      <span class="value" id="pressureKgf">–</span>
+    </div>
+
+    <div class="badge-row">
+      <span class="badge green">Expérience Ludo : 2 à 3 N/cm</span>
+      <span class="badge blue">Départ conseillé : 2,5 N/cm</span>
+    </div>
+  </div>
+
+  <div class="section-title">4. Points de vigilance</div>
+
+  <div class="panel warning">
+    <ul>
+      <li>La longueur PCB Y doit correspondre au sens avant / arrière machine, pas au sens gauche / droite.</li>
+      <li>Pour une image centrée, la distance dépend de la longueur PCB Y.</li>
+      <li>Pour le mode bord inférieur à 114 mm, la distance à l’image ne dépend pas de la longueur PCB Y ; la longueur sert surtout à vérifier la marge arrière restante.</li>
+      <li>La pression racle est indicative : elle doit être ajustée selon pâte, pochoir, support, état des racles et résultat d’impression.</li>
+    </ul>
+  </div>
+
+  <p class="note">
+    Cet assistant sert d’aide au contrôle. Les valeurs doivent être validées par la pratique terrain et les réglages machine.
+  </p>
+</div>
+
+<script>
+function n(value) {
+  return Number(value);
+}
+
+function fmt(value, decimals = 1) {
+  if (!isFinite(value)) return "–";
+  return value.toLocaleString("fr-FR", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: decimals
+  });
+}
+
+function getFrameY() {
+  const type = document.getElementById("frameType").value;
+  const customInput = document.getElementById("customFrameY");
+
+  if (type === "vector") {
+    customInput.disabled = true;
+    return 584;
+  }
+
+  if (type === "tensored") {
+    customInput.disabled = true;
+    return 587;
+  }
+
+  customInput.disabled = false;
+  return n(customInput.value);
+}
+
+function getSqueegeeLength() {
+  const lengthChoice = document.getElementById("squeegeeLength").value;
+  const customInput = document.getElementById("customSqueegee");
+
+  if (lengthChoice === "300") {
+    customInput.disabled = true;
+    return 300;
+  }
+
+  if (lengthChoice === "350") {
+    customInput.disabled = true;
+    return 350;
+  }
+
+  customInput.disabled = false;
+  return n(customInput.value);
+}
+
+function updateDistance() {
+  const frameY = getFrameY();
+  const pcbY = n(document.getElementById("pcbY").value);
+  const mode = document.getElementById("imageMode").value;
+  const bottomOffset = n(document.getElementById("bottomOffset").value);
+  const programValueRaw = document.getElementById("programValue").value;
+  const programValue = programValueRaw === "" ? null : n(programValueRaw);
+
+  const resultEl = document.getElementById("distanceResult");
+  const rearEl = document.getElementById("rearMargin");
+  const frontEl = document.getElementById("frontMargin");
+  const diffEl = document.getElementById("programDiff");
+  const formulaEl = document.getElementById("formulaText");
+  const badgesEl = document.getElementById("distanceBadges");
+
+  badgesEl.innerHTML = "";
+
+  if (!frameY || !pcbY || frameY <= 0 || pcbY <= 0) {
+    resultEl.textContent = "–";
+    rearEl.textContent = "–";
+    frontEl.textContent = "–";
+    diffEl.textContent = "–";
+    formulaEl.textContent = "Renseigner une dimension de cadre et une longueur PCB valides.";
+    badgesEl.innerHTML = `<span class="badge orange">Valeurs à compléter</span>`;
+    return;
+  }
+
+  let distanceImage;
+  let rearMargin;
+  let frontMargin;
+  let formula;
+
+  if (mode === "centered") {
+    distanceImage = (frameY + pcbY) / 2;
+    rearMargin = (frameY - pcbY) / 2;
+    frontMargin = (frameY - pcbY) / 2;
+
+    formula = "Image centrée : distance = (cadre Y + PCB Y) / 2 = (" +
+      fmt(frameY) + " + " + fmt(pcbY) + ") / 2 = " + fmt(distanceImage) + " mm";
+  } else {
+    distanceImage = frameY - bottomOffset;
+    frontMargin = bottomOffset;
+    rearMargin = frameY - bottomOffset - pcbY;
+
+    formula = "Bord inférieur à " + fmt(bottomOffset) +
+      " mm : distance = cadre Y - marge avant = " +
+      fmt(frameY) + " - " + fmt(bottomOffset) + " = " + fmt(distanceImage) + " mm";
+  }
+
+  resultEl.textContent = fmt(distanceImage) + " mm";
+  rearEl.textContent = fmt(rearMargin) + " mm";
+  frontEl.textContent = fmt(frontMargin) + " mm";
+  formulaEl.textContent = formula;
+
+  if (rearMargin < 0 || frontMargin < 0) {
+    badgesEl.innerHTML += `<span class="badge orange">Attention : image hors cadre</span>`;
+  } else {
+    badgesEl.innerHTML += `<span class="badge green">Image compatible avec le cadre</span>`;
+  }
+
+  if (mode === "centered") {
+    badgesEl.innerHTML += `<span class="badge blue">Mode centré</span>`;
+  } else {
+    badgesEl.innerHTML += `<span class="badge blue">Bord inférieur à ${fmt(bottomOffset)} mm</span>`;
+  }
+
+  if (programValue === null || !isFinite(programValue)) {
+    diffEl.textContent = "–";
+  } else {
+    const diff = programValue - distanceImage;
+    const absDiff = Math.abs(diff);
+
+    diffEl.textContent = (diff >= 0 ? "+" : "") + fmt(diff) + " mm";
+
+    if (absDiff <= 1) {
+      badgesEl.innerHTML += `<span class="badge green">Programme proche du calcul</span>`;
+    } else if (absDiff <= 3) {
+      badgesEl.innerHTML += `<span class="badge orange">Écart à contrôler</span>`;
+    } else {
+      badgesEl.innerHTML += `<span class="badge orange">Écart important avec le programme</span>`;
+    }
+  }
+}
+
+function updatePressure() {
+  const lengthMm = getSqueegeeLength();
+  const pressureRule = n(document.getElementById("pressureRule").value);
+
+  const startEl = document.getElementById("pressureStart");
+  const rangeEl = document.getElementById("pressureRange");
+  const kgfEl = document.getElementById("pressureKgf");
+
+  if (!lengthMm || lengthMm <= 0) {
+    startEl.textContent = "–";
+    rangeEl.textContent = "–";
+    kgfEl.textContent = "–";
+    return;
+  }
+
+  const lengthCm = lengthMm / 10;
+
+  const minN = lengthCm * 2;
+  const startN = lengthCm * pressureRule;
+  const maxN = lengthCm * 3;
+
+  const minKgf = minN / 9.80665;
+  const startKgf = startN / 9.80665;
+  const maxKgf = maxN / 9.80665;
+
+  startEl.textContent = fmt(startN) + " N";
+  rangeEl.textContent = fmt(minN) + " à " + fmt(maxN) + " N";
+  kgfEl.textContent = fmt(startKgf) + " kgf environ";
+}
+
+function updateAll() {
+  updateDistance();
+  updatePressure();
+}
+
+window.addEventListener("load", updateAll);
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js").catch(err => {
+      console.log("SW registration failed", err);
+    });
+  });
+}
+</script>
+</body>
+</html>
