@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Bobines & Feeders</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Bobines Feeders">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color-scheme: light;
+    }
+
+    body {
+      margin: 0;
+      padding: 1rem;
+      background: #f5f5f5;
+    }
+
+    .app {
+      max-width: 960px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 1.25rem 1.5rem 1.5rem;
+      border-radius: 18px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    h1 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+
+    .subtitle {
+      font-size: 0.8rem;
+      color: #555;
+      line-height: 1.35;
+    }
+
+    a.back {
+      font-size: 0.8rem;
+      text-decoration: none;
+      color: #007aff;
+      margin-top: 0.2rem;
+      white-space: nowrap;
+    }
+
+    .section-title {
+      font-weight: 700;
+      margin-top: 0.95rem;
+      margin-bottom: 0.4rem;
+      font-size: 0.95rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.75rem 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    label {
+      font-size: 0.85rem;
+      display: block;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      margin-top: 0.25rem;
+      padding: 0.45rem 0.55rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+      background: white;
+      font-family: inherit;
+    }
+
+    textarea {
+      min-height: 95px;
+      resize: vertical;
+      line-height: 1.35;
+    }
+
+    .help {
+      font-size: 0.75rem;
+      color: #666;
+      line-height: 1.35;
+      margin-top: 0.25rem;
+      display: block;
+    }
+
+    .panel {
+      border-radius: 14px;
+      border: 1px solid #e3e3e3;
+      background: #fafafa;
+      padding: 0.75rem 0.8rem;
+      margin-top: 0.45rem;
+      font-size: 0.9rem;
+    }
+
+    .result {
+      background: #f8fbff;
+      border-color: #d6e8ff;
+    }
+
+    .warning {
+      background: #fff8e1;
+      border-color: #ffe082;
+    }
+
+    .ok {
+      background: #f1f8f3;
+      border-color: #cde9d4;
+    }
+
+    .danger {
+      background: #fff0f0;
+      border-color: #ffc7c7;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.6rem;
+      margin: 0.25rem 0;
+    }
+
+    .value {
+      font-weight: 800;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin: 0.35rem 0 0.55rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.12rem 0.58rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      background: #e9ecef;
+      color: #495057;
+    }
+
+    .badge.blue {
+      background: #e7f0ff;
+      color: #003f8c;
+    }
+
+    .badge.green {
+      background: #e8f5e9;
+      color: #1b5e20;
+    }
+
+    .badge.orange {
+      background: #fff3cd;
+      color: #7a5b00;
+    }
+
+    .badge.red {
+      background: #fdecea;
+      color: #b42318;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-top: 0.55rem;
+    }
+
+    button {
+      padding: 0.48rem 0.75rem;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      background: #fff;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    button.primary {
+      background: #0b5ed7;
+      color: white;
+      border-color: #0b5ed7;
+    }
+
+    button.danger-btn {
+      background: #fff0f0;
+      border-color: #ffc7c7;
+      color: #a40000;
+    }
+
+    button:active {
+      transform: scale(0.99);
+    }
+
+    .block-title {
+      font-weight: 700;
+      margin-top: 0.55rem;
+      margin-bottom: 0.25rem;
+      font-size: 0.92rem;
+    }
+
+    ul {
+      margin: 0 0 0.35rem 1.2rem;
+      padding: 0;
+    }
+
+    li {
+      margin-bottom: 0.22rem;
+      line-height: 1.4;
+    }
+
+    .list {
+      display: grid;
+      gap: 0.45rem;
+      margin-top: 0.45rem;
+    }
+
+    .card {
+      border: 1px solid #e3e3e3;
+      border-radius: 12px;
+      background: #fff;
+      padding: 0.55rem 0.65rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      background: #f8fbff;
+    }
+
+    .card-title {
+      font-weight: 800;
+      margin-bottom: 0.2rem;
+    }
+
+    .card-sub {
+      color: #555;
+      font-size: 0.78rem;
+      line-height: 1.35;
+    }
+
+    .note {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 0.7rem;
+      line-height: 1.4;
+    }
+
+    .hidden-file {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>Assistant Bobines & Feeders</h1>
+      <div class="subtitle">
+        Mini-base personnelle pour associer une référence interne bobine à son composant,
+        son feeder utilisé en production et ses remarques terrain.
+      </div>
+    </div>
+    <a href="index.html" class="back">← Accueil outils CMS</a>
+  </header>
+
+  <div class="section-title">1. Recherche référence interne</div>
+
+  <div class="panel result">
+    <label>
+      Référence interne bobine
+      <input id="searchRef" type="text" placeholder="Exemple : 80-000-106" oninput="liveSearch()">
+      <span class="help">Saisir la référence interne présente sur la bobine. Exemple : 80-000-106, 80-001-400, 80-CA5-056.</span>
+    </label>
+
+    <div class="buttons">
+      <button class="primary" onclick="searchReference()">Rechercher / charger</button>
+      <button onclick="newReference()">Créer une nouvelle fiche</button>
+      <button onclick="clearForm()">Vider le formulaire</button>
+    </div>
+
+    <div class="badge-row" id="statusBadges">
+      <span class="badge blue">Base locale</span>
+      <span class="badge green" id="countBadge">0 fiche</span>
+    </div>
+
+    <div id="searchResult" class="note">
+      Saisis une référence puis lance la recherche. Si elle n’existe pas encore, tu pourras créer la fiche.
+    </div>
+  </div>
+
+  <div class="section-title">2. Fiche bobine</div>
+
+  <div class="grid">
+    <label>
+      Référence interne
+      <input id="refInterne" type="text" placeholder="80-000-106">
+    </label>
+
+    <label>
+      Désignation / valeur
+      <input id="designation" type="text" placeholder="Exemple : Résistance 10 kΩ 1 %">
+    </label>
+
+    <label>
+      Type composant
+      <select id="typeComposant">
+        <option value="">Non renseigné</option>
+        <option>Résistance</option>
+        <option>Condensateur</option>
+        <option>Inductance</option>
+        <option>Diode</option>
+        <option>LED</option>
+        <option>Transistor</option>
+        <option>Circuit intégré</option>
+        <option>Connecteur</option>
+        <option>Quartz / oscillateur</option>
+        <option>Autre</option>
+      </select>
+    </label>
+
+    <label>
+      Boîtier
+      <select id="boitier">
+        <option value="">Non renseigné</option>
+        <option>01005</option>
+        <option>0201</option>
+        <option>0402</option>
+        <option>0603</option>
+        <option>0805</option>
+        <option>1206</option>
+        <option>1210</option>
+        <option>SOD-123</option>
+        <option>SOD-323</option>
+        <option>SOT-23</option>
+        <option>SOT-223</option>
+        <option>SOIC</option>
+        <option>TSSOP</option>
+        <option>QFN</option>
+        <option>QFP</option>
+        <option>BGA</option>
+        <option>MELF</option>
+        <option>LED petit boîtier</option>
+        <option>Autre</option>
+      </select>
+    </label>
+
+    <label>
+      Largeur bande
+      <select id="largeurBande">
+        <option value="">Non renseignée</option>
+        <option>4 mm</option>
+        <option>8 mm</option>
+        <option>12 mm</option>
+        <option>16 mm</option>
+        <option>24 mm</option>
+        <option>32 mm</option>
+        <option>44 mm</option>
+        <option>56 mm</option>
+        <option>72 mm</option>
+        <option>88 mm</option>
+        <option>104 mm</option>
+        <option>120 mm</option>
+        <option>136 mm</option>
+        <option>152 mm</option>
+      </select>
+    </label>
+
+    <label>
+      Pas d’avance
+      <select id="pasAvance">
+        <option value="">Non renseigné</option>
+        <option>2 mm</option>
+        <option>4 mm</option>
+        <option>8 mm</option>
+        <option>12 mm</option>
+        <option>16 mm</option>
+        <option>24 mm</option>
+        <option>32 mm</option>
+        <option>Autre</option>
+      </select>
+    </label>
+
+    <label>
+      Feeder utilisé en production
+      <select id="feeder">
+        <!-- rempli par JS -->
+      </select>
+      <span class="help" id="feederHelp"></span>
+    </label>
+
+    <label>
+      Polarité
+      <select id="polarite">
+        <option>Non renseignée</option>
+        <option>Non polarisé</option>
+        <option>Polarisé – cathode</option>
+        <option>Polarisé – anode</option>
+        <option>Polarisé – pin 1</option>
+        <option>Polarisé – détrompeur / repère boîtier</option>
+        <option>À vérifier avant lancement</option>
+      </select>
+    </label>
+
+    <label>
+      Outil de pose probable
+      <select id="outilPose">
+        <option value="">Non renseigné</option>
+        <option>H01 – blanc</option>
+        <option>H02 – jaune</option>
+        <option>H03 – rouge</option>
+        <option>H04 – bleu</option>
+        <option>H05 – marron</option>
+        <option>H06 – vert</option>
+        <option>Outil Midas</option>
+        <option>À vérifier machine</option>
+        <option>Autre</option>
+      </select>
+    </label>
+
+    <label>
+      Statut fiche
+      <select id="statut">
+        <option>À vérifier</option>
+        <option>Validé production</option>
+        <option>À corriger</option>
+        <option>Ancien / à confirmer</option>
+      </select>
+    </label>
+  </div>
+
+  <label>
+    Remarque terrain
+    <textarea id="remarque" placeholder="Écris ici librement : feeder spécial, orientation, polarité, ligne habituelle, problème rencontré, outil conseillé, etc."></textarea>
+    <span class="help">Champ libre : tu peux écrire ce que tu veux, sur plusieurs lignes.</span>
+  </label>
+
+  <div class="buttons">
+    <button class="primary" onclick="saveCurrent()">Enregistrer / mettre à jour</button>
+    <button class="danger-btn" onclick="deleteCurrent()">Supprimer cette fiche</button>
+  </div>
+
+  <div class="section-title">3. Résumé de la fiche</div>
+
+  <div class="panel result">
+    <div class="row">
+      <span>Référence</span>
+      <span class="value" id="summaryRef">–</span>
+    </div>
+    <div class="row">
+      <span>Feeder</span>
+      <span class="value" id="summaryFeeder">–</span>
+    </div>
+    <div class="row">
+      <span>Boîtier / bande</span>
+      <span class="value" id="summaryPackage">–</span>
+    </div>
+    <div class="row">
+      <span>Statut</span>
+      <span class="value" id="summaryStatus">–</span>
+    </div>
+    <div class="badge-row" id="summaryBadges"></div>
+  </div>
+
+  <div class="section-title">4. Sauvegarde / transfert</div>
+
+  <div class="panel warning">
+    <div class="block-title">Important</div>
+    <ul>
+      <li>Les fiches sont sauvegardées localement dans le navigateur / l’iPhone.</li>
+      <li>Si les données du site sont effacées, la base peut être perdue.</li>
+      <li>Utilise régulièrement le bouton <strong>Exporter la base</strong> pour sauvegarder un fichier JSON.</li>
+    </ul>
+
+    <div class="buttons">
+      <button onclick="exportDatabase()">Exporter la base JSON</button>
+      <button onclick="document.getElementById('importFile').click()">Importer une base JSON</button>
+      <input id="importFile" class="hidden-file" type="file" accept=".json,application/json" onchange="importDatabase(event)">
+    </div>
+  </div>
+
+  <div class="section-title">5. Fiches enregistrées</div>
+
+  <div class="panel">
+    <div class="block-title">Liste rapide</div>
+    <div id="cardsList" class="list"></div>
+  </div>
+
+  <p class="note">
+    Cet assistant est une base terrain personnelle. Les choix de feeders doivent rester validés par la production,
+    la disponibilité machine, le type de bande, le pas, la polarité et les consignes internes.
+  </p>
+</div>
+
+<script>
+const STORAGE_KEY = "bobines_feeders_db_v1";
+
+const FEEDERS = [
+  {
+    id: "",
+    label: "Non renseigné",
+    help: "Choisir le feeder réellement utilisé en production."
+  },
+  {
+    id: "agilis_8_37",
+    label: "Agilis 8 mm 3.7 – vert",
+    help: "Utilisation typique : très petits composants, 01005 / 0201 selon cas."
+  },
+  {
+    id: "agilis_8_40_blanc",
+    label: "Agilis 8 mm 4.0 – blanc",
+    help: "Utilisation typique : 0402 / 0603 selon cas et pratique production."
+  },
+  {
+    id: "agilis_8_40_blanc_A",
+    label: "Agilis 8 mm 4.0 – blanc aimanté “A”",
+    help: "Feeder blanc avec marquage A, fourni par Mycronic. Utilisé en production pour 0402 et éventuellement petites LED."
+  },
+  {
+    id: "agilis_8_47",
+    label: "Agilis 8 mm 4.7 – jaune",
+    help: "Utilisation typique : 0805 / 1206 / petits MELF selon cas."
+  },
+  {
+    id: "agilis_8_54",
+    label: "Agilis 8 mm 5.4 – rouge",
+    help: "Utilisation typique : SOT-23, petits boîtiers plus hauts ou cas particuliers."
+  },
+  {
+    id: "agilis_8_adj",
+    label: "Agilis 8 mm ADJ – noir",
+    help: "Feeder ajustable pour cas particuliers."
+  },
+  {
+    id: "agilis_12",
+    label: "Agilis 12 mm",
+    help: "Pour bandes 12 mm."
+  },
+  {
+    id: "agilis_16",
+    label: "Agilis 16 mm",
+    help: "Pour bandes 16 mm."
+  },
+  {
+    id: "agilis_flex_8",
+    label: "Agilis Flex 8 mm",
+    help: "Feeder Flex pour bande 8 mm."
+  },
+  {
+    id: "agilis_flex_12",
+    label: "Agilis Flex 12 mm",
+    help: "Feeder Flex pour bande 12 mm."
+  },
+  {
+    id: "agilis_flex_16",
+    label: "Agilis Flex 16 mm",
+    help: "Feeder Flex pour bande 16 mm."
+  },
+  {
+    id: "agilis_flex_24",
+    label: "Agilis Flex 24 mm",
+    help: "Feeder Flex pour bande 24 mm."
+  },
+  {
+    id: "agilis_flex_32",
+    label: "Agilis Flex 32 mm",
+    help: "Feeder Flex pour bande 32 mm."
+  },
+  {
+    id: "agilis_flex_44",
+    label: "Agilis Flex 44 mm",
+    help: "Feeder Flex pour bande 44 mm."
+  },
+  {
+    id: "agilis_flex_56",
+    label: "Agilis Flex 56 mm",
+    help: "Feeder Flex pour bande 56 mm."
+  },
+  {
+    id: "agilis_flex_72",
+    label: "Agilis Flex 72 mm",
+    help: "Feeder Flex pour bande 72 mm."
+  },
+  {
+    id: "agilis_stick",
+    label: "Agilis Stick Magazine",
+    help: "Pour composants en stick / tube."
+  },
+  {
+    id: "agilis_tray",
+    label: "Agilis Tray Magazine",
+    help: "Pour composants en plateau."
+  },
+  {
+    id: "autre",
+    label: "Autre / à préciser dans remarque",
+    help: "Choisir cette option si le feeder n’est pas dans la liste."
+  }
+];
+
+let db = {};
+
+function normalizeRef(ref) {
+  return (ref || "").trim().toUpperCase();
+}
+
+function loadDatabase() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    db = raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    db = {};
+  }
+}
+
+function saveDatabase() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+  updateCount();
+  renderCards();
+}
+
+function populateFeeders() {
+  const select = document.getElementById("feeder");
+  select.innerHTML = "";
+
+  FEEDERS.forEach(f => {
+    const opt = document.createElement("option");
+    opt.value = f.id;
+    opt.textContent = f.label;
+    select.appendChild(opt);
+  });
+
+  select.addEventListener("change", updateSummary);
+}
+
+function getFeederLabel(id) {
+  const f = FEEDERS.find(x => x.id === id);
+  return f ? f.label : "Non renseigné";
+}
+
+function getFeederHelp(id) {
+  const f = FEEDERS.find(x => x.id === id);
+  return f ? f.help : "";
+}
+
+function getFormData() {
+  const ref = normalizeRef(document.getElementById("refInterne").value);
+
+  return {
+    ref,
+    designation: document.getElementById("designation").value.trim(),
+    typeComposant: document.getElementById("typeComposant").value,
+    boitier: document.getElementById("boitier").value,
+    largeurBande: document.getElementById("largeurBande").value,
+    pasAvance: document.getElementById("pasAvance").value,
+    feeder: document.getElementById("feeder").value,
+    polarite: document.getElementById("polarite").value,
+    outilPose: document.getElementById("outilPose").value,
+    statut: document.getElementById("statut").value,
+    remarque: document.getElementById("remarque").value,
+    updatedAt: new Date().toISOString()
+  };
+}
+
+function setFormData(item) {
+  document.getElementById("refInterne").value = item.ref || "";
+  document.getElementById("designation").value = item.designation || "";
+  document.getElementById("typeComposant").value = item.typeComposant || "";
+  document.getElementById("boitier").value = item.boitier || "";
+  document.getElementById("largeurBande").value = item.largeurBande || "";
+  document.getElementById("pasAvance").value = item.pasAvance || "";
+  document.getElementById("feeder").value = item.feeder || "";
+  document.getElementById("polarite").value = item.polarite || "Non renseignée";
+  document.getElementById("outilPose").value = item.outilPose || "";
+  document.getElementById("statut").value = item.statut || "À vérifier";
+  document.getElementById("remarque").value = item.remarque || "";
+
+  updateSummary();
+}
+
+function clearForm() {
+  setFormData({
+    ref: "",
+    designation: "",
+    typeComposant: "",
+    boitier: "",
+    largeurBande: "",
+    pasAvance: "",
+    feeder: "",
+    polarite: "Non renseignée",
+    outilPose: "",
+    statut: "À vérifier",
+    remarque: ""
+  });
+
+  document.getElementById("searchResult").textContent = "Formulaire vidé.";
+}
+
+function newReference() {
+  const ref = normalizeRef(document.getElementById("searchRef").value);
+
+  clearForm();
+
+  if (ref) {
+    document.getElementById("refInterne").value = ref;
+    document.getElementById("searchResult").textContent = "Nouvelle fiche prête pour : " + ref;
+  } else {
+    document.getElementById("searchResult").textContent = "Nouvelle fiche vide créée. Renseigne la référence interne.";
+  }
+
+  updateSummary();
+}
+
+function searchReference() {
+  const ref = normalizeRef(document.getElementById("searchRef").value);
+
+  if (!ref) {
+    document.getElementById("searchResult").textContent = "Saisir une référence interne avant de rechercher.";
+    return;
+  }
+
+  if (db[ref]) {
+    setFormData(db[ref]);
+    document.getElementById("searchResult").textContent = "Référence trouvée et chargée : " + ref;
+  } else {
+    clearForm();
+    document.getElementById("refInterne").value = ref;
+    document.getElementById("searchResult").textContent = "Référence inconnue. Tu peux compléter la fiche puis enregistrer.";
+    updateSummary();
+  }
+}
+
+function liveSearch() {
+  const ref = normalizeRef(document.getElementById("searchRef").value);
+  const result = document.getElementById("searchResult");
+
+  if (!ref) {
+    result.textContent = "Saisis une référence puis lance la recherche.";
+    return;
+  }
+
+  if (db[ref]) {
+    result.textContent = "Référence déjà enregistrée : " + ref + ". Clique sur “Rechercher / charger”.";
+  } else {
+    result.textContent = "Référence non trouvée pour le moment : " + ref + ".";
+  }
+}
+
+function saveCurrent() {
+  const item = getFormData();
+
+  if (!item.ref) {
+    alert("Renseigne une référence interne avant d’enregistrer.");
+    return;
+  }
+
+  db[item.ref] = item;
+  saveDatabase();
+
+  document.getElementById("searchRef").value = item.ref;
+  document.getElementById("searchResult").textContent = "Fiche enregistrée : " + item.ref;
+  updateSummary();
+}
+
+function deleteCurrent() {
+  const ref = normalizeRef(document.getElementById("refInterne").value);
+
+  if (!ref) {
+    alert("Aucune référence à supprimer.");
+    return;
+  }
+
+  if (!db[ref]) {
+    alert("Cette référence n’est pas enregistrée dans la base.");
+    return;
+  }
+
+  const ok = confirm("Supprimer la fiche " + ref + " ?");
+  if (!ok) return;
+
+  delete db[ref];
+  saveDatabase();
+  clearForm();
+
+  document.getElementById("searchResult").textContent = "Fiche supprimée : " + ref;
+}
+
+function updateCount() {
+  const count = Object.keys(db).length;
+  document.getElementById("countBadge").textContent = count + (count > 1 ? " fiches" : " fiche");
+}
+
+function updateSummary() {
+  const item = getFormData();
+
+  document.getElementById("summaryRef").textContent = item.ref || "–";
+  document.getElementById("summaryFeeder").textContent = getFeederLabel(item.feeder);
+  document.getElementById("summaryPackage").textContent =
+    (item.boitier || "Boîtier non renseigné") + " / " + (item.largeurBande || "bande non renseignée");
+  document.getElementById("summaryStatus").textContent = item.statut || "–";
+  document.getElementById("feederHelp").textContent = getFeederHelp(item.feeder);
+
+  const badges = document.getElementById("summaryBadges");
+  badges.innerHTML = "";
+
+  if (item.feeder === "agilis_8_40_blanc_A") {
+    badges.innerHTML += `<span class="badge green">Feeder blanc aimanté “A”</span>`;
+  }
+
+  if (item.statut === "Validé production") {
+    badges.innerHTML += `<span class="badge green">Validé production</span>`;
+  } else if (item.statut === "À corriger") {
+    badges.innerHTML += `<span class="badge red">À corriger</span>`;
+  } else {
+    badges.innerHTML += `<span class="badge orange">${item.statut || "À vérifier"}</span>`;
+  }
+
+  if (item.polarite && item.polarite !== "Non renseignée" && item.polarite !== "Non polarisé") {
+    badges.innerHTML += `<span class="badge orange">Polarité à contrôler</span>`;
+  }
+
+  if (item.outilPose) {
+    badges.innerHTML += `<span class="badge blue">${item.outilPose}</span>`;
+  }
+}
+
+function renderCards() {
+  const list = document.getElementById("cardsList");
+  const refs = Object.keys(db).sort();
+
+  if (refs.length === 0) {
+    list.innerHTML = `<div class="note">Aucune fiche enregistrée pour le moment.</div>`;
+    return;
+  }
+
+  list.innerHTML = refs.map(ref => {
+    const item = db[ref];
+    const feederLabel = getFeederLabel(item.feeder);
+    const designation = item.designation || "Désignation non renseignée";
+    const details = [
+      item.boitier || "boîtier ?",
+      item.largeurBande || "bande ?",
+      feederLabel,
+      item.statut || "À vérifier"
+    ].join(" • ");
+
+    return `
+      <div class="card" onclick="loadCard('${ref.replace(/'/g, "\\'")}')">
+        <div class="card-title">${ref} — ${escapeHtml(designation)}</div>
+        <div class="card-sub">${escapeHtml(details)}</div>
+      </div>
+    `;
+  }).join("");
+}
+
+function loadCard(ref) {
+  if (!db[ref]) return;
+
+  document.getElementById("searchRef").value = ref;
+  setFormData(db[ref]);
+  document.getElementById("searchResult").textContent = "Fiche chargée depuis la liste : " + ref;
+}
+
+function exportDatabase() {
+  const exportData = {
+    app: "Assistant Bobines & Feeders",
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    items: db
+  };
+
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  const date = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = "bobines_feeders_" + date + ".json";
+  document.body.appendChild(a);
+  a.click();
+
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 0);
+}
+
+function importDatabase(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+      const items = imported.items || imported;
+
+      if (!items || typeof items !== "object") {
+        alert("Fichier JSON non reconnu.");
+        return;
+      }
+
+      const count = Object.keys(items).length;
+      const ok = confirm("Importer " + count + " fiche(s) ? Les références identiques seront remplacées.");
+      if (!ok) return;
+
+      Object.keys(items).forEach(ref => {
+        const norm = normalizeRef(ref);
+        const item = items[ref];
+        item.ref = normalizeRef(item.ref || norm);
+        db[item.ref] = item;
+      });
+
+      saveDatabase();
+      alert("Import terminé.");
+    } catch (err) {
+      alert("Impossible de lire le fichier JSON.");
+    } finally {
+      event.target.value = "";
+    }
+  };
+
+  reader.readAsText(file);
+}
+
+function escapeHtml(text) {
+  return String(text || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+[
+  "refInterne", "designation", "typeComposant", "boitier", "largeurBande",
+  "pasAvance", "feeder", "polarite", "outilPose", "statut", "remarque"
+].forEach(id => {
+  window.addEventListener("load", () => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("input", updateSummary);
+    if (el) el.addEventListener("change", updateSummary);
+  });
+});
+
+window.addEventListener("load", () => {
+  loadDatabase();
+  populateFeeders();
+  updateCount();
+  renderCards();
+  clearForm();
+});
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js").catch(err => {
+      console.log("SW registration failed", err);
+    });
+  });
+}
+</script>
+</body>
+</html>
