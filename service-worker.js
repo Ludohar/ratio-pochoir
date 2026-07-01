@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stencil-ratio-v28';
+const CACHE_NAME = 'stencil-ratio-v29';
 const URLS_TO_CACHE = [
   './',
   './index.html',

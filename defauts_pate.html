@@ -835,6 +835,38 @@ const DEFECTS = [
       "Utiliser un vernis de tropicalisation si l environnement est critique.",
       "Limiter les risques de condensation et de pollution sur le produit fini."
     ]
+  },
+  {
+    id: "black_traces_solder",
+    name_fr: "Traces noires sur soudures",
+    name_en: "Black marks / dark residues on solder joints",
+    categoryKey: "residus",
+    kind: "Aspect après refusion / fiabilité",
+    tags: ["Flux", "Résidus", "Four", "Profil", "Pâte", "Oxydation", "ENIG", "No-clean", "Fiabilité"],
+    impacts: ["paste", "oven", "pcb"],
+    causes: [
+      "Résidus de flux no-clean brunis, noircis, brûlés ou polymérisés pendant la refusion.",
+      "Profil four trop sévère : pic de température trop haut, temps au-dessus du liquidus trop long, soak trop long ou temps total dans le four trop élevé.",
+      "Profil de refusion non adapté à la pâte à braser utilisée ou à sa fenêtre process.",
+      "Deuxième passage au four pouvant accentuer le brunissement ou le noircissement des résidus.",
+      "Pollution ou redéposition de condensats de flux provenant du four : zones encrassées, extraction insuffisante, maintenance four à vérifier.",
+      "Pâte à braser vieillie, mal stockée, temps ouvert trop long ou gestion de pâte non maîtrisée.",
+      "Oxydation des surfaces à braser ou mauvais mouillage pouvant donner un aspect sombre localisé.",
+      "Finition PCB à contrôler, notamment ENIG : suspicion possible de black pad si l aspect sombre est associé à un mauvais mouillage, une soudure fragile ou une rupture anormale."
+    ],
+    actions: [
+      "Faire un premier test simple : essayer de retirer la trace avec un chiffon adapté ou un coton-tige légèrement imbibé d alcool isopropylique. Si la trace part, il s agit probablement d un résidu de flux ou d une pollution de surface.",
+      "Si la trace ne part pas facilement, contrôler l aspect du joint, le mouillage, la brillance, la continuité du filet et rechercher une oxydation ou un problème de finition PCB.",
+      "Comparer la localisation des traces : toutes les cartes, une zone précise du PCB, certains composants, proximité d une masse thermique, dessous de composants, sortie de four, deuxième face, etc.",
+      "Mesurer le profil réel avec une carte instrumentée et comparer avec la datasheet de la pâte : préchauffe, soak, pic, temps au-dessus du liquidus et temps total dans le four.",
+      "Vérifier l état du four : propreté, condensation de flux, filtres, extraction, maintenance et éventuelles projections ou redépositions sur les cartes.",
+      "Contrôler la gestion de la pâte : date, stockage, remise à température, temps ouvert, temps sur pochoir et conditions d utilisation.",
+      "Comparer avec un autre lot de pâte, un autre lot PCB ou une autre finition si le défaut apparaît brutalement sur une série donnée.",
+      "Court terme : si le résidu est sec, stable, non conducteur et conforme au process no-clean, l impact peut être surtout visuel. Cela peut néanmoins générer un doute qualité ou un refus client selon le niveau d exigence.",
+      "Moyen terme : si le résidu est actif, contaminé ou hygroscopique, il peut retenir humidité et poussières, favoriser des courants de fuite, des défauts intermittents ou une corrosion locale.",
+      "Long terme : en environnement humide, pollué ou sous tension, un résidu ionique peut favoriser corrosion, migration électrochimique et dendrites, surtout entre pads rapprochés, sous QFN/BGA, sur fine pitch, haute impédance ou haute tension.",
+      "Si la suspicion porte sur une finition ENIG / black pad ou sur un joint mécaniquement fragile, faire remonter le point qualité : contrôle fournisseur PCB, coupe micrographique, test d adhérence ou analyse laboratoire si nécessaire."
+    ]
   }
 ];
 
